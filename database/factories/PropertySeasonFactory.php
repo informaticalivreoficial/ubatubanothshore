@@ -17,7 +17,9 @@ class PropertySeasonFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'start_date' => now()->addDays(30),
+            'end_date' => now()->addDays(60),
+            'price_per_day' => fake()->numberBetween(800, 2500),
         ];
     }
 }

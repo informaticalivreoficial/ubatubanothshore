@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
             TemplateTableSeeder::class,
             PropertyTableSeeder::class,
             PropertyGbTableSeeder::class,
+            PropertySeasonSeeder::class,
+            //PropertyBlockedDateSeeder::class,
+            //CommentSeeder::class,
+            PropertyReservationSeeder::class,
             CatPostSeeder::class
         ]);
     }

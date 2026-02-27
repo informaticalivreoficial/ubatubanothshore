@@ -13,6 +13,6 @@ class PropertyTableSeeder extends Seeder
      */
     public function run(): void
     {
-        Property::factory()->count(30)->create();
+        Property::factory()->count(10)->create();
     }
 }
