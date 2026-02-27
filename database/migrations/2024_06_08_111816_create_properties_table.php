@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('sale_value', 10, 2)->nullable();
             $table->decimal('rental_value', 10, 2)->nullable();
             $table->integer('location_period')->nullable();
+            $table->integer('min_nights')->default(1);
+            $table->integer('cleaning_fee')->nullable();
             $table->decimal('iptu', 10, 2)->nullable();
             $table->decimal('condominium', 10, 2)->nullable();
             

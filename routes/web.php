@@ -25,6 +25,7 @@ use App\Livewire\Dashboard\Posts\PostForm;
 use App\Livewire\Dashboard\Posts\Posts;
 use App\Livewire\Dashboard\Properties\Properties;
 use App\Livewire\Dashboard\Properties\PropertyForm;
+use App\Livewire\Dashboard\Properties\ReservationCalendar;
 use App\Livewire\Dashboard\Reports\PropertiesReport;
 use App\Livewire\Dashboard\Sitemap\SitemapGenerator;
 use App\Livewire\Dashboard\Slides\SlideForm;
@@ -100,6 +101,7 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], functi
     // Route::get('templates', [TemplateController::class, 'index'])->name('templates.index');
 
     /** Imóveis */
+    Route::get('imoveis/{property}/calendario', ReservationCalendar::class)->name('property.calendar');
     Route::get('imoveis/{property}/editar', PropertyForm::class)->name('property.edit');
     Route::get('imoveis/cadastrar', PropertyForm::class)->name('properties.create');
     Route::get('imoveis', Properties::class)->name('properties.index');

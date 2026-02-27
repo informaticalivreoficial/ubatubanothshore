@@ -1,6 +1,6 @@
 <p align="center">
-	<a href="http://imobiliariaubatuba.com"  target="_blank" title="Sistema Imobiliário Imóveis em Ubatuba">
-		<img src="public/images/brand.png" alt="Sistema Imobiliário Imóveis em Ubatuba" width="280px">
+	<a href="http://ubatubanorthshore.com.br"  target="_blank" title="Sistema de locação de imóveis">
+		<img src="public/images/brand.png" alt="Sistema de locação de imóveis" width="280px">
 	</a>
 </p>
 

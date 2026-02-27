@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\Cropper;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -106,6 +107,21 @@ class Property extends Model
     /**
      * Relationships
     */
+    public function seasons()
+    {
+        return $this->hasMany(PropertySeason::class);
+    }
+
+    public function blockedDates()
+    {
+        return $this->hasMany(PropertyBlockedDate::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(PropertyReservation::class);
+    }
+
     public function images()
     {
         return $this->hasMany(PropertyGb::class, 'property', 'id')
@@ -126,6 +142,60 @@ class Property extends Model
     /**
      * Accerssors and Mutators
     */  
+    public function isAvailable($checkin, $checkout)
+    {
+        $checkin = Carbon::parse($checkin);
+        $checkout = Carbon::parse($checkout);
+
+        // Verifica reservas existentes
+        $hasReservation = $this->reservations()
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($checkin, $checkout) {
+                $query->whereBetween('checkin', [$checkin, $checkout])
+                    ->orWhereBetween('checkout', [$checkin, $checkout])
+                    ->orWhere(function ($q) use ($checkin, $checkout) {
+                        $q->where('checkin', '<=', $checkin)
+                            ->where('checkout', '>=', $checkout);
+                    });
+            })
+            ->exists();
+
+        if ($hasReservation) {
+            return false;
+        }
+
+        // Verifica bloqueios manuais
+        $hasBlocked = $this->blockedDates()
+            ->whereBetween('date', [$checkin, $checkout])
+            ->exists();
+
+        return !$hasBlocked;
+    }
+
+    public function calculatePrice($checkin, $checkout)
+    {
+        $checkin = Carbon::parse($checkin);
+        $checkout = Carbon::parse($checkout);
+
+        $total = 0;
+
+        for ($date = $checkin; $date < $checkout; $date->addDay()) {
+
+            $season = $this->seasons()
+                ->where('start_date', '<=', $date)
+                ->where('end_date', '>=', $date)
+                ->first();
+
+            if ($season) {
+                $total += $season->price_per_night;
+            } else {
+                $total += $this->rental_value; // valor padrão
+            }
+        }
+
+        return $total;
+    }
+
     public function getContentWebAttribute()
     {
         return Str::words($this->description, '20', ' ...');
