@@ -56,41 +56,6 @@
             <div x-show="tab === 'dados'" x-transition>
                 <div class="bg-white" x-data="{ sale: @entangle('sale'), location: @entangle('location') }">
                     <div class="card-body text-muted">
-                        <div class="row mt-2 mb-3">
-                            <div class="col-12 col-sm-12 col-md-12 col-lg-12"> 
-                                <label class="labelforms"><b>Finalidade:</b></label>
-                                <div class="flex flex-row gap-x-4">
-                                    <label class="inline-flex items-center space-x-2">
-                                        <input type="checkbox" x-model="sale" wire:model="sale" class="form-checkbox text-blue-600">
-                                        <span>Venda</span>
-                                    </label>
-                                    <label class="inline-flex items-center space-x-2">
-                                        <input type="checkbox" x-model="location" wire:model="location" class="form-checkbox text-blue-600">
-                                        <span>Locação</span>
-                                    </label>                                    
-                                </div> 
-                                @error('sale')
-                                    <span class="error erro-feedback">{{ $message }}</span>
-                                @enderror
-                                @error('location')
-                                    <span class="error erro-feedback">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="row mt-2" x-show="!(sale && !location)">                           
-                            <div class="col-12 col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="labelforms"><b>Link Booking.com</b></label>
-                                    <input type="text" class="form-control" placeholder="Link Booking.com" wire:model="url_booking">
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label class="labelforms"><b>Link Airbnb</b></label>
-                                    <input type="text" class="form-control" placeholder="Link Airbnb" wire:model="url_arbnb">
-                                </div>
-                            </div>                    
-                        </div>
                         <div class="row">                           
                             <div class="col-12 col-md-6 col-lg-5">   
                                 <div class="form-group">
@@ -157,6 +122,12 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="col-12 col-md-3 col-lg-2"> 
+                                <div class="form-group">
+                                    <label class="labelforms"><b>Hóspedes</b></label>
+                                    <input type="text" class="form-control" wire:model="capacity">
+                                </div>
+                            </div>
                         </div>
                         <hr class="my-4 border-gray-300">
                         <div class="row">
@@ -172,56 +143,14 @@
                                 </div>
                             </div>
                             <div class="col-12 col-md-3 col-lg-2"> 
-                                <div class="form-group" 
-                                    x-data="maskMoeda(@entangle('sale_value'))"
-                                    x-init="init()"         
-                                    >
-                                    <label class="labelforms text-muted"><b>Venda</b></label>
-                                    <input type="text" class="form-control" x-model="display">
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3 col-lg-2" x-show="!(sale && !location)"> 
                                 <div class="form-group"
                                     x-data="maskMoeda(@entangle('rental_value'))"
                                     x-init="init()"         
                                     >
                                     <label class="labelforms text-muted"><b>Locação</b></label>
-                                    <input type="text" class="form-control" x-model="display">
+                                    <input type="text" class="form-control">
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-3 col-lg-2"> 
-                                <div class="form-group"
-                                    x-data="maskMoeda(@entangle('iptu'))"
-                                    x-init="init()"         
-                                    >
-                                    <label class="labelforms text-muted"><b>IPTU</b></label>
-                                    <input type="text" class="form-control" x-model="display">
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-3 col-lg-2"> 
-                                <div class="form-group"
-                                    x-data="maskMoeda(@entangle('condominium'))"
-                                    x-init="init()"         
-                                    >
-                                    <label class="labelforms text-muted"><b>Condomínio</b></label>
-                                    <input type="text" class="form-control" x-model="display">
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6 col-lg-4" x-show="!(sale && !location)"> 
-                                <div class="form-group">
-                                    <label class="labelforms text-muted"><b>Período da Locação</b></label>
-                                    <select class="form-control" wire:model="location_period">
-                                        <option value=""> Selecione </option>
-                                        <option value="1">Diária</option>
-                                        <option value="2">Quinzenal</option>
-                                        <option value="3">Mensal</option>
-                                        <option value="4">Trimestral</option>
-                                        <option value="5">Semestral</option>
-                                        <option value="6">Anual</option>
-                                        <option value="7">Bianual</option>
-                                    </select>
-                                </div>
-                            </div>
+                            </div> 
                         </div>
                         <hr class="my-4 border-gray-300">
                         <div class="row mb-2">

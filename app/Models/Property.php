@@ -16,21 +16,16 @@ class Property extends Model
     protected $table = 'properties';
 
     protected $fillable = [
-        'sale',
-        'location',
         'category',
         'type',
         'expired_at',
         'display_values',
-        'sale_value',
         'rental_value',
-        'location_period',
-        'iptu',
         'reference',
-        'condominium',
         'description',
         'additional_notes',
         'dormitories',
+        'capacity',
         'suites',
         'bathrooms',
         'rooms',
@@ -56,7 +51,7 @@ class Property extends Model
         'internet', 'geladeira',
 
         //SEO
-        'title', 'slug', 'url_booking', 'url_arbnb', 'status', 'views', 'metatags', 'headline',
+        'title', 'slug', 'status', 'views', 'metatags', 'headline',
         'display_marked_water', 'youtube_video', 'caption_img_cover', 'google_map',
         'experience', 'highlight', 'publication_type'
     ];
@@ -73,16 +68,7 @@ class Property extends Model
     {
         return $query->where('status', 0);
     }    
-    public function scopeSale($query)
-    {
-        return $query->where('sale', 1);
-    }
-
-    public function scopeLocation($query)
-    {
-        return $query->where('location', 1);
-    }
-
+   
     protected static function booted()
     {
         // 🔹 Gerar slug automaticamente
@@ -134,11 +120,7 @@ class Property extends Model
         return $this->hasMany(PropertyGb::class, 'property', 'id')->whereNull('watermark')->count();
     }
 
-    public function pimoveis()
-    {
-        return $this->hasMany(PortalImoveis::class, 'imovel', 'id');
-    }
-
+    
     /**
      * Accerssors and Mutators
     */  
@@ -264,39 +246,7 @@ class Property extends Model
         return max(1, min(5, $stars)); // garante mínimo 1 e máximo 5
     }
 
-    public function getLocationPeriod(): ?string
-    {
-        if (empty($this->location_period)) {
-            return null;
-        }
-
-        $periods = [
-            1 => 'Diária',
-            2 => 'Quinzenal',
-            3 => 'Mensal',
-            4 => 'Trimestral',
-            5 => 'Semestral',
-            6 => 'Anual',
-            7 => 'Bianual',
-        ];
-
-        // Retorna o valor correspondente ou 'Diária' como padrão
-        return $periods[$this->location_period] ?? 'Diária';
-    }
-
-    // public function getStarsAttribute(): int
-    // {
-    //     $totalViews = self::where('status', 1)->sum('views');
-
-    //     if ($this->views <= 0 || $totalViews <= 0) {
-    //         return 0;
-    //     }
-
-    //     $percent = ($this->views / $totalViews) * 100;
-
-    //     // transforma em número de estrelas (0 a 5)
-    //     return ceil($percent / 20);
-    // }
+    
 
     public function setDisplayAddressAttribute($value)
     {
@@ -312,95 +262,18 @@ class Property extends Model
     {
         $this->attributes['display_marked_water'] = ($value == true || $value == '1' ? 1 : 0);
     }
-    
+
     public function setStatusAttribute($value)
     {
         $this->attributes['status'] = ($value == '1' ? 1 : 0);
-    }
-
-    public function getFormattedSaleValueAttribute(): ?string
-    {
-        return $this->sale_value !== null
-            ? 'R$ ' . number_format($this->sale_value, 0, ',', '.')
-            : null;
-    }
+    }    
 
     public function getFormattedRentalValueAttribute(): ?string
     {
         return $this->rental_value !== null
             ? 'R$ ' . number_format($this->rental_value, 0, ',', '.')
             : null;
-    }
-
-    // public function setSaleValueAttribute($value)
-    // {
-    //     $this->attributes['sale_value'] = (!empty($value) ? floatval($this->convertStringToDouble($value)) : null);
-    // }
-
-    // public function getSaleValueAttribute($value)
-    // {
-    //     if (empty($value)) {
-    //         return null;
-    //     }
-
-    //     return number_format($value, 2, ',', '.');
-    // }
-    
-    // public function setRentalValueAttribute($value)
-    // {
-    //     $this->attributes['rental_value'] = (!empty($value) ? floatval($this->convertStringToDouble($value)) : null);
-    // }
-
-    // public function getRentalValueAttribute($value)
-    // {
-    //     if (empty($value)) {
-    //         return null;
-    //     }
-
-    //     return number_format($value, 2, ',', '.');
-    // }
-    
-    // public function setIptuAttribute($value)
-    // {
-    //     $this->attributes['iptu'] = (!empty($value) ? floatval($this->convertStringToDouble($value)) : null);
-    // }
-
-    // public function getIptuAttribute($value)
-    // {
-    //     if (empty($value)) {
-    //         return null;
-    //     }
-
-    //     return number_format($value, 2, ',', '.');
-    // }
-    
-    // public function setCondominiumAttribute($value)
-    // {
-    //     $this->attributes['condominium'] = (!empty($value) ? floatval($this->convertStringToDouble($value)) : null);
-    // }
-
-    // public function getCondominiumAttribute($value)
-    // {
-    //     if (empty($value)) {
-    //         return null;
-    //     }
-
-    //     return number_format($value, 2, ',', '.');
-    // }
-    
-    // public function setZipcodeAttribute($value)
-    // {
-    //     $this->attributes['zipcode'] = (!empty($value) ? $this->clearField($value) : null);
-    // }
-
-    // public function getZipcodeAttribute($value)
-    // {
-    //     if (empty($value)) {
-    //         return null;
-    //     }
-
-    //     return substr($value, 0, 5) . '-' . substr($value, 5, 3);
-    // }
+    }    
 
     public function setSlug()
     {

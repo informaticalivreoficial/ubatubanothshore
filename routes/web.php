@@ -16,6 +16,9 @@ use App\Livewire\Dashboard\Permissions\Index as PermissionIndex;
 use App\Livewire\Dashboard\Roles\Index as RoleIndex;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\{
+    HomeController,
+    PageController,
+    PropertyController,
     PropertyRssController,
     Webcontroller
 };
@@ -31,13 +34,35 @@ use App\Livewire\Dashboard\Sitemap\SitemapGenerator;
 use App\Livewire\Dashboard\Slides\SlideForm;
 use App\Livewire\Dashboard\Slides\Slides;
 
+// Route::prefix('/')->group(function () {
+
+//     Route::view('/', 'web.home')->name('web.home');
+
+//     Route::view('/search', 'web.search')->name('web.search');
+
+//     Route::get('/imovel/{slug}', function ($slug) {
+//         return view('web.property', compact('slug'));
+//     })->name('web.property');
+
+// });
+
 
 Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     //Institucional
-    Route::get('/', [WebController::class, 'home'])->name('home');
-    Route::get('/politica-de-privacidade', [WebController::class, 'privacy'])->name('privacy');
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
+    Route::get('/imoveis', [PropertyController::class, 'index'])->name('properties');
+
+    Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
+
+    Route::get('/sobre', [PageController::class, 'about'])->name('about');
+
+    Route::get('/contato', [PageController::class, 'contact'])->name('contact');
+
+    //Route::get('/', [WebController::class, 'home'])->name('home');
+    //Route::get('/politica-de-privacidade', [WebController::class, 'privacy'])->name('privacy');
     
-    Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
+    //Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
 
 //     /** FEED */
 //     Route::get('feed', [FeedController::class, 'feed'])->name('feed');
@@ -48,26 +73,26 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
 //     Route::get('/experiencias/{slug}', [FilterController::class, 'experienceCategory'])->name('experienceCategory');
 
      //Properties
-     Route::get('pesquisar-imoveis', [WebController::class, 'pesquisaImoveis'])->name('pesquisar-imoveis');
-     Route::get('imoveis/{slug}', [WebController::class, 'Property'])->name('property');
-     Route::get('imoveis/categoria/{type}', [WebController::class, 'propertyList'])->name('propertylist');
-     Route::get('imoveis/bairro/{neighborhood}', [WebController::class, 'propertyNeighborhood'])->name('properties.neighborhood');
-     Route::get('lancamentos', [WebController::class, 'PropertyHighliths'])->name('highliths');
-     Route::get('imoveis', [WebController::class, 'Properties'])->name('properties');
+    //  Route::get('pesquisar-imoveis', [WebController::class, 'pesquisaImoveis'])->name('pesquisar-imoveis');
+    //  Route::get('imoveis/{slug}', [WebController::class, 'Property'])->name('property');
+    //  Route::get('imoveis/categoria/{type}', [WebController::class, 'propertyList'])->name('propertylist');
+    //  Route::get('imoveis/bairro/{neighborhood}', [WebController::class, 'propertyNeighborhood'])->name('properties.neighborhood');
+    //  Route::get('lancamentos', [WebController::class, 'PropertyHighliths'])->name('highliths');
+    //  Route::get('imoveis', [WebController::class, 'Properties'])->name('properties');
 
-     //Client
-     Route::get('/atendimento', [WebController::class, 'contact'])->name('contact');
-     Route::get('/simulador-de-credito-imobiliario', [WebController::class, 'creditSimulator'])->name('simulator');
+    //  //Client
+    //  Route::get('/atendimento', [WebController::class, 'contact'])->name('contact');
+    //  Route::get('/simulador-de-credito-imobiliario', [WebController::class, 'creditSimulator'])->name('simulator');
      
 
-     //Blog
-     Route::get('/blog/artigo/{slug}', [WebController::class, 'artigo'])->name('blog.artigo');
-     Route::get('/blog/noticia/{slug}', [WebController::class, 'noticia'])->name('blog.noticia');
-     Route::get('/blog/categoria/{slug}', [WebController::class, 'blogCategory'])->name('blog.category');
-     Route::get('/blog', [WebController::class, 'blog'])->name('blog.index');
+    //  //Blog
+    //  Route::get('/blog/artigo/{slug}', [WebController::class, 'artigo'])->name('blog.artigo');
+    //  Route::get('/blog/noticia/{slug}', [WebController::class, 'noticia'])->name('blog.noticia');
+    //  Route::get('/blog/categoria/{slug}', [WebController::class, 'blogCategory'])->name('blog.category');
+    //  Route::get('/blog', [WebController::class, 'blog'])->name('blog.index');
 
-     //Page
-     Route::get('/pagina/{slug}', [WebController::class, 'page'])->name('page');
+    //  //Page
+    //  Route::get('/pagina/{slug}', [WebController::class, 'page'])->name('page');
 });
 
 Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], function () {

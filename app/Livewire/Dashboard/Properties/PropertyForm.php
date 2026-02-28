@@ -26,9 +26,9 @@ class PropertyForm extends Component
     public ?string $expired_at = null;
 
     public $category, $type,
-       $sale_value, $rental_value, $location_period, $iptu, $construction_year,
+       $rental_value, $location_period, $iptu, $construction_year,
        $reference, $condominium, $description, $additional_notes,
-       $dormitories, $suites, $bathrooms, $rooms, $garage, $covered_garage,
+       $dormitories, $capacity, $suites, $bathrooms, $rooms, $garage, $covered_garage,
        $total_area, $useful_area, $measures,
        $latitude, $longitude, 
        // Address
@@ -46,14 +46,11 @@ class PropertyForm extends Component
        $elevador, $mobiliado, $vista_para_mar, $piscina, $sauna, $ventilador_teto,
        $internet, $geladeira,
 
-       $title, $slug, $url_booking, $url_arbnb, $status, $views,
+       $title, $slug, $status, $views,
        $headline, $youtube_video, $caption_img_cover,
        $google_map, $experience, $highlight, $publication_type;
 
     public array $metatags = [];
-
-    public bool $sale = false;
-    public bool $location = false;
 
     public ?int $display_address = 0; // 0 = Não, 1 = Sim
     public int $display_values = 0; // 0 = Não, 1 = Sim
@@ -87,12 +84,9 @@ class PropertyForm extends Component
             $this->display_values = $property->exists ? (int) $property->display_values : 0;
             $this->display_marked_water = $property->exists ? (int) $property->display_marked_water : 0;
 
-            $this->sale = (bool) $property->sale;
-            $this->location = (bool) $property->location;
-
             // Preenche todos os campos exceto metatags
             $data = collect($property->toArray())
-                ->except(['metatags', 'sale', 'location', 'display_marked_water'])
+                ->except(['metatags', 'display_marked_water'])
                 ->toArray();
             $this->fill($data);
 

@@ -12,9 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('properties', function (Blueprint $table) {
-            $table->increments('id');
-            $table->boolean('sale')->nullable();
-            $table->boolean('location')->nullable();
+            $table->increments('id');            
             $table->boolean('highlight')->default('0');
             $table->string('category');
             $table->string('type');
@@ -22,20 +20,14 @@ return new class extends Migration
 
             /** pricing and values */
             $table->boolean('display_values')->nullable();
-            $table->decimal('sale_value', 10, 2)->nullable();
             $table->decimal('rental_value', 10, 2)->nullable();
-            $table->integer('location_period')->nullable();
             $table->integer('min_nights')->default(1);
             $table->integer('cleaning_fee')->nullable();
-            $table->decimal('iptu', 10, 2)->nullable();
-            $table->decimal('condominium', 10, 2)->nullable();
             
             $table->string('reference')->nullable();
             
             $table->string('title');
             $table->string('slug')->nullable();
-            $table->string('url_booking')->nullable();
-            $table->string('url_arbnb')->nullable();
             $table->string('headline')->nullable();
             $table->string('experience')->nullable();
             $table->text('metatags')->nullable();
@@ -45,6 +37,7 @@ return new class extends Migration
             $table->text('description')->nullable();            
             $table->text('additional_notes')->nullable();
             $table->integer('dormitories')->default('0');
+            $table->integer('capacity')->default('0');
             $table->integer('suites')->nullable();
             $table->integer('bathrooms')->nullable();
             $table->integer('rooms')->nullable();
@@ -119,6 +112,7 @@ return new class extends Migration
             $table->text('youtube_video')->nullable(); 
             
             $table->bigInteger('views')->default('0');
+            $table->date('expired_at')->nullable();
 
             $table->timestamps();
             $table->integer('publication_type')->nullable();

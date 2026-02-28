@@ -24,8 +24,6 @@ class StoreUpdatePropertyRequest extends FormRequest
     {
         return [     
             // Basic Info  
-            'sale'     => 'boolean',
-            'location' => 'boolean',
             //'highlight'     => 'nullable|boolean',            
             'title'         => 'required',
             'category'      => 'required|string',
@@ -35,17 +33,11 @@ class StoreUpdatePropertyRequest extends FormRequest
 
             // Pricing and Values
             'display_values' => 'nullable|boolean', 
-            'sale_value'     => 'nullable|numeric',
             'rental_value'   => 'nullable|numeric',
-            'location_period'=> 'nullable|integer',
-            'iptu'           => 'nullable|numeric',
-            'condominium'    => 'nullable|numeric',
-
+            
             // Basic Info
             'reference'         => 'nullable|string|max:255',
             'slug'              => 'nullable|string|max:255',
-            'url_booking'       => 'nullable|string|max:255',
-            'url_arbnb'         => 'nullable|string|max:255',
             'headline'          => 'nullable|string|max:255',
             'experience'        => 'nullable|string|max:255',
             'metatags'          => 'nullable|array',

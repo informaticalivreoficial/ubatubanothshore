@@ -2,16 +2,165 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply font-sans text-text-main bg-white overflow-x-hidden;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-heading;
+  }
+}
+
 @layer components {
+
+  /* -------- FORMS -------- */
   .input-form {
     @apply w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring focus:border-blue-400;
   }
 
+  /* -------- BUTTONS -------- */
   .btn-primary {
     @apply bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition;
   }
 
   .btn-danger {
     @apply bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition;
+  }
+
+  .btn-primary-ns {
+    @apply inline-flex items-center justify-center gap-2
+           bg-primary text-white font-heading font-bold text-sm
+           px-8 py-3.5 rounded-pill border-0 cursor-pointer no-underline
+           transition-all duration-200
+           hover:bg-primary-dark hover:text-white hover:-translate-y-0.5
+           hover:shadow-[0_6px_20px_rgba(30,111,186,0.35)];
+  }
+
+  .btn-outline-ns {
+    @apply inline-flex items-center justify-center gap-2
+           bg-transparent text-primary font-heading font-bold text-sm
+           px-8 py-3 rounded-pill border-2 border-primary no-underline cursor-pointer
+           transition-all duration-200
+           hover:bg-primary hover:text-white hover:-translate-y-0.5;
+  }
+
+  /* -------- PAGE HERO -------- */
+  .page-hero {
+    @apply bg-gradient-to-br from-navy to-navy-light px-6 text-center text-white;
+    padding-top: 80px;
+    padding-bottom: 60px;
+  }
+
+  .page-hero h1 {
+    @apply font-heading font-extrabold mb-3;
+    font-size: clamp(28px, 5vw, 42px);
+  }
+
+  .breadcrumb-nav {
+    @apply flex justify-center items-center gap-2 text-sm text-white/75;
+  }
+
+  .breadcrumb-nav a {
+    @apply text-white/75 no-underline hover:text-white;
+  }
+
+  .breadcrumb-nav .sep { @apply opacity-50; }
+
+  /* -------- SECTION TITLE -------- */
+  .section-title {
+    @apply text-center mb-12;
+  }
+
+  .section-title h2 {
+    @apply font-heading font-extrabold text-navy mb-2;
+    font-size: clamp(24px, 4vw, 36px);
+  }
+
+  .section-title p {
+    @apply text-text-muted text-base;
+  }
+
+  /* -------- PROPERTY CARD -------- */
+  .property-card {
+    @apply bg-white rounded-card overflow-hidden shadow-card transition-all duration-300 cursor-pointer
+           hover:-translate-y-1.5 hover:shadow-hover;
+  }
+
+  .property-card .card-img {
+    @apply relative overflow-hidden;
+    aspect-ratio: 4 / 3;
+  }
+
+  .property-card .card-img img {
+    @apply w-full h-full object-cover transition-transform duration-300;
+  }
+
+  .property-card:hover .card-img img {
+    @apply scale-105;
+  }
+
+  .badge-neighborhood {
+    @apply absolute top-3 left-3
+           bg-primary text-white font-heading font-bold text-[11px]
+           px-3 py-1 rounded-pill;
+  }
+
+  .badge-type {
+    @apply absolute top-3 right-3
+           bg-navy/85 text-white font-heading font-bold text-[11px]
+           px-3 py-1 rounded-pill backdrop-blur-sm;
+  }
+
+  .badge-price {
+    @apply absolute bottom-3 left-3
+           bg-white/95 text-primary font-heading font-bold text-[13px]
+           px-3.5 py-1.5 rounded-pill backdrop-blur-sm;
+  }
+
+  .property-card .card-body {
+    @apply px-5 pt-4 pb-5;
+  }
+
+  .card-title {
+    @apply block font-heading font-bold text-[15px] text-navy mb-1.5 leading-snug no-underline
+           hover:text-primary;
+  }
+
+  .card-subtitle {
+    @apply flex items-center gap-1.5 text-[13px] text-text-muted mb-3;
+  }
+
+  .card-subtitle i {
+    @apply text-[11px] text-primary;
+  }
+
+  .card-stats {
+    @apply flex gap-3.5 text-text-muted text-[13px] mb-3;
+  }
+
+  .card-stats span {
+    @apply flex items-center gap-1;
+  }
+
+  .card-stats i { @apply text-primary text-[12px]; }
+
+  .card-amenities {
+    @apply flex flex-wrap gap-1.5;
+  }
+
+  .amenity-pill {
+    @apply text-[11px] font-medium text-text-muted
+           bg-bg-light border border-gray-200 rounded-pill px-3 py-1;
+  }
+
+  /* -------- WHATSAPP FLOAT -------- */
+  .whatsapp-float {
+    @apply fixed bottom-6 left-6 w-[58px] h-[58px]
+           bg-[#25d366] rounded-full flex items-center justify-center
+           text-white text-[28px] no-underline
+           shadow-[0_4px_20px_rgba(37,211,102,0.45)] z-[9998]
+           transition-all duration-300 cursor-pointer border-none
+           hover:bg-[#1fba5a] hover:scale-110 hover:shadow-[0_8px_30px_rgba(37,211,102,0.5)];
   }
 }
