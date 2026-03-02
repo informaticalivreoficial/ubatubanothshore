@@ -54,6 +54,7 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     Route::get('/imoveis', [PropertyController::class, 'index'])->name('properties');
 
     Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
+    Route::get('/checkout/{property}', [PropertyController::class, 'checkout'])->name('checkout');
 
     Route::get('/sobre', [PageController::class, 'about'])->name('about');
 
@@ -72,9 +73,9 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
 //     /** Página de Experiências - Específica de uma categoria */
 //     Route::get('/experiencias/{slug}', [FilterController::class, 'experienceCategory'])->name('experienceCategory');
 
-     //Properties
+    //Properties
     //  Route::get('pesquisar-imoveis', [WebController::class, 'pesquisaImoveis'])->name('pesquisar-imoveis');
-    //  Route::get('imoveis/{slug}', [WebController::class, 'Property'])->name('property');
+    // Route::get('imoveis/{slug}', [WebController::class, 'Property'])->name('property');
     //  Route::get('imoveis/categoria/{type}', [WebController::class, 'propertyList'])->name('propertylist');
     //  Route::get('imoveis/bairro/{neighborhood}', [WebController::class, 'propertyNeighborhood'])->name('properties.neighborhood');
     //  Route::get('lancamentos', [WebController::class, 'PropertyHighliths'])->name('highliths');
@@ -85,11 +86,7 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     //  Route::get('/simulador-de-credito-imobiliario', [WebController::class, 'creditSimulator'])->name('simulator');
      
 
-    //  //Blog
-    //  Route::get('/blog/artigo/{slug}', [WebController::class, 'artigo'])->name('blog.artigo');
-    //  Route::get('/blog/noticia/{slug}', [WebController::class, 'noticia'])->name('blog.noticia');
-    //  Route::get('/blog/categoria/{slug}', [WebController::class, 'blogCategory'])->name('blog.category');
-    //  Route::get('/blog', [WebController::class, 'blog'])->name('blog.index');
+    
 
     //  //Page
     //  Route::get('/pagina/{slug}', [WebController::class, 'page'])->name('page');

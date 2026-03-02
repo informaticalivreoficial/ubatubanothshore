@@ -40,6 +40,8 @@ return new class extends Migration
             $table->decimal('daily_total', 10, 2);
             $table->decimal('cleaning_fee', 10, 2)->default(0);
             $table->decimal('total_value', 10, 2);
+            $table->text('notes')->nullable();
+            $table->integer('guests')->default(1);
 
             $table->enum('origin', ['admin', 'site']);
             $table->enum('status', ['pending', 'confirmed', 'cancelled']);

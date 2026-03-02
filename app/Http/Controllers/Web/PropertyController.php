@@ -47,4 +47,9 @@ class PropertyController extends Controller
 
         return view('web.property', compact('property'));
     }
+
+    public function checkout(Property $property)
+    {
+        return view('web.checkout', compact('property'));
+    }
 }

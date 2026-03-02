@@ -1,6 +1,6 @@
 @props(['property'])
 
-<a href="{{--  --}}"
+<a href="{{route('web.property',['slug' => $property->slug])}}"
    class="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
 
     {{-- Imagem --}}

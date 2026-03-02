@@ -21,8 +21,10 @@ return new class extends Migration
             /** pricing and values */
             $table->boolean('display_values')->nullable();
             $table->decimal('rental_value', 10, 2)->nullable();
+            $table->decimal('value_aditional', 10, 2)->nullable();
             $table->integer('min_nights')->default(1);
             $table->integer('cleaning_fee')->nullable();
+            $table->integer('aditional_person')->nullable();
             
             $table->string('reference')->nullable();
             

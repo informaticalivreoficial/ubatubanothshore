@@ -21,6 +21,8 @@ class Property extends Model
         'expired_at',
         'display_values',
         'rental_value',
+        'min_nights',
+        'cleaning_fee',
         'reference',
         'description',
         'additional_notes',

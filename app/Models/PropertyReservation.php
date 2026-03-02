@@ -20,6 +20,8 @@ class PropertyReservation extends Model
         'check_out',
         'nights',
         'daily_total',
+        'notes',
+        'guests',
         'cleaning_fee',
         'total_value',
         'origin',
@@ -31,30 +33,30 @@ class PropertyReservation extends Model
         'check_out' => 'date',
     ];
 
-    protected static function booted()
-    {
-        static::creating(function ($reservation) {
+    // protected static function booted()
+    // {
+    //     static::creating(function ($reservation) {
 
-            $checkIn  = Carbon::parse($reservation->check_in);
-            $checkOut = Carbon::parse($reservation->check_out);
+    //         $checkIn  = Carbon::parse($reservation->check_in);
+    //         $checkOut = Carbon::parse($reservation->check_out);
 
-            $nights = $checkIn->diffInDays($checkOut);
+    //         $nights = $checkIn->diffInDays($checkOut);
 
-            $reservation->nights = $nights;
+    //         $reservation->nights = $nights;
 
-            // se vier daily_total vazio, calcula
-            if (!$reservation->daily_total && $reservation->property) {
+    //         // se vier daily_total vazio, calcula
+    //         if (!$reservation->daily_total && $reservation->property) {
 
-                $dailyTotal = $reservation->property
-                    ->calculatePrice($reservation->check_in, $reservation->check_out);
+    //             $dailyTotal = $reservation->property
+    //                 ->calculatePrice($reservation->check_in, $reservation->check_out);
 
-                $reservation->daily_total = $dailyTotal;
-            }
+    //             $reservation->daily_total = $dailyTotal;
+    //         }
 
-            $reservation->total_value =
-                $reservation->daily_total + $reservation->cleaning_fee;
-        });
-    }
+    //         $reservation->total_value =
+    //             $reservation->daily_total + $reservation->cleaning_fee;
+    //     });
+    // }
 
     public function property()
     {

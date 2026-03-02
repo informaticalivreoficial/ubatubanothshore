@@ -21,12 +21,11 @@
     <link rel="icon" type="image/png" href="{{$configuracoes->getfaveicon()}}" />
     <link rel="shortcut icon" href="{{$configuracoes->getfaveicon()}}" type="image/x-icon"/> 
 
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
-        body { font-family: 'DM Sans', sans-serif; background-color: #f8f5f0; color: #1a2e1a; }
+        body { font-family: 'DM Sans', sans-serif; color: #1a2e1a; }
         h1,h2,h3,h4 { font-family: 'Cormorant Garamond', serif; }
 
         .nav-link {
@@ -82,21 +81,27 @@
         .fade-up-delay-2 { animation-delay: 0.30s; opacity: 0; animation-fill-mode: forwards; animation-name: fadeUp; animation-duration: 0.7s; }
         .fade-up-delay-3 { animation-delay: 0.45s; opacity: 0; animation-fill-mode: forwards; animation-name: fadeUp; animation-duration: 0.7s; }
     </style>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     @stack('styles')
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-[#f8f8f8]">
 
     {{-- NAVBAR --}}
     @include('web.components.header')    
 
     {{-- PAGE CONTENT --}}
-    <main class="flex-1">
+    <main class="pt-24">
         {{ $slot ?? '' }}
         @yield('content')
     </main>
 
     {{-- FOOTER --}}
-    @include('web.components.footer')    
+    @include('web.components.footer')  
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
 
     <script>
         // Navbar scroll effect
