@@ -72,40 +72,42 @@
     {{-- ============================
          PROPERTIES SECTION
     ============================= --}}
-    <section class="py-20 px-6">
-        <div class="max-w-7xl mx-auto">
+    @if ($properties->count() > 0)
+        <section class="py-20 px-6">
+            <div class="max-w-7xl mx-auto">
 
-            {{-- Section header --}}
-            <div class="mb-12 flex items-end justify-between">
-                <div>
-                    <p class="text-accent text-xs font-medium tracking-[0.2em] uppercase mb-2">Explore</p>
-                    <h2 class="font-display text-4xl font-semibold text-primary">Nossas principais propriedades</h2>
+                {{-- Section header --}}
+                <div class="mb-12 flex items-end justify-between">
+                    <div>
+                        <p class="text-accent text-xs font-medium tracking-[0.2em] uppercase mb-2">Explore</p>
+                        <h2 class="font-display text-4xl font-semibold text-primary">Nossos principais imóveis</h2>
+                    </div>
+                    <a href="{{ route('web.properties') }}"
+                    class="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary/60 hover:text-accent transition-colors group">
+                        Ver todos imóveis
+                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
-                <a href="{{ route('web.properties') }}"
-                   class="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary/60 hover:text-accent transition-colors group">
-                    Ver todos imóveis
-                    <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </a>
-            </div>
 
-            {{-- Properties grid --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                @foreach($properties as $property)
-                    @include('web.components.property-card', ['property' => $property])
-                @endforeach
-            </div>
+                {{-- Properties grid --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @foreach($properties as $property)
+                        @include('web.components.property-card', ['property' => $property])
+                    @endforeach
+                </div>
 
-            {{-- CTA button --}}
-            <div class="mt-12 text-center">
-                <a href="/all-listings"
-                   class="inline-flex items-center gap-2 border border-slate-600 text-primary  px-8 py-3 rounded-xl text-xl font-medium transition-all duration-300">
-                    Explorar todas as propriedades (122)
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </a>
-            </div>
-        </div>
-    </section>
-
+                {{-- CTA button --}}            
+                <div class="mt-12 text-center">
+                    <a href="{{ route('web.properties') }}"
+                    class="inline-flex items-center gap-2 border border-slate-600 text-primary  px-8 py-3 rounded-xl text-xl font-medium transition-all duration-300">
+                        Explorar todos os imóveis ({{ $properties->count() }})
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+                            
+            </div>        
+        </section>
+    @endif
 @endsection
 
 @push('scripts')
