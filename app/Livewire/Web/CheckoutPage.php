@@ -5,6 +5,7 @@ namespace App\Livewire\Web;
 use App\Mail\AdminReservationNotification;
 use App\Mail\ClientReservationReceived;
 use App\Models\Property;
+use App\Models\PropertyBlockedDate;
 use App\Models\PropertyReservation;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
@@ -36,6 +37,10 @@ class CheckoutPage extends Component
 
     public $editingTrip = false;
 
+    public $success = false; // flag para exibir a mensagem de sucesso
+
+    public $disabledDates = [];
+
     public function mount(Property $property, $check_in, $check_out, $guests)
     {
         $this->property = $property;
@@ -47,6 +52,34 @@ class CheckoutPage extends Component
         if (!$check_in || !$check_out) {
             return redirect()->route('web.property', $property->slug);
         }
+
+        $dates = [];
+
+        // 🔹 Datas de reservas
+        $reservations = PropertyReservation::where('property_id', $property->id)
+            ->where('status', '!=', 'cancelled')
+            ->get();
+
+        foreach ($reservations as $reservation) {
+
+            $period = Carbon::parse($reservation->check_in)
+                ->daysUntil(Carbon::parse($reservation->check_out));
+
+            foreach ($period as $date) {
+                $dates[] = $date->format('Y-m-d');
+            }
+        }
+
+        // 🔴 Datas bloqueadas manualmente
+        $blockedDates = PropertyBlockedDate::where('property_id', $property->id)
+            ->pluck('date')
+            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->toArray();
+
+        // 🔥 Junta tudo e remove duplicados
+        $this->disabledDates = array_values(
+            array_unique(array_merge($dates, $blockedDates))
+        );
 
         $this->calculateTotal();
     }
@@ -98,25 +131,22 @@ class CheckoutPage extends Component
                 'daily_total' => $this->property->rental_value,
                 'total_value' => $this->total,
                 'status' => 'pending',
-            ]);
-
-            
+            ]);            
 
             $admin = User::where('admin', true)->first();
 
             if ($admin) {
                 $admin->notify(new NewReservationNotification($reservation));
-
-                Mail::to($admin->email)
-                    ->send(new AdminReservationNotification($reservation));
             }            
 
             // 📧 Email para cliente
             //Mail::to($client->email)
             //    ->send(new ClientReservationReceived($reservation));
         });
-        dd('reservation success');
-        //return redirect()->route('reservation.success');
+
+        $this->reset(['name', 'email', 'phone', 'notes']);
+        $this->success = true;
+        $this->dispatch('reservation-success');
     }
 
     private function validateAvailability()
@@ -136,7 +166,7 @@ class CheckoutPage extends Component
         }
     }
 
-    private function calculateTotal()
+    public function calculateTotal()
     {
         if (!$this->check_in || !$this->check_out) {
             return;

@@ -20,7 +20,6 @@
                 class="w-full border rounded p-2"
                 placeholder="Selecione check-in e check-out"
             >
-
         </div>
 
         @if($dateError)

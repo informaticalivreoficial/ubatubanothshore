@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\PropertyReservation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -13,12 +14,11 @@ class ClientReservationReceived extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+    public $reservation;
+
+    public function __construct(PropertyReservation $reservation)
     {
-        //
+        $this->reservation = $reservation;
     }
 
     /**

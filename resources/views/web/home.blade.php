@@ -81,9 +81,9 @@
                     <p class="text-accent text-xs font-medium tracking-[0.2em] uppercase mb-2">Explore</p>
                     <h2 class="font-display text-4xl font-semibold text-primary">Nossas principais propriedades</h2>
                 </div>
-                <a href="/all-listings"
+                <a href="{{ route('web.properties') }}"
                    class="hidden md:inline-flex items-center gap-2 text-sm font-medium text-primary/60 hover:text-accent transition-colors group">
-                    Ver todas
+                    Ver todos imóveis
                     <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
             </div>

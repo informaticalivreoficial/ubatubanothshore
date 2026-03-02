@@ -56,12 +56,9 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
     Route::get('/checkout/{property}', [PropertyController::class, 'checkout'])->name('checkout');
 
-    Route::get('/sobre', [PageController::class, 'about'])->name('about');
-
     Route::get('/contato', [PageController::class, 'contact'])->name('contact');
 
-    //Route::get('/', [WebController::class, 'home'])->name('home');
-    //Route::get('/politica-de-privacidade', [WebController::class, 'privacy'])->name('privacy');
+    Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');
     
     //Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
 
@@ -88,8 +85,8 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
 
     
 
-    //  //Page
-    //  Route::get('/pagina/{slug}', [WebController::class, 'page'])->name('page');
+    
+    Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
 });
 
 Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], function () {

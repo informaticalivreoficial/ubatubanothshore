@@ -58,7 +58,6 @@ class BookingForm extends Component
         $this->disabledDates = array_values(
             array_unique(array_merge($dates, $blockedDates))
         );
-        //dd($this->disabledDates);
     }
 
     public function updated($field)

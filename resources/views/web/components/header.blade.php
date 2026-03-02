@@ -8,7 +8,7 @@
         {{-- Nav links --}}
         <nav class="hidden md:flex items-center gap-8 text-slate-800">
             <a href="{{ route('web.home') }}" class="nav-link text-sm font-medium">Início</a>
-            <a href="/all-listings" class="nav-link text-sm font-medium">Todos os imóveis</a>
+            <a href="{{ route('web.properties') }}" class="nav-link text-sm font-medium">Todos os imóveis</a>
             <a href="/about-us" class="nav-link text-sm font-medium">Sobre nós</a>            
         </nav>
 

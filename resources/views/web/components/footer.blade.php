@@ -10,7 +10,7 @@
 
             {{-- Links --}}
             <nav class="flex flex-wrap justify-center gap-6 text-sm text-white/70">
-                <a href="/privacy-policy" class="hover:text-accent transition-colors">Política de Privacidade</a>
+                <a href="{{ route('web.privacy') }}" class="hover:text-accent transition-colors">Política de Privacidade</a>
                 <a href="/terms-and-conditions" class="hover:text-accent transition-colors">Termos e Condições</a>
                 <button class="hover:text-accent transition-colors">Preferências de cookies</button>
             </nav>

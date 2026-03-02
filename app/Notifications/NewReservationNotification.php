@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\PropertyReservation;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -11,12 +12,11 @@ class NewReservationNotification extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct()
+    public $reservation;
+
+    public function __construct(PropertyReservation $reservation)
     {
-        //
+        $this->reservation = $reservation;
     }
 
     /**
@@ -26,7 +26,7 @@ class NewReservationNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database']; // envia e-mail e salva no banco
     }
 
     /**
@@ -35,20 +35,18 @@ class NewReservationNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+                ->markdown('emails.notifications.new_reservation', [
+                    'reservation' => $this->reservation
+                ]);
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray(object $notifiable): array
+    public function toDatabase($notifiable)
     {
         return [
-            //
+            'reservation_id' => $this->reservation->id,
+            'guest_name' => $this->reservation->guest_name,
+            'check_in' => $this->reservation->check_in,
+            'check_out' => $this->reservation->check_out,
         ];
     }
 }

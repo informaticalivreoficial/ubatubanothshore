@@ -35,5 +35,5 @@ class HomeController extends Controller
             'head' => $head,
             'properties' => $properties,
         ]);
-    }
+    }    
 }
