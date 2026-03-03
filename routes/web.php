@@ -22,7 +22,7 @@ use App\Http\Controllers\Web\{
     PropertyRssController,
     Webcontroller
 };
-
+use App\Livewire\Dashboard\Menu\Index;
 use App\Livewire\Dashboard\Posts\CatPosts;
 use App\Livewire\Dashboard\Posts\PostForm;
 use App\Livewire\Dashboard\Posts\Posts;
@@ -129,6 +129,8 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], functi
     Route::get('slides/{slide}/editar', SlideForm::class)->name('slides.edit');
     Route::get('slides/cadastrar', SlideForm::class)->name('slides.create');
     Route::get('slides', Slides::class)->name('slides.index');
+
+    Route::get('menus', Index::class)->name('menus.index');
 
     //*********************** Posts *********************************************/
     Route::get('posts/{post}/editar', PostForm::class)->name('posts.edit');

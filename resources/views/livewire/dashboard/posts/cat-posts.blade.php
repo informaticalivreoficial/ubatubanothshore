@@ -57,7 +57,7 @@
                                 <tr style="{{ ($category->status == true ? '' : 'background: #fffed8 !important;')  }}">
                                     <td><i class="fas fa-angle-right"></i> {{$category->title}}</td>
                                     <td class="text-center">{{ $category->status ? 'Sim' : 'Não' }}</td>
-                                    <td class="text-center">{{date('d/m/Y H:i', strtotime($category->created_at))}}</td>
+                                    <td class="text-center">{{date('d/m/Y', strtotime($category->created_at))}}</td>
                                     <td class="text-center">{{$category->type}}</td>
                                     <td>
                                         <div class="flex items-center gap-2">
@@ -96,7 +96,7 @@
                                     <tr style="{{ ($subcategory->status == true ? '' : 'background: #fffed8 !important;')  }}">                            
                                         <td><i class="fas fa-angle-double-right"></i>  {{$subcategory->title}}</td>
                                         <td class="text-center">{{ $subcategory->status ? 'Sim' : 'Não' }}</td>
-                                        <td class="text-center">{{$subcategory->created_at}}</td>
+                                        <td class="text-center">{{date('d/m/Y', strtotime($subcategory->created_at))}}</td>
                                         <td class="text-center">---------</td>
                                         <td>   
                                             <div class="flex items-center gap-2">

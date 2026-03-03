@@ -91,6 +91,12 @@
                         <p>Banners</p>
                     </a>
                 </li>  
+                <li class="nav-item">
+                    <a href="{{route('menus.index')}}" class="nav-link {{ Route::is('menus.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-list"></i>
+                        <p>Menu</p>
+                    </a>
+                </li>  
                 <li class="nav-item {{ Route::is('posts.*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ Route::is('posts.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-pencil-alt"></i>
