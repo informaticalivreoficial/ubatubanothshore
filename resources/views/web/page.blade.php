@@ -2,7 +2,6 @@
 
 @section('content')    
 
-<!-- CONTEÚDO PRINCIPAL -->
 <section class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto px-6">
 

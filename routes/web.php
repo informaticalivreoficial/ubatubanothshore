@@ -34,21 +34,10 @@ use App\Livewire\Dashboard\Sitemap\SitemapGenerator;
 use App\Livewire\Dashboard\Slides\SlideForm;
 use App\Livewire\Dashboard\Slides\Slides;
 
-// Route::prefix('/')->group(function () {
-
-//     Route::view('/', 'web.home')->name('web.home');
-
-//     Route::view('/search', 'web.search')->name('web.search');
-
-//     Route::get('/imovel/{slug}', function ($slug) {
-//         return view('web.property', compact('slug'));
-//     })->name('web.property');
-
-// });
 
 
 Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
-    //Institucional
+    
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
     Route::get('/imoveis', [PropertyController::class, 'index'])->name('properties');
@@ -56,7 +45,7 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
     Route::get('/checkout/{property}', [PropertyController::class, 'checkout'])->name('checkout');
 
-    Route::get('/contato', [PageController::class, 'contact'])->name('contact');
+    Route::get('/atendimento', [PageController::class, 'contact'])->name('contact');
 
     Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');
     
@@ -77,14 +66,6 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     //  Route::get('imoveis/bairro/{neighborhood}', [WebController::class, 'propertyNeighborhood'])->name('properties.neighborhood');
     //  Route::get('lancamentos', [WebController::class, 'PropertyHighliths'])->name('highliths');
     //  Route::get('imoveis', [WebController::class, 'Properties'])->name('properties');
-
-    //  //Client
-    //  Route::get('/atendimento', [WebController::class, 'contact'])->name('contact');
-    //  Route::get('/simulador-de-credito-imobiliario', [WebController::class, 'creditSimulator'])->name('simulator');
-     
-
-    
-
     
     Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
 });

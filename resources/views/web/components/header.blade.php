@@ -11,7 +11,12 @@
 
         <!-- Desktop Menu -->
         <nav class="hidden md:flex items-center gap-8 text-slate-800 text-sm font-medium">
-
+            <a href="{{ route('web.home') }}" target="_self" class="hover:text-primary transition font-bold">
+                Início
+            </a>
+            <a href="{{ route('web.properties') }}" target="_self" class="hover:text-primary transition font-bold">
+                Todos os Imóveis
+            </a>            
             @if (!empty($Links) && $Links->count())                            
                 @foreach($Links as $menuItem)
 
@@ -26,7 +31,7 @@
 
                         <a href="{{ $url }}"
                         target="{{ $menuItem->target == 1 ? '_blank' : '_self' }}"
-                        class="hover:text-primary transition">
+                        class="hover:text-primary transition font-bold">
                             {{ $menuItem->title }}
                         </a>
 
@@ -75,6 +80,9 @@
 
                 @endforeach
             @endif
+            <a href="{{ route('web.contact') }}" target="_self" class="hover:text-primary transition font-bold">
+                Atendimento
+            </a>
 
 
             <!-- Redes sociais -->

@@ -129,6 +129,11 @@ class Config extends Model
         $this->attributes['whatsapp'] = (!empty($value) ? $this->clearField($value) : null);
     }
 
+    public function getWhatsappNumberAttribute()
+    {
+        return preg_replace('/\D/', '', $this->whatsapp);
+    }
+
     public function setPhoneAttribute($value)
     {
         $this->attributes['phone'] = (!empty($value) ? $this->clearField($value) : null);

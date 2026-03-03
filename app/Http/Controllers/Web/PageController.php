@@ -40,7 +40,15 @@ class PageController extends Controller
 
     public function contact()
     {
-        return view('web.pages.contact');
+        $head = $this->seo->render('Atendimento - ' . $this->config->app_name ?? env('APP_NAME'),
+            'Entre em contato conosco, teremos prazer em atendê-lo!',
+            route('web.contact'),
+            $this->config->getmetaimg() ?? url(asset('theme/images/image.jpg'))
+        );
+
+        return view('web.contact', [
+            'head' => $head,
+        ]);
     }
 
     public function privacy()
