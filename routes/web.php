@@ -39,15 +39,12 @@ use App\Livewire\Dashboard\Slides\Slides;
 Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     
     Route::get('/', [HomeController::class, 'index'])->name('home');
-
     Route::get('/imoveis', [PropertyController::class, 'index'])->name('properties');
-
     Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
     Route::get('/checkout/{property}', [PropertyController::class, 'checkout'])->name('checkout');
-
     Route::get('/atendimento', [PageController::class, 'contact'])->name('contact');
-
     Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');
+    Route::get('/termos-e-condicoes', [PageController::class, 'terms'])->name('terms');
     
     //Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
 

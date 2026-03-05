@@ -62,10 +62,18 @@
         </div>
 
         <ul class="mt-3 flex flex-wrap gap-3">
-            <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Cozinha</li>
-            <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Ar condicionado</li>
-            <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Wifi grátis</li>
-            <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Adequado para crianças</li>
+            @if($property->cozinha == true)
+                <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Cozinha</li>
+            @endif
+            @if($property->ar_condicionado == true)
+                <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Ar condicionado</li>
+            @endif
+            @if($property->wifi == true)
+                <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Wifi grátis</li>
+            @endif
+            @if($property->adequado_criancas == true)
+                <li class="border rounded-xl border-slate-400 bg-slate-100 py-1 px-2">Adequado para crianças</li>
+            @endif
         </ul>
     </div>
 </a>

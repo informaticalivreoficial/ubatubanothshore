@@ -309,7 +309,15 @@
                         <div class="row mb-2">
                             <div class="col-12">   
                                 <label class="labelforms text-muted"><b>Notas Adicionais</b></label>
-                                <textarea id="inputDescription" class="form-control" rows="5" wire:model="additional_notes">{{ $additional_notes ?? 'Os valores podem ser alterados sem aviso prévio. Informações e metragens sujeitos a confirmações. Crédito / Financiamento dependem de aprovação.'}}</textarea>                                                      
+                                <textarea id="inputDescription" class="form-control" rows="5" wire:model="additional_notes">{{ $additional_notes ?? 'Os valores podem ser alterados sem aviso prévio. Informações e metragens sujeitos a confirmações.'}}</textarea>                                                      
+                            </div>
+                        </div>  
+                        <div class="row mb-2">
+                            <div class="col-12">   
+                                <label class="labelforms text-muted"><b>Política de cancelamento</b></label>
+                                <textarea id="inputDescription" class="form-control" rows="5" wire:model="politica_cancelamento">
+                                    {{ $politica_cancelamento ?? "100% reembolso até 30 dias antes chegada.\n50% reembolso até 14 dias antes chegada."}}
+                                </textarea>                                                      
                             </div>
                         </div>  
                                                 
@@ -318,207 +326,262 @@
             </div>
             <div x-show="tab === 'estrutura'" x-transition>
                 <div class="bg-white p-4">
-                    <div class="row mb-4">                                     
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">                                        
-                            <!-- checkbox -->
+                    <div class="row mb-4">
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                             <div class="form-group p-3 mb-1">
+
                                 <div class="form-check mb-2">
-                                    <input id="areadelazer" class="form-check-input" type="checkbox" wire:model="areadelazer">
-                                    <label for="areadelazer" class="form-check-label">Área de Lazer</label>
+                                    <input id="acesso_praia" class="form-check-input" type="checkbox" wire:model="acesso_praia">
+                                    <label for="acesso_praia" class="form-check-label">Acesso à Praia</label>
                                 </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="adequado_criancas" class="form-check-input" type="checkbox" wire:model="adequado_criancas">
+                                    <label for="adequado_criancas" class="form-check-label">Adequado para Crianças</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="adequado_idosos" class="form-check-input" type="checkbox" wire:model="adequado_idosos">
+                                    <label for="adequado_idosos" class="form-check-label">Adequado para Idosos</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="agua_quente" class="form-check-input" type="checkbox" wire:model="agua_quente">
+                                    <label for="agua_quente" class="form-check-label">Água Quente</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="aquecedor" class="form-check-input" type="checkbox" wire:model="aquecedor">
+                                    <label for="aquecedor" class="form-check-label">Aquecedor</label>
+                                </div>
+
                                 <div class="form-check mb-2">
                                     <input id="ar_condicionado" class="form-check-input" type="checkbox" wire:model="ar_condicionado">
                                     <label for="ar_condicionado" class="form-check-label">Ar Condicionado</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="aquecedor_solar" class="form-check-input" type="checkbox" wire:model="aquecedor_solar">
-                                    <label for="aquecedor_solar" class="form-check-label">Aquecedor Solar</label>
+                                    <input id="areadelazer" class="form-check-input" type="checkbox" wire:model="areadelazer">
+                                    <label for="areadelazer" class="form-check-label">Área de Lazer</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="armarionautico" class="form-check-input" type="checkbox" wire:model="armarionautico">
-                                    <label for="armarionautico" class="form-check-label">Armário Náutico</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input id="balcaoamericano" class="form-check-input" type="checkbox"  wire:model="balcaoamericano">
-                                    <label for="balcaoamericano" class="form-check-label">Balcão Americano</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input id="banheira" class="form-check-input" type="checkbox"  wire:model="banheira">
+                                    <input id="banheira" class="form-check-input" type="checkbox" wire:model="banheira">
                                     <label for="banheira" class="form-check-label">Banheira</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="banheirosocial" class="form-check-input" type="checkbox"  wire:model="banheirosocial">
-                                    <label for="banheirosocial" class="form-check-label">Banheiro Social</label>
+                                    <input id="banheiro_privativo" class="form-check-input" type="checkbox" wire:model="banheiro_privativo">
+                                    <label for="banheiro_privativo" class="form-check-label">Banheiro Privativo</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="bar" class="form-check-input" type="checkbox" wire:model="bar">
-                                    <label for="bar" class="form-check-label">Bar Social</label>
+                                    <input id="cafeteira" class="form-check-input" type="checkbox" wire:model="cafeteira">
+                                    <label for="cafeteira" class="form-check-label">Cafeteira</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="biblioteca" class="form-check-input" type="checkbox"  wire:model="biblioteca">
-                                    <label for="biblioteca" class="form-check-label">Biblioteca</label>
-                                </div>  
-                                <div class="form-check mb-2">
-                                    <input id="brinquedoteca" class="form-check-input" type="checkbox"  wire:model="brinquedoteca">
-                                    <label for="brinquedoteca" class="form-check-label">Brinquedoteca</label>
+                                    <input id="cama_casal" class="form-check-input" type="checkbox" wire:model="cama_casal">
+                                    <label for="cama_casal" class="form-check-label">Cama de Casal</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="condominiofechado" class="form-check-input" type="checkbox"  wire:model="condominiofechado">
-                                    <label for="condominiofechado" class="form-check-label">Condomínio fechado</label>
-                                </div> 
-                                <div class="form-check mb-2">
-                                    <input id="cozinha_planejada" class="form-check-input" type="checkbox"  wire:model="cozinha_planejada">
-                                    <label for="cozinha_planejada" class="form-check-label">Cozinha Planejada</label>
-                                </div>                        
+                                    <input id="cameras" class="form-check-input" type="checkbox" wire:model="cameras">
+                                    <label for="cameras" class="form-check-label">Câmeras</label>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">                                        
-                            <!-- checkbox -->
-                            <div class="form-group p-3 mb-1"> 
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group p-3 mb-1">
+
                                 <div class="form-check mb-2">
-                                    <input id="cozinha_americana" class="form-check-input" type="checkbox"  wire:model="cozinha_americana">
-                                    <label for="cozinha_americana" class="form-check-label">Cozinha Americana</label>
-                                </div>                                          
-                                <div class="form-check mb-2">
-                                    <input id="churrasqueira" class="form-check-input" type="checkbox"  wire:model="churrasqueira">
+                                    <input id="churrasqueira" class="form-check-input" type="checkbox" wire:model="churrasqueira">
                                     <label for="churrasqueira" class="form-check-label">Churrasqueira</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="dispensa" class="form-check-input" type="checkbox"  wire:model="dispensa">
-                                    <label for="dispensa" class="form-check-label">Despensa</label>
+                                    <input id="condominiofechado" class="form-check-input" type="checkbox" wire:model="condominiofechado">
+                                    <label for="condominiofechado" class="form-check-label">Condomínio Fechado</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="edicula" class="form-check-input" type="checkbox" wire:model="edicula">
-                                    <label for="edicula" class="form-check-label">Edícula</label>
+                                    <input id="cozinha" class="form-check-input" type="checkbox" wire:model="cozinha">
+                                    <label for="cozinha" class="form-check-label">Cozinha</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="elevador" class="form-check-input" type="checkbox"  wire:model="elevador">
+                                    <input id="elevador" class="form-check-input" type="checkbox" wire:model="elevador">
                                     <label for="elevador" class="form-check-label">Elevador</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="escritorio" class="form-check-input" type="checkbox"  wire:model="escritorio">
-                                    <label for="escritorio" class="form-check-label">Escritório</label>
-                                </div>                                            
-                                <div class="form-check mb-2">
-                                    <input id="espaco_fitness" class="form-check-input" type="checkbox"  wire:model="espaco_fitness">
+                                    <input id="espaco_fitness" class="form-check-input" type="checkbox" wire:model="espaco_fitness">
                                     <label for="espaco_fitness" class="form-check-label">Espaço Fitness</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="estacionamento" class="form-check-input" type="checkbox"  wire:model="estacionamento">
+                                    <input id="estacionamento" class="form-check-input" type="checkbox" wire:model="estacionamento">
                                     <label for="estacionamento" class="form-check-label">Estacionamento</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="fornodepizza" class="form-check-input" type="checkbox"  wire:model="fornodepizza">
-                                    <label for="fornodepizza" class="form-check-label">Forno de Pizza</label>
+                                    <input id="fornopizza" class="form-check-input" type="checkbox" wire:model="fornopizza">
+                                    <label for="fornopizza" class="form-check-label">Forno de Pizza</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="geladeira" class="form-check-input" type="checkbox"  wire:model="geladeira">
+                                    <input id="frigobar" class="form-check-input" type="checkbox" wire:model="frigobar">
+                                    <label for="frigobar" class="form-check-label">Frigobar</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="garagem" class="form-check-input" type="checkbox" wire:model="garagem">
+                                    <label for="garagem" class="form-check-label">Garagem</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="geladeira" class="form-check-input" type="checkbox" wire:model="geladeira">
                                     <label for="geladeira" class="form-check-label">Geladeira</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="geradoreletrico" class="form-check-input" type="checkbox"  wire:model="geradoreletrico">
-                                    <label for="geradoreletrico" class="form-check-label">Gerador elétrico</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input id="interfone" class="form-check-input" type="checkbox"  wire:model="interfone">
+                                    <input id="interfone" class="form-check-input" type="checkbox" wire:model="interfone">
                                     <label for="interfone" class="form-check-label">Interfone</label>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">                                        
-                            <!-- checkbox -->
-                            <div class="form-group p-3 mb-1">                                            
+
                                 <div class="form-check mb-2">
-                                    <input id="internet" class="form-check-input" type="checkbox"  wire:model="internet">
-                                    <label for="internet" class="form-check-label">Internet</label>
-                                </div>
-                                <div class="form-check mb-2">
-                                    <input id="jardim" class="form-check-input" type="checkbox"  wire:model="jardim">
+                                    <input id="jardim" class="form-check-input" type="checkbox" wire:model="jardim">
                                     <label for="jardim" class="form-check-label">Jardim</label>
                                 </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group p-3 mb-1">
+
                                 <div class="form-check mb-2">
-                                    <input id="lareira" class="form-check-input" type="checkbox"  wire:model="lareira">
+                                    <input id="lareira" class="form-check-input" type="checkbox" wire:model="lareira">
                                     <label for="lareira" class="form-check-label">Lareira</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="lavabo" class="form-check-input" type="checkbox"  wire:model="lavabo">
+                                    <input id="lavabo" class="form-check-input" type="checkbox" wire:model="lavabo">
                                     <label for="lavabo" class="form-check-label">Lavabo</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="lavanderia" class="form-check-input" type="checkbox"  wire:model="lavanderia">
-                                    <label for="lavanderia" class="form-check-label">Lavanderia</label>
+                                    <input id="maquina_lavar" class="form-check-input" type="checkbox" wire:model="maquina_lavar">
+                                    <label for="maquina_lavar" class="form-check-label">Máquina de Lavar</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="mobiliado" class="form-check-input" type="checkbox"  wire:model="mobiliado">
+                                    <input id="mesa_refeicao" class="form-check-input" type="checkbox" wire:model="mesa_refeicao">
+                                    <label for="mesa_refeicao" class="form-check-label">Mesa de Refeição</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="mesa_trabalho" class="form-check-input" type="checkbox" wire:model="mesa_trabalho">
+                                    <label for="mesa_trabalho" class="form-check-label">Mesa de Trabalho</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="microondas" class="form-check-input" type="checkbox" wire:model="microondas">
+                                    <label for="microondas" class="form-check-label">Microondas</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="mobiliado" class="form-check-input" type="checkbox" wire:model="mobiliado">
                                     <label for="mobiliado" class="form-check-label">Mobiliado</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="pertodeescolas" class="form-check-input" type="checkbox" wire:model="pertodeescolas">
-                                    <label for="pertodeescolas" class="form-check-label">Perto de Escolas</label>
+                                    <input id="permiteanimais" class="form-check-input" type="checkbox" wire:model="permiteanimais">
+                                    <label for="permiteanimais" class="form-check-label">Permite Animais</label>
                                 </div>
+
                                 <div class="form-check mb-2">
                                     <input id="piscina" class="form-check-input" type="checkbox" wire:model="piscina">
                                     <label for="piscina" class="form-check-label">Piscina</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="portaria24hs" class="form-check-input" type="checkbox"  wire:model="portaria24hs">
-                                    <label for="portaria24hs" class="form-check-label">Portaria 24 Horas</label>
+                                    <input id="portaria24hs" class="form-check-input" type="checkbox" wire:model="portaria24hs">
+                                    <label for="portaria24hs" class="form-check-label">Portaria 24h</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="quadrapoliesportiva" class="form-check-input" type="checkbox"  wire:model="quadrapoliesportiva">
-                                    <label for="quadrapoliesportiva" class="form-check-label">Quadra poliesportiva</label>
+                                    <input id="pratos_talheres" class="form-check-input" type="checkbox" wire:model="pratos_talheres">
+                                    <label for="pratos_talheres" class="form-check-label">Pratos e Talheres</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="quintal" class="form-check-input" type="checkbox"  wire:model="quintal">
-                                    <label for="quintal" class="form-check-label">Quintal</label>
-                                </div> 
-                                <div class="form-check mb-2">
-                                    <input id="sauna" class="form-check-input" type="checkbox"  wire:model="sauna">
-                                    <label for="sauna" class="form-check-label">Sauna</label>
-                                </div>                                           
+                                    <input id="produtos_limpeza" class="form-check-input" type="checkbox" wire:model="produtos_limpeza">
+                                    <label for="produtos_limpeza" class="form-check-label">Produtos de Limpeza</label>
+                                </div>
+
                             </div>
                         </div>
-                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">                                        
-                            <!-- checkbox -->
-                            <div class="form-group p-3 mb-1"> 
+
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                            <div class="form-group p-3 mb-1">
+
                                 <div class="form-check mb-2">
-                                    <input id="saladetv" class="form-check-input" type="checkbox"  wire:model="saladetv">
-                                    <label for="saladetv" class="form-check-label">Sala de TV</label>
+                                    <input id="roupa_cama" class="form-check-input" type="checkbox" wire:model="roupa_cama">
+                                    <label for="roupa_cama" class="form-check-label">Roupa de Cama</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="salaodefestas" class="form-check-input" type="checkbox"  wire:model="salaodefestas">
-                                    <label for="salaodefestas" class="form-check-label">Salão de Festas</label>
+                                    <input id="sauna" class="form-check-input" type="checkbox" wire:model="sauna">
+                                    <label for="sauna" class="form-check-label">Sauna</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="salaodejogos" class="form-check-input" type="checkbox"  wire:model="salaodejogos">
+                                    <input id="salaodejogos" class="form-check-input" type="checkbox" wire:model="salaodejogos">
                                     <label for="salaodejogos" class="form-check-label">Salão de Jogos</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="zeladoria" class="form-check-input" type="checkbox"  wire:model="zeladoria">
-                                    <label for="zeladoria" class="form-check-label">Serviço de Zeladoria</label>
+                                    <input id="secador_cabelo" class="form-check-input" type="checkbox" wire:model="secador_cabelo">
+                                    <label for="secador_cabelo" class="form-check-label">Secador de Cabelo</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="sistemadealarme" class="form-check-input" type="checkbox"  wire:model="sistemadealarme">
-                                    <label for="sistemadealarme" class="form-check-label">Sistema de alarme</label>
+                                    <input id="secadora" class="form-check-input" type="checkbox" wire:model="secadora">
+                                    <label for="secadora" class="form-check-label">Secadora</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="permiteanimais" class="form-check-input" type="checkbox"  wire:model="permiteanimais">
-                                    <label for="permiteanimais" class="form-check-label">Permite animais</label>
+                                    <input id="tv" class="form-check-input" type="checkbox" wire:model="tv">
+                                    <label for="tv" class="form-check-label">TV</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="varandagourmet" class="form-check-input" type="checkbox"  wire:model="varandagourmet">
-                                    <label for="varandagourmet" class="form-check-label">Varanda Gourmet</label>
+                                    <input id="tv_netflix" class="form-check-input" type="checkbox" wire:model="tv_netflix">
+                                    <label for="tv_netflix" class="form-check-label">TV com Netflix</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="vista_para_mar" class="form-check-input" type="checkbox"  wire:model="vista_para_mar">
+                                    <input id="ventilador_teto" class="form-check-input" type="checkbox" wire:model="ventilador_teto">
+                                    <label for="ventilador_teto" class="form-check-label">Ventilador de Teto</label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input id="vista_para_mar" class="form-check-input" type="checkbox" wire:model="vista_para_mar">
                                     <label for="vista_para_mar" class="form-check-label">Vista para o Mar</label>
                                 </div>
+
                                 <div class="form-check mb-2">
-                                    <input id="ventilador_teto" class="form-check-input" type="checkbox"  wire:model="ventilador_teto">
-                                    <label for="ventilador_teto" class="form-check-label">Ventilador de Teto</label>
-                                </div>    
+                                    <input id="wifi" class="form-check-input" type="checkbox" wire:model="wifi">
+                                    <label for="wifi" class="form-check-label">Wi-Fi</label>
+                                </div>
+
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

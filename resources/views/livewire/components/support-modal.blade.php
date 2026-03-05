@@ -1,27 +1,24 @@
 <div>
+    @if ($showSupport)
     <div
-        x-data="{
-            open: @entangle('showSupport'),
-            toggleBody() {
-                document.body.classList.toggle('overflow-hidden', this.open);
-            }
-        }"
-        x-effect="toggleBody()"
-        x-show="open"
-        x-transition.opacity
+        x-data
         x-cloak
-        @keydown.escape.window="open = false"
+        x-transition.opacity
+        @keydown.escape.window="$wire.showSupport = false"
         class="fixed inset-0 z-[1055] flex items-center justify-center"
     >
         <!-- Overlay -->
         <div
             class="absolute inset-0 bg-black/40"
-            aria-hidden="true"
-            @click="open = false"
+            @click="$wire.showSupport = false"
         ></div>
 
         <!-- Modal -->
-        <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+        <div
+            @click.stop
+            x-transition.scale
+            class="relative bg-white rounded-xl shadow-xl w-full max-w-lg p-6"
+        >
             <h2 class="text-lg font-semibold mb-4">Suporte</h2>
 
             <textarea
@@ -37,6 +34,7 @@
 
             <div class="flex justify-end gap-2 mt-4">
                 <button
+                    type="button"
                     wire:click="$set('showSupport', false)"
                     class="px-4 py-2 bg-gray-200 rounded"
                 >
@@ -52,4 +50,5 @@
             </div>
         </div>
     </div>
+@endif
 </div>

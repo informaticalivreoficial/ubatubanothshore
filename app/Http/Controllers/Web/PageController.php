@@ -67,4 +67,21 @@ class PageController extends Controller
             'head' => $head,
         ]);
     }
+
+    public function terms()
+    {
+        $head = $this->seo->render('Termos e Condições - ' . $this->config->app_name ?? env('APP_NAME'),
+            'Leia nossos termos e condições e saiba como seus direitos sejam respeitados.',
+            route('web.terms'),
+            $this->config->getmetaimg() ?? url(asset('theme/images/image.jpg'))
+        );
+
+        if(empty($this->config->terms_condicions)){
+            return redirect()->route('web.home');
+        }
+
+        return view("web.terms-conditions",[
+            'head' => $head,
+        ]);
+    }
 }

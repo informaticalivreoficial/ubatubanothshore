@@ -83,8 +83,9 @@
                         <!-- Cancellation -->
                         <div class="mb-5">
                             <p class="text-sm font-semibold text-gray-900 mb-1.5">Política de cancelamento</p>
-                            <p class="text-sm text-gray-600">100% reembolso até 30 dias antes chegada</p>
-                            <p class="text-sm text-gray-600">50% reembolso até 14 dias antes chegada</p>
+                            <p class="text-sm text-gray-600">
+                                {!! nl2br(e($property->politica_cancelamento)) !!}
+                            </p>
                         </div>
 
                         <hr class="border-gray-200 mb-5"/>

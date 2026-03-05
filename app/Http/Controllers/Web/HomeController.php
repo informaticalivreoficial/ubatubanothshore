@@ -19,7 +19,7 @@ class HomeController extends Controller
 
     public function index()
     {
-        $properties = Property::where('status', 1)
+        $properties = Property::available()
             //->where('highlight', 1) // opcional
             ->latest()
             ->take(8)

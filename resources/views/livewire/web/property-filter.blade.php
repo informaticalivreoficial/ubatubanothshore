@@ -1,70 +1,70 @@
 <div>
-    <form wire:submit.prevent>
-        <div class="search-area">
-            <div class="container">
-                <div class="search-area-inner">
-                    <div class="search-contents ">
-                        <div class="row">
-                            <div class="col-lg-2 col-md-4 col-sm-4 col-xs-12">
-                                <div class="form-group">
-                                    <label>Alugar ou Comprar?</label>
-                                    <select class="search-fields" wire:model.live="operation">
-                                        <option value="">Selecione</option>
-                                        <option value="location">Alugar</option>
-                                        <option value="sale">Comprar</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                                <div class="form-group">
-                                    <label>Escolha a Cidade</label>
-                                    <select class="search-fields" wire:model.live="cidade">
-                                        <option value="">Selecione</option>
-                                        @foreach($cidades as $cidade)
-                                            <option value="{{ $cidade }}">{{ $cidade }}</option>
-                                        @endforeach                                        
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
-                                <div class="form-group">
-                                    <label>Bairro</label>
-                                    <select wire:model.live="bairro" class="search-fields">
-                                        <option value="">Selecione</option>
-                                        @foreach($bairros as $bairro)
-                                            <option value="{{ $bairro }}">{{ $bairro }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
-                                <div class="form-group">
-                                    <label>Valores</label>                                        
-                                    <select class="search-fields" wire:model.live="valores" @disabled(empty($valoresOptions))>
-                                        <option value="">Todos</option>
-                                        @foreach($valoresOptions as $value => $label)
-                                            <option value="{{ $value }}">{{ $label }}</option>
-                                        @endforeach
-                                    </select>                                        
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12">
-                                <div class="form-group">
-                                    <label>Quartos</label>
-                                    <select class="search-fields" wire:model.live="dormitorios">
-                                        <option value="">Todos</option>
-                                        <option value="1">1+</option>
-                                        <option value="2">2+</option>
-                                        <option value="3">3+</option>
-                                        <option value="4">4+</option>
-                                        <option value="5">5+</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <section class="py-10 px-6">
+        <div class="max-w-7xl mx-auto">
+
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">
+                Propriedades
+            </h1>
+
+            {{-- Filtros --}}
+            <div class="mb-12 flex flex-wrap items-center gap-2">
+
+                {{-- TODOS --}}
+                <button
+                    wire:click="setNeighborhood(null)"
+                    class="px-4 py-1.5 rounded-full border text-sm font-medium transition
+                    {{ $activeNeighborhood === null 
+                        ? 'bg-blue-600 text-white border-blue-600' 
+                        : 'bg-white text-gray-800 border-gray-300 hover:border-gray-500' }}">
+
+                    Todos ({{ $this->totalGeral }})
+                </button>
+
+                {{-- BAIRROS --}}
+                @foreach($this->neighborhoods as $bairro)
+                    <button
+                        wire:click="setNeighborhood('{{ $bairro->neighborhood }}')"
+                        class="px-4 py-1.5 rounded-full border text-sm font-medium transition
+                        {{ $activeNeighborhood === $bairro->neighborhood 
+                            ? 'bg-blue-600 text-white border-blue-600' 
+                            : 'bg-white text-gray-800 border-gray-300 hover:border-gray-500' }}">
+
+                        {{ $bairro->neighborhood }} ({{ $bairro->total }})
+                    </button>
+                @endforeach
+
             </div>
+
+            {{-- Grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                @forelse($this->properties as $property)
+                    @include('web.components.property-card', ['property' => $property])
+                @empty
+                    <p class="col-span-full text-center text-gray-500">
+                        Nenhuma propriedade encontrada.
+                    </p>
+                @endforelse
+            </div>
+
+            {{-- Botão Carregar Mais --}}
+            @if($this->properties->count() < $this->total)
+                <div class="mt-12 text-center">
+                    <button
+                        wire:click="loadMore"
+                        wire:loading.attr="disabled"
+                        class="inline-flex items-center gap-2 border border-slate-600 px-8 py-3 rounded-xl text-lg font-medium transition hover:bg-slate-100">
+
+                        <span wire:loading.remove>
+                            Carregar mais imóveis
+                        </span>
+
+                        <span wire:loading>
+                            Carregando...
+                        </span>
+                    </button>
+                </div>
+            @endif
+
         </div>
-    </form>
+    </section>
 </div>

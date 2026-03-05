@@ -192,9 +192,21 @@
                         </div>
                     </div>
                     <div class="row mb-2">
-                        <div class="col-12" wire:ignore>   
+                        <div class="col-12 pt-4" wire:ignore>   
                             <label class="labelforms text-muted"><b>Política de Privacidade</b></label>
-                            <textarea id="privacy_policy" wire:model="configData.privacy_policy">{{ $configData['privacy_policy'] ?? '' }}</textarea>                                                                                     
+                            <x-editor-quill 
+                                :value="$configData['privacy_policy']" 
+                                model="configData.privacy_policy" 
+                            />                                                                                     
+                        </div>                                    
+                    </div>                                       
+                    <div class="row mb-2">
+                        <div class="col-12 pt-4" wire:ignore>   
+                            <label class="labelforms text-muted"><b>Termos e Condições</b></label>
+                            <x-editor-quill 
+                                :value="$configData['terms_condicions']" 
+                                model="configData.terms_condicions" 
+                            />                                                                                     
                         </div>                                    
                     </div>                                       
                 </div> 
@@ -831,28 +843,7 @@
             showConfirmButton: false,
             timer: 3000 // Fecha automaticamente após 3 segundos
         });
-    });
-    
-    document.addEventListener("livewire:navigated", () => {
-        $('#privacy_policy').summernote({
-            height: 300,
-            toolbar: [
-                ['style', ['bold', 'italic', 'underline', 'clear']],
-                ['font', ['strikethrough', 'superscript', 'subscript']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['height', ['height']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview']]
-            ],
-            callbacks: {
-                onChange: function(contents, $editable) {
-                    Livewire.dispatch('updatePrivacyPolicy', { value: contents });
-                }
-            }
-        });
-    });
+    }); 
 
     function tagInputComponent(tagsBinding) {
         return {
@@ -870,7 +861,5 @@
             }
         };
     }
-
-    
     
 </script>

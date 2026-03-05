@@ -109,31 +109,69 @@
                 <!-- Comodidades -->
                 <div class="mt-6">
                     <h3 class="font-semibold text-lg mb-3">Facilidades</h3>
+                    @php
+                        $amenidades = [
+                            'acesso_praia' => 'Acesso à Praia',
+                            'adequado_criancas' => 'Adequado para Crianças',
+                            'adequado_idosos' => 'Adequado para Idosos',
+                            'agua_quente' => 'Água Quente',
+                            'aquecedor' => 'Aquecedor',
+                            'ar_condicionado' => 'Ar Condicionado',
+                            'areadelazer' => 'Área de Lazer',
+                            'banheira' => 'Banheira',
+                            'banheiro_privativo' => 'Banheiro Privativo',
+                            'cafeteira' => 'Cafeteira',
+                            'cama_casal' => 'Cama de Casal',
+                            'cameras' => 'Câmeras de Segurança',
+                            'churrasqueira' => 'Churrasqueira',
+                            'condominiofechado' => 'Condomínio Fechado',
+                            'cozinha' => 'Cozinha',
+                            'elevador' => 'Elevador',
+                            'espaco_fitness' => 'Espaço Fitness',
+                            'estacionamento' => 'Estacionamento',
+                            'fechadura_eletronica' => 'Fechadura Eletrônica',
+                            'ferro_passar' => 'Ferro de Passar',
+                            'fornopizza' => 'Forno de Pizza',
+                            'frigobar' => 'Frigobar',
+                            'garagem' => 'Garagem',
+                            'geladeira' => 'Geladeira',
+                            'interfone' => 'Interfone',
+                            'jardim' => 'Jardim',
+                            'lareira' => 'Lareira',
+                            'lavabo' => 'Lavabo',
+                            'maquina_lavar' => 'Máquina de Lavar',
+                            'mesa_refeicao' => 'Mesa de Refeição',
+                            'mesa_trabalho' => 'Mesa de Trabalho',
+                            'microondas' => 'Microondas',
+                            'mobiliado' => 'Mobiliado',
+                            'permiteanimais' => 'Permite Animais',
+                            'piscina' => 'Piscina',
+                            'portaria24hs' => 'Portaria 24h',
+                            'pratos_talheres' => 'Pratos e Talheres',
+                            'produtos_limpeza' => 'Produtos de Limpeza',
+                            'roupa_cama' => 'Roupa de Cama',
+                            'sauna' => 'Sauna',
+                            'salaodejogos' => 'Salão de Jogos',
+                            'secador_cabelo' => 'Secador de Cabelo',
+                            'secadora' => 'Secadora',
+                            'tv' => 'TV',
+                            'tv_netflix' => 'TV com Netflix',
+                            'ventilador_teto' => 'Ventilador de Teto',
+                            'vista_para_mar' => 'Vista para o Mar',
+                            'wifi' => 'Wi-Fi',
+                        ];
+                    @endphp
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>Ar condicionado</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>Wi-Fi</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>TV</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>Cozinha</span>
-                        </div>
+                        @foreach($amenidades as $campo => $label)
+                            @if($property->$campo)
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span>{{ $label }}</span>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
 
@@ -210,7 +248,12 @@
 
                 <div class="mb-6 mt-4">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4">Bom saber</h2>
-                    <p>{{ $property->additional_notes }}</p>
+                    <p>{!! nl2br(e($property->additional_notes)) !!}</p>
+                </div>
+
+                <div class="mb-6 mt-4">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Política de cancelamento</h2>
+                    <p>{!! nl2br(e($property->politica_cancelamento)) !!}</p>
                 </div>
 
             </div>

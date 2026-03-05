@@ -100,7 +100,7 @@
                 <div class="mt-12 text-center">
                     <a href="{{ route('web.properties') }}"
                     class="inline-flex items-center gap-2 border border-slate-600 text-primary  px-8 py-3 rounded-xl text-xl font-medium transition-all duration-300">
-                        Explorar todos os imóveis ({{ $properties->count() }})
+                        Explorar todos os imóveis
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
                 </div>
