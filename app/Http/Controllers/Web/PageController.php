@@ -26,6 +26,9 @@ class PageController extends Controller
             return redirect()->route('web.home');
         }
 
+        $page->views = $page->views + 1;
+        $page->save();
+
         $head = $this->seo->render($page->title . ' - ' . $this->config->app_name ?? env('APP_NAME'),
             $page->headline ?? $page->title,
             route('web.page', ['slug' => $page->slug]),

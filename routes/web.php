@@ -33,8 +33,8 @@ use App\Livewire\Dashboard\Reports\PropertiesReport;
 use App\Livewire\Dashboard\Sitemap\SitemapGenerator;
 use App\Livewire\Dashboard\Slides\SlideForm;
 use App\Livewire\Dashboard\Slides\Slides;
-
-
+use App\Livewire\Dashboard\Reservations\Index as Reservations;
+use App\Livewire\Dashboard\Reservations\ReservationForm;
 
 Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     
@@ -102,6 +102,10 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], functi
     Route::get('imoveis/{property}/editar', PropertyForm::class)->name('property.edit');
     Route::get('imoveis/cadastrar', PropertyForm::class)->name('properties.create');
     Route::get('imoveis', Properties::class)->name('properties.index');
+    
+    Route::get('reservas/{reservation}/editar', ReservationForm::class)->name('reservations.edit');
+    Route::get('reservas/cadastrar', ReservationForm::class)->name('reservations.create');
+    Route::get('reservas', Reservations::class)->name('reservations.index');
 
     //*********************** Slides ********************************************/
     Route::get('slides/{slide}/editar', SlideForm::class)->name('slides.edit');

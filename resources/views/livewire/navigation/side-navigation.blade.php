@@ -86,6 +86,12 @@
                     </a>
                 </li>     
                 <li class="nav-item">
+                    <a href="{{route('reservations.index')}}" class="nav-link {{ Route::is('reservations.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-ticket-alt"></i>
+                        <p>Reservas</p>
+                    </a>
+                </li>     
+                <li class="nav-item">
                     <a href="{{route('slides.index')}}" class="nav-link {{ Route::is('slides.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-film"></i>
                         <p>Banners</p>

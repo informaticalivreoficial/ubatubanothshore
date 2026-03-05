@@ -1,7 +1,5 @@
 import './bootstrap';
 
-import Alpine from 'alpinejs'
-
 Alpine.data('cookieConsent', () => ({
     open: false,
     accepted: localStorage.getItem('cookie_consent') !== null,
@@ -36,7 +34,5 @@ Alpine.data('cookieConsent', () => ({
     }
 }))
 
-Alpine.start()
-window.Alpine = Alpine
 
 

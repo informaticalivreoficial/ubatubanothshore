@@ -109,6 +109,9 @@ class CheckoutPage extends Component
                 ['email' => $this->email],
                 [
                     'name' => $this->name,
+                    'client' => true,
+                    'phone' => $this->phone,
+                    'status' => 1,
                     'password' => bcrypt(str()->random(10))
                 ]
             );

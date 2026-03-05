@@ -19,6 +19,13 @@ class PropertyController extends Controller
             ->available()
             ->firstOrFail();
 
+        if(empty($property)){
+            return redirect()->route('web.home');
+        }
+
+        $property->views = $property->views + 1;
+        $property->save();
+
         return view('web.property', compact('property'));
     }
 
