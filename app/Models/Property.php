@@ -23,12 +23,14 @@ class Property extends Model
         'rental_value',
         'min_nights',
         'cleaning_fee',
+        'value_aditional',
+        'aditional_person',
+        'capacity',
         'reference',
         'description',
         'additional_notes',
         'politica_cancelamento',
-        'dormitories',
-        'capacity',
+        'dormitories',        
         'suites',
         'bathrooms',
         'rooms',
@@ -212,6 +214,11 @@ class Property extends Model
     public function imagesmarkedwater()
     {
         return $this->hasMany(PropertyGb::class, 'property', 'id')->whereNull('watermark')->count();
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(PropertyReview::class);
     }
 
     

@@ -1,6 +1,11 @@
 <div 
     wire:ignore
-    x-data="reservationCalendar(@entangle('blockedDates'))"
+    x-data="reservationCalendar(
+        @entangle('blockedDates'),
+        @entangle('check_in'),
+        @entangle('check_out')
+    )"
+    x-init="init()"
 >
     <div class="content-header">
         <div class="container-fluid">
@@ -70,7 +75,6 @@
             <hr class="my-4 border-gray-300">
 
             <div 
-                x-data
                 x-init="
                     flatpickr($refs.checkin,{
                         dateFormat:'Y-m-d',
@@ -100,7 +104,6 @@
                         <label class="labelforms"><b>Check-in</b></label>
                         <input
                             x-ref="checkin"
-                            wire:model="check_in"
                             type="text"
                             class="form-control"
                             placeholder="Check-in"
@@ -112,7 +115,6 @@
                         <label class="labelforms"><b>Check-out</b></label>
                         <input
                             x-ref="checkout"
-                            wire:model="check_out"
                             type="text"
                             class="form-control"
                             placeholder="Check-out"
@@ -125,7 +127,18 @@
                 <div class="col-12 col-md-2 col-lg-2">
                     <div class="form-group">
                         <label class="labelforms"><b>Hóspedes</b></label>
-                        <input type="number" class="form-control" id="guests" wire:model="guests">
+                        <input 
+                            type="number"
+                            class="form-control @error('guests') is-invalid @enderror"
+                            wire:model.live="guests"
+                            min="1"
+                            max="{{ $maxGuests }}"
+                        >
+                        @error('guests')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-12 col-md-2 col-lg-2">
@@ -163,7 +176,7 @@
 
             <div class="row text-right">
                 <div class="col-12 pb-4 mt-3">
-                    <button type="submit" class="btn btn-lg btn-success p-3">
+                    <button type="button" wire:click="save" class="btn btn-lg btn-success p-3">
                         <i class="nav-icon fas fa-check mr-2"></i>
                         {{ $reservation ? 'Atualizar Agora' : 'Cadastrar Agora' }}
                     </button>
@@ -176,18 +189,60 @@
 
 @push('scripts')
     <script>
-        window.reservationCalendar = (blockedDates) => ({
-            init(){
+        window.reservationCalendar = (blockedDates, checkIn, checkOut) => ({
 
-                this.$watch('blockedDates', (dates)=>{
+    blockedDates,
+    checkIn,
+    checkOut,
 
-                    flatpickr(this.$refs.checkin,{
-                        disable: dates
-                    });
+    checkin: null,
+    checkout: null,
 
-                });
+    init(){
 
+        this.checkin = flatpickr(this.$refs.checkin,{
+            dateFormat:'Y-m-d',
+            altInput:true,
+            altFormat:'d/m/Y',
+            locale:'pt',
+            disable: this.blockedDates,
+            defaultDate: this.checkIn || null,
+
+            onChange: (selectedDates, dateStr) => {
+                this.checkIn = dateStr
+                $wire.set('check_in', dateStr)
             }
         });
+
+        this.checkout = flatpickr(this.$refs.checkout,{
+            dateFormat:'Y-m-d',
+            altInput:true,
+            altFormat:'d/m/Y',
+            locale:'pt',
+            disable: this.blockedDates,
+            defaultDate: this.checkOut || null,
+
+            onChange: (selectedDates, dateStr) => {
+                this.checkOut = dateStr
+                $wire.set('check_out', dateStr)
+            }
+        });
+
+        // 🔥 sincroniza quando Livewire atualizar
+        this.$watch('checkIn', value => {
+            if(value){
+                this.checkin.setDate(value, false)
+            }
+        });
+
+        this.$watch('checkOut', value => {
+            if(value){
+                this.checkout.setDate(value, false)
+            }
+        });
+
+    }
+
+});
     </script>
 @endpush

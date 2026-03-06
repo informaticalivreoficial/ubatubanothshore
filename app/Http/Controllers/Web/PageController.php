@@ -26,11 +26,10 @@ class PageController extends Controller
             return redirect()->route('web.home');
         }
 
-        $page->views = $page->views + 1;
-        $page->save();
+        $page->increment('views');
 
         $head = $this->seo->render($page->title . ' - ' . $this->config->app_name ?? env('APP_NAME'),
-            $page->headline ?? $page->title,
+            $page->title ?? $this->config->app_name,
             route('web.page', ['slug' => $page->slug]),
             $page->cover() ?? $this->config->getmetaimg()
         );
@@ -85,6 +84,20 @@ class PageController extends Controller
 
         return view("web.terms-conditions",[
             'head' => $head,
+        ]);
+    }
+
+    public function review($token)
+    {
+        $head = $this->seo->render('Avaliação - ' . $this->config->app_name ?? env('APP_NAME'),
+            'Deixe sua avaliação e ajude-nos a melhorar.',
+            route('web.review', ['token' => $token]),
+            $this->config->getmetaimg() ?? url(asset('theme/images/image.jpg'))
+        );
+
+        return view('web.review', [
+            'token' => $token,
+            'head' => $head
         ]);
     }
 }

@@ -113,7 +113,7 @@
                     let disabledDates = JSON.parse(this.$el.dataset.disabled)
                         .map(date => new Date(date + "T00:00:00"));
 
-                    console.log('Datas desabilitadas:', disabledDates);
+                    //console.log('Datas desabilitadas:', disabledDates);
 
                     flatpickr(this.$refs.picker, {
                         mode: "range",
@@ -122,7 +122,7 @@
                         altFormat: "d/m/Y",
                         showMonths: 2,
                         minDate: "today",
-                        locale: flatpickr.l10ns.pt,
+                        //locale: flatpickr.l10ns.pt,
                         rangeSeparator: " até ",
                         disable: disabledDates,
 

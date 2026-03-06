@@ -20,7 +20,6 @@ use App\Http\Controllers\Web\{
     PageController,
     PropertyController,
     PropertyRssController,
-    Webcontroller
 };
 use App\Livewire\Dashboard\Menu\Index;
 use App\Livewire\Dashboard\Posts\CatPosts;
@@ -45,7 +44,9 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     Route::get('/atendimento', [PageController::class, 'contact'])->name('contact');
     Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');
     Route::get('/termos-e-condicoes', [PageController::class, 'terms'])->name('terms');
-    
+    Route::get('/avaliacao/{token}', [PageController::class, 'review'])->name('review');
+    Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
+
     //Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
 
 //     /** FEED */
@@ -53,18 +54,6 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     
 //     Route::get('/sitemap', [WebController::class, 'sitemap'])->name('sitemap');
 
-//     /** Página de Experiências - Específica de uma categoria */
-//     Route::get('/experiencias/{slug}', [FilterController::class, 'experienceCategory'])->name('experienceCategory');
-
-    //Properties
-    //  Route::get('pesquisar-imoveis', [WebController::class, 'pesquisaImoveis'])->name('pesquisar-imoveis');
-    // Route::get('imoveis/{slug}', [WebController::class, 'Property'])->name('property');
-    //  Route::get('imoveis/categoria/{type}', [WebController::class, 'propertyList'])->name('propertylist');
-    //  Route::get('imoveis/bairro/{neighborhood}', [WebController::class, 'propertyNeighborhood'])->name('properties.neighborhood');
-    //  Route::get('lancamentos', [WebController::class, 'PropertyHighliths'])->name('highliths');
-    //  Route::get('imoveis', [WebController::class, 'Properties'])->name('properties');
-    
-    Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
 });
 
 Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], function () {

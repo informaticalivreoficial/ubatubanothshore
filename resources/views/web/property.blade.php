@@ -91,14 +91,16 @@
                 </div>
 
                 <!-- Avaliação -->
-                <div class="flex items-center gap-2 mb-4 mt-4">
-                    <div class="flex items-center">
-                        <span class="text-yellow-500">★</span>
-                        <span class="font-medium ml-1">4.85</span>
+                @if($property->reviews_count > 0)
+                    <div class="flex items-center gap-2 mb-4 mt-4">
+                        <div class="flex items-center">
+                            <span class="text-yellow-500">★</span>
+                            <span class="font-medium ml-1">{{ number_format($property->reviews_avg_rating, 1) }}</span>
+                        </div>
+                        <span class="text-gray-400">•</span>
+                        <span class="text-gray-500">{{ $property->reviews_count }} comentário(s)</span>
                     </div>
-                    <span class="text-gray-400">•</span>
-                    <span class="text-gray-500">3 comentários</span>
-                </div>
+                @endif                
 
                 <!-- Descrição -->
                 <div class="mt-6 text-gray-600">
@@ -179,70 +181,34 @@
 
                 <div class="max-w-3xl mx-auto font-sans mt-4">
                     <!-- Cabeçalho da seção de avaliações -->
-                    <div class="flex items-center gap-2 mb-6">
+                    @if($property->reviews_count > 0)
                         <h2 class="text-xl font-semibold text-gray-900">Avaliações</h2>
                         <span class="flex items-center gap-1">
                         <span class="text-yellow-500">⭐</span>
-                        <span class="font-medium text-gray-900">4.85</span>
-                        <span class="text-gray-500">(3)</span>
+                        <span class="font-medium text-gray-900">{{ number_format($property->reviews_avg_rating, 1) }}</span>
+                        <span class="text-gray-500">({{ $property->reviews_count }})</span>
                         </span>
-                    </div>
+                    @endif                    
 
                     <!-- Lista de avaliações -->
                     <div class="space-y-6">
-                        <!-- Avaliação 1 - Mariana -->
-                        <div class="border-b border-gray-200 pb-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-yellow-400 text-lg">⭐⭐⭐⭐</span>
-                                <span class="font-medium text-gray-900">· Mariana ·</span>
-                                <span class="text-gray-600">Fevereiro De 2026</span>
+                        @forelse($property->reviews as $review)
+                            <div class="border-b border-gray-200 pb-6">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-yellow-400 text-lg">{{ str_repeat('⭐', $review->rating) }}</span>
+                                    <span class="font-medium text-gray-900">· {{ $review->guest_name }} ·</span>
+                                    <span class="text-gray-600">
+                                        {{ $review->created_at->translatedFormat('F \d\e Y') }}
+                                    </span>
+                                </div>
+                                
+                                <div class="space-y-2 text-gray-700">
+                                    <p>{{ $review->comment }}</p>
+                                </div>
                             </div>
-                            
-                            <div class="space-y-2 text-gray-700">
-                                <p>
-                                <span class="font-medium">Positive:</span> Habia comerciou y el metro estaba cerca
-                                <span class="font-medium ml-1">Negative:</span> El precio fue un poco elevado para los pocos días que estuvimos
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Avaliação 2 - Costa -->
-                        <div class="border-b border-gray-200 pb-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-yellow-400 text-lg">⭐⭐⭐⭐</span>
-                                <span class="font-medium text-gray-900">· Costa ·</span>
-                                <span class="text-gray-600">Janeiro De 2026</span>
-                            </div>
-                        
-                            <div class="space-y-2 text-gray-700">
-                                <p class="mb-1">Lugar cómodo en un barrio no turístico.</p>
-                                <p>
-                                <span class="font-medium">Positive:</span> El ambiente, la estética del departamento. Es tal cual las fotos. Amanda súper anfitriona.
-                                </p>
-                                <p>
-                                <span class="font-medium">Negative:</span> Que no tenga un tender donde poner ropa húmeda, mojada.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Avaliação 3 - Vinicius (com Mostrar mais) -->
-                        <div class="border-b border-gray-200 pb-6">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-yellow-400 text-lg">⭐⭐⭐⭐</span>
-                                <span class="font-medium text-gray-900">· Vinicius ·</span>
-                                <span class="text-gray-600">Janeiro De 2026</span>
-                            </div>
-                        
-                            <div class="space-y-2 text-gray-700">
-                                <p class="font-medium">Aprovada! Com uns adendos, mas aprovada</p>
-                                <p>
-                                <span class="font-medium">Positive:</span> O apartamento é bonito, bem aconchegante e limpo.
-                                </p>
-                                <p>
-                                <span class="font-medium">Negative:</span> Wi-fi faltou durante toda a estadia, me prejudicando muito. Tive que sair pra buscar um local com wi-fi pra trabalhar, perdendo muito tempo com isso e o suporte não resolveu. Como sugestão, coloquem uma Airfryer: ajuda muito quem viaja e cozinha na hospedagem.
-                                </p>
-                            </div>
-                        </div>
+                        @empty
+                            <p>Ainda não há avaliações para este imóvel.</p>
+                        @endforelse                        
                     </div>                    
                 </div>                
 

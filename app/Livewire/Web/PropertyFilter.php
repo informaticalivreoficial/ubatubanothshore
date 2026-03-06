@@ -28,6 +28,12 @@ class PropertyFilter extends Component
             ->when($this->activeNeighborhood, function ($query) {
                 $query->where('neighborhood', $this->activeNeighborhood);
             })
+            ->withCount(['reviews as reviews_count' => function($query) {
+                $query->where('approved', true);
+            }])
+            ->withAvg(['reviews as reviews_avg_rating' => function($query) {
+                $query->where('approved', true);
+            }], 'rating')
             ->available()
             ->latest()
             ->take($this->perPage)

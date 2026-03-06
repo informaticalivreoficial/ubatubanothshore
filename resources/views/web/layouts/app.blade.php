@@ -23,11 +23,11 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     
     <style>
         body { font-family: 'DM Sans', sans-serif; color: #1a2e1a; }           
     </style>
+
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -50,6 +50,7 @@
     
         <!-- BANNER -->
         <div 
+            x-cloak
             x-show="!accepted"
             class="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 z-40"
         >
@@ -72,6 +73,7 @@
 
         <!-- MODAL -->
         <div 
+            x-cloak
             x-show="open"
             x-transition
             class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
@@ -110,10 +112,51 @@
                     Salvar preferências
                 </button>
             </div>
-        </div>
+        </div>    
     
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>    
+    <script>
+        // Listener genérico para todos os tipos de SweetAlert
+        ['swal', 'swal:error', 'swal:success', 'swal:info', 'swal:warning'].forEach(eventName => {
+            window.addEventListener(eventName, (event) => {
+                const data = event.detail?.[0] ?? {};
+
+                let defaultIcon = 'info';
+                if (eventName === 'swal:error') defaultIcon = 'error';
+                if (eventName === 'swal:success') defaultIcon = 'success';
+                if (eventName === 'swal:warning') defaultIcon = 'warning';
+
+                Swal.fire({
+                    title: data.title ?? 'Aviso',
+                    text: data.text ?? '',
+                    icon: data.icon ?? defaultIcon,
+                    timer: data.timer ?? null,
+                    showConfirmButton: data.showConfirmButton ?? true,
+                    confirmButtonText: data.confirmButtonText ?? 'OK',
+                }).then(() => {
+                    if (data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                    }
+                });
+            });
+        });
+
+        window.addEventListener('swal:confirm', (event) => {
+            const data = event.detail?.[0] ?? {};
+
+            Swal.fire({
+                title: data.title ?? 'Tem certeza?',
+                text: data.text ?? '',
+                icon: data.icon ?? 'warning',
+                showCancelButton: true,
+                confirmButtonText: data.confirmButtonText ?? 'Confirmar',
+                cancelButtonText: data.cancelButtonText ?? 'Cancelar',
+            }).then((result) => {
+                if (result.isConfirmed && data.confirmEvent) {
+                    Livewire.dispatch(data.confirmEvent, data.confirmParams ?? []);
+                }
+            });
+        });
+    </script>
 
     <script>
         const mobileMenu = document.getElementById('mobile-menu');

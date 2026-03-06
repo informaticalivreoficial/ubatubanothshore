@@ -13,6 +13,7 @@ class PropertyReservation extends Model
     protected $fillable = [
         'property_id',
         'user_id',
+        'review_token',
         'guest_name',
         'guest_email',
         'guest_phone',
@@ -66,5 +67,49 @@ class PropertyReservation extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+
+    public function review()
+    {
+        return $this->hasOne(PropertyReview::class, 'reservation_id');
+    }
+
+    public static function calculateTotals(Property $property, $checkIn, $checkOut, $guests)
+    {
+        $checkIn = Carbon::parse($checkIn);
+        $checkOut = Carbon::parse($checkOut);
+
+        if ($checkOut->lte($checkIn)) {
+            return null;
+        }
+
+        $nights = $checkIn->diffInDays($checkOut);
+
+        $cleaningFee = $property->cleaning_fee ?? 0;
+
+        $subtotal = $property->rental_value * $nights;
+
+        $extraGuests = max(
+            0,
+            (int) $guests - (int) $property->aditional_person
+        );
+
+        $extraTotal =
+            $extraGuests *
+            $property->value_aditional *
+            $nights;
+
+        $total =
+            $subtotal +
+            $extraTotal +
+            $cleaningFee;
+
+        return [
+            'nights' => $nights,
+            'daily_total' => $subtotal,
+            'cleaning_fee' => $cleaningFee,
+            'total_value' => $total
+        ];
     }
 }

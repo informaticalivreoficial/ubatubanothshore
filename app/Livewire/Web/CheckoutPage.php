@@ -12,6 +12,7 @@ use App\Notifications\NewReservationNotification;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class CheckoutPage extends Component
@@ -29,6 +30,7 @@ class CheckoutPage extends Component
     public $email;
     public $phone;
     public $notes;
+    public $review_token;
 
     public $nights;
     public $subtotal;
@@ -116,11 +118,11 @@ class CheckoutPage extends Component
                 ]
             );
 
-            //dd($this->total);
             // 📅 Criar reserva
             $reservation = PropertyReservation::create([
                 'property_id' => $this->property->id,
                 'user_id' => $client->id,
+                'review_token' => Str::uuid(),
                 'guest_name' => $this->name,
                 'guest_email' => $this->email,
                 'guest_phone' => $this->phone,

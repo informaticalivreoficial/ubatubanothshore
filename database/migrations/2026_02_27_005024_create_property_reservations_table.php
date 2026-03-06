@@ -27,6 +27,8 @@ return new class extends Migration
                 ->references('id')
                 ->on('users')
                 ->onDelete('cascade');
+                
+            $table->uuid('review_token')->nullable();
 
             // Dados do hóspede (caso não esteja logado)
             $table->string('guest_name')->nullable();

@@ -1,6 +1,9 @@
+@import 'flatpickr/dist/flatpickr.min.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
 
 @layer base {
   body {
@@ -162,5 +165,9 @@
            shadow-[0_4px_20px_rgba(37,211,102,0.45)] z-[9998]
            transition-all duration-300 cursor-pointer border-none
            hover:bg-[#1fba5a] hover:scale-110 hover:shadow-[0_8px_30px_rgba(37,211,102,0.5)];
+  }
+
+  [x-cloak] {
+      display: none !important;
   }
 }

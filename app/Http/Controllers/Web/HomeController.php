@@ -20,7 +20,12 @@ class HomeController extends Controller
     public function index()
     {
         $properties = Property::available()
-            //->where('highlight', 1) // opcional
+            ->withCount(['reviews as reviews_count' => function($query) {
+                $query->where('approved', true);
+            }])
+            ->withAvg(['reviews as reviews_avg_rating' => function($query) {
+                $query->where('approved', true);
+            }], 'rating')
             ->latest()
             ->take(8)
             ->get();  

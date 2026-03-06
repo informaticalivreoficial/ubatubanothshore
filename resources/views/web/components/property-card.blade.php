@@ -23,7 +23,11 @@
         {{-- Badge venda ou aluguel --}}
         <div class="absolute top-3 right-3">
             <span class="bg-blue-400 text-white text-xs px-2 py-1 rounded-full">
-                4.90★
+                @if($property->reviews_count > 0)
+                    ★ {{ number_format($property->reviews_avg_rating, 1) }}
+                @else
+                    Novo
+                @endif
             </span>
         </div>
     </div>
