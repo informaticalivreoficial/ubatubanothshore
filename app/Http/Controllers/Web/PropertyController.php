@@ -73,4 +73,56 @@ class PropertyController extends Controller
             'head' => $head
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $check_in = $request->query('check_in');
+        $check_out = $request->query('check_out');
+        $guests = $request->query('guests', 1);
+
+        $query = Property::available();
+
+        if ($check_in && $check_out) {
+            $query->whereDoesntHave('reservations', function ($q) use ($check_in, $check_out) {
+                $q->where(function ($q2) use ($check_in, $check_out) {
+                    $q2->whereBetween('start_date', [$check_in, $check_out])
+                       ->orWhereBetween('end_date', [$check_in, $check_out])
+                       ->orWhere(function ($q3) use ($check_in, $check_out) {
+                           $q3->where('start_date', '<=', $check_in)
+                              ->where('end_date', '>=', $check_out);
+                       });
+                });
+            });
+
+            $query->whereDoesntHave('blockedDates', function ($q) use ($check_in, $check_out) {
+                $q->whereBetween('date', [$check_in, $check_out]);
+            });
+        }
+
+        if ($guests) {
+            $query->where('capacity', '>=', $guests);
+        }
+
+        $properties = $query
+            ->withCount(['reviews as reviews_count' => fn($q) => $q->approved()])
+            ->withAvg(['reviews as reviews_avg_rating' => fn($q) => $q->approved()], 'rating')
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        $head = $this->seo->render('Pesquisar Imóveis - ' .   $this->config->app_name ?? env('APP_NAME'),
+            'Pesquisar Imóveis' ?? $this->config->app_name,
+            route('web.property.search'),
+            $this->config->getmetaimg()
+        );
+
+        return view('web.search-property', [
+            'properties' => $properties,
+            'check_in' => $check_in,
+            'check_out' => $check_out,
+            'guests' => $guests,
+            'head' => $head
+        ]);
+    }
+
 }

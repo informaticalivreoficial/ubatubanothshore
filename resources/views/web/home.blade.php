@@ -23,42 +23,36 @@
             </p>
 
             {{-- Search bar --}}
-            <div class="fade-up-delay-3 search-bar rounded-2xl p-4 shadow-2xl max-w-3xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                    {{-- Check-in --}}
-                    <div class="flex flex-col gap-1">
-                        <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-in</label>
-                        <input type="date"
-                               class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
-                               name="check_in">
-                    </div>
-
-                    {{-- Check-out --}}
-                    <div class="flex flex-col gap-1">
-                        <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-out</label>
-                        <input type="date"
-                               class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
-                               name="check_out">
-                    </div>
-
-                    {{-- Guests --}}
-                    <div class="flex flex-col gap-1">
-                        <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Hóspedes</label>
-                        <div class="flex items-center gap-2 bg-cream border border-sand rounded-xl px-3 py-2.5">
-                            <button type="button" class="text-primary/40 hover:text-primary transition-colors w-5 h-5 flex items-center justify-center text-lg leading-none" id="guests-minus">−</button>
-                            <span class="flex-1 text-center text-sm font-medium text-primary" id="guests-count">1</span>
-                            <button type="button" class="text-primary/40 hover:text-primary transition-colors w-5 h-5 flex items-center justify-center text-lg leading-none" id="guests-plus">+</button>
-                        </div>
-                    </div>
-
-                    {{-- Search button --}}
-                    <button
-                        class="bg-primary hover:bg-primary/90 text-white text-sm font-medium px-6 py-2.5 rounded-xl transition-all hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        Procurar
-                    </button>
+            <form action="{{ route('web.property.search') }}" method="GET" class="fade-up-delay-3 search-bar rounded-2xl p-4 shadow-2xl max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                {{-- Check-in --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-in</label>
+                    <input type="date" name="check_in"
+                        class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
+                        value="{{ request('check_in') }}">
                 </div>
-            </div>
+
+                {{-- Check-out --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-out</label>
+                    <input type="date" name="check_out"
+                        class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
+                        value="{{ request('check_out') }}">
+                </div>
+
+                {{-- Hóspedes --}}
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Hóspedes</label>
+                    <input type="number" name="guests" min="1" class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary"
+                        value="{{ request('guests', 1) }}">
+                </div>
+
+                {{-- Botão --}}
+                <button type="submit" class="bg-white border border-blue-500 text-blue-500 text-sm font-medium px-6 py-2.5 rounded-xl transition-all hover:bg-[#f8f8f8]">
+                    Procurar
+                </button>
+            </form>
+
         </div>
 
         {{-- Scroll indicator --}}
