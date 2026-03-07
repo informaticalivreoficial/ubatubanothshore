@@ -25,7 +25,15 @@ class Time extends Component
 
         $users = User::query()
             ->where(function($query) {
-                $query->where('editor', 1)->orWhere('admin', 1);
+                $query->where('editor', 1)
+                    ->orWhere('admin', 1);
+            })
+            ->when(auth()->user()->superadmin, function($query) {
+                // se for superadmin, deixa ele ver só ele mesmo
+                $query->where('id', auth()->id());
+            }, function($query) {
+                // se não for superadmin, remove superadmins da lista
+                $query->where('superadmin', 0);
             })
             ->when($this->search, function($query) {
                 $query->where(function($q) {

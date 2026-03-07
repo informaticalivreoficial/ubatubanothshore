@@ -4,11 +4,13 @@ namespace App\Livewire\Dashboard\Properties;
 
 use App\Models\Config;
 use App\Models\Property;
+use App\Models\PropertyGb;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class Properties extends Component
 {
@@ -86,13 +88,14 @@ class Properties extends Component
     {
         $this->dispatch('swal:confirm', [
             'title' => 'Excluir Imóvel',
-            'text' => 'Essa ação não pode ser desfeita.',
+            'text' => 'Essa ação não pode ser desfeita.!',
+            'showConfirmButton' => false,
             'icon' => 'warning',
             'confirmButtonText' => 'Sim, excluir',
             'cancelButtonText' => 'Cancelar',
             'confirmEvent' => 'deleteProperty',
             'confirmParams' => [$id],
-        ]);       
+        ]);      
     }
 
     #[On('deleteProperty')]
@@ -102,61 +105,72 @@ class Properties extends Component
 
         $property->delete();
 
-        $this->dispatch('swal', [
+        $this->dispatch('swal:success', [
             'title' => 'Excluído!',
-            'text'  => 'Imóvel e todas as imagens foram removidas!',
-            'icon'  => 'success',
+            'text' => 'Imóvel e todas as imagens foram removidas!',
             'timer' => 2000,
-            'showConfirmButton' => false,
-        ]);                
+            'showConfirmButton' => false
+        ]);              
     }    
 
     public function applyWatermark(Property $property)
-    {
-        // Se já estiver marcada, não faz nada
-        if ($property->display_marked_water) {
+    {      
+
+        $config = Config::first();
+
+        if (!$config || !$config->watermark) {
+            $this->dispatch('swal:error', [
+                'title' => false,
+                'text' => 'Nenhuma marca d’água configurada!',
+                'timer' => 2000,
+                'showConfirmButton' => false
+            ]);
             return;
         }
 
-        // Pega a marca d'água da tabela config
-        $config = Config::first(); // ou filtro específico se tiver mais de uma
-        if (!$config || !$config->watermark) {
-            $this->dispatch('swal', [
-                'title' => 'Erro!',
-                'icon'  => 'error',
-                'text'  => 'Nenhuma marca d’água configurada.'
-            ]);
-            return;
-        }
-        
         $watermarkPath = storage_path('app/public/' . $config->watermark);
+
         if (!file_exists($watermarkPath)) {
-            $this->dispatch('swal', [
-                'title' => 'Erro!',
-                'icon'  => 'error',
-                'text'  => 'Arquivo de marca d’água não encontrado.'
+            $this->dispatch('swal:error', [
+                'title' => false,
+                'text' => 'Arquivo de marca d’água não encontrado!',
+                'timer' => 2000,
+                'showConfirmButton' => false
             ]);
             return;
         }
+
+        $manager = new ImageManager(new Driver());
+
+        $watermark = $manager->read($watermarkPath);
 
         foreach ($property->images as $image) {
+
+            if ($image->watermark) {
+                continue; // pula se já tiver marca
+            }
+
             $imagePath = storage_path('app/public/' . $image->path);
 
             if (file_exists($imagePath)) {
-                $img = Image::make($imagePath);
-                $img->insert($watermarkPath, 'bottom-right', 20, 20); // posição
+
+                $img = $manager->read($imagePath);
+                $img->place($watermark, 'bottom-right', 30, 30);
                 $img->save($imagePath);
+
+                $image->update([
+                    'watermark' => true
+                ]);
             }
-        }
+        }        
 
-        // Atualiza o campo display_marked_water
-        $property->update(['display_marked_water' => true]);
-
-        $this->dispatch('swal', [
-            'title' => 'Marca d’água aplicada!',
-            'icon'  => 'success',
-        ]);
+        $this->dispatch('swal:success', [
+            'title' => false,
+            'text' => 'Marca d’água aplicada!',
+            'timer' => 2000,
+            'showConfirmButton' => false
+        ]);        
 
         $property->refresh();
-    }
+    }    
 }

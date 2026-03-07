@@ -34,11 +34,10 @@ class GenerateSitemap extends Command
         // Páginas estáticas
         $staticPages = [
             ['url' => route('web.contact'), 'priority' => 0.8],
-            ['url' => route('web.simulator'), 'priority' => 0.8],
             ['url' => route('web.properties'), 'priority' => 0.9],
-            ['url' => route('web.highliths'), 'priority' => 0.9],
-            ['url' => route('web.blog.index'), 'priority' => 0.9],
+            ['url' => route('web.terms'), 'priority' => 0.9],
             ['url' => route('web.privacy'), 'priority' => 0.9],
+            //['url' => route('web.privacy'), 'priority' => 0.9],
             // Adicione outras páginas estáticas aqui
         ];
 
@@ -68,19 +67,19 @@ class GenerateSitemap extends Command
         // Posts (se tiver blog)
         if (class_exists(Post::class)) {
         // Artigos
-        Post::where('status', 1)
-            ->where('type', 'artigo')
-            ->orderBy('created_at', 'desc')
-            ->chunk(100, function ($posts) use ($sitemap) {
-                foreach ($posts as $post) {
-                    $sitemap->add(
-                        Url::create(route('web.blog.artigo', $post->slug))
-                            ->setLastModificationDate($post->updated_at)
-                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
-                            ->setPriority(0.6)
-                    );
-                }
-            });
+        // Post::where('status', 1)
+        //     ->where('type', 'artigo')
+        //     ->orderBy('created_at', 'desc')
+        //     ->chunk(100, function ($posts) use ($sitemap) {
+        //         foreach ($posts as $post) {
+        //             $sitemap->add(
+        //                 Url::create(route('web.blog.artigo', $post->slug))
+        //                     ->setLastModificationDate($post->updated_at)
+        //                     ->setChangeFrequency(Url::CHANGE_FREQUENCY_MONTHLY)
+        //                     ->setPriority(0.6)
+        //             );
+        //         }
+        //     });
 
         // Páginas
         Post::where('status', 1)
@@ -98,19 +97,19 @@ class GenerateSitemap extends Command
             });
 
         // Notícias
-        Post::where('status', 1)
-            ->where('type', 'noticia')
-            ->orderBy('created_at', 'desc')
-            ->chunk(100, function ($posts) use ($sitemap) {
-                foreach ($posts as $post) {
-                    $sitemap->add(
-                        Url::create(route('web.blog.noticia', $post->slug))
-                            ->setLastModificationDate($post->updated_at)
-                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY) // Notícias mudam mais
-                            ->setPriority(0.7)
-                    );
-                }
-            });
+        // Post::where('status', 1)
+        //     ->where('type', 'noticia')
+        //     ->orderBy('created_at', 'desc')
+        //     ->chunk(100, function ($posts) use ($sitemap) {
+        //         foreach ($posts as $post) {
+        //             $sitemap->add(
+        //                 Url::create(route('web.blog.noticia', $post->slug))
+        //                     ->setLastModificationDate($post->updated_at)
+        //                     ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY) // Notícias mudam mais
+        //                     ->setPriority(0.7)
+        //             );
+        //         }
+        //     });
     }
 
         // Salva o sitemap

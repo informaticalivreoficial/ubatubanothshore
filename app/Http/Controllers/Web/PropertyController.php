@@ -85,11 +85,11 @@ class PropertyController extends Controller
         if ($check_in && $check_out) {
             $query->whereDoesntHave('reservations', function ($q) use ($check_in, $check_out) {
                 $q->where(function ($q2) use ($check_in, $check_out) {
-                    $q2->whereBetween('start_date', [$check_in, $check_out])
-                       ->orWhereBetween('end_date', [$check_in, $check_out])
+                    $q2->whereBetween('check_in', [$check_in, $check_out])
+                       ->orWhereBetween('check_out', [$check_in, $check_out])
                        ->orWhere(function ($q3) use ($check_in, $check_out) {
-                           $q3->where('start_date', '<=', $check_in)
-                              ->where('end_date', '>=', $check_out);
+                           $q3->where('check_in', '<=', $check_in)
+                              ->where('check_out', '>=', $check_out);
                        });
                 });
             });

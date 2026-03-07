@@ -14,10 +14,12 @@ class SideNavigation extends Component
     {
         $clientCount = User::where('client', 1)->count();
         $timeCount = User::where(function($query) {
-            $query->where('editor', 1)
-                ->orWhere('admin', 1)
-                ->orWhere('superadmin', 1);
-        })->count();
+                $query->where('editor', 1)
+                      ->orWhere('admin', 1);
+            })
+            ->where('superadmin', 0) // exclui superadmins
+            ->where('client', 0)     // exclui clients
+            ->count();
         $postsCount = Post::count();
         $propertyCount = Property::count();
         // Manifest count

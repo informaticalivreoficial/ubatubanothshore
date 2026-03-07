@@ -90,13 +90,16 @@
                         <i class="nav-icon fas fa-ticket-alt"></i>
                         <p>Reservas</p>
                     </a>
-                </li>     
-                <li class="nav-item">
-                    <a href="{{route('slides.index')}}" class="nav-link {{ Route::is('slides.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-film"></i>
-                        <p>Banners</p>
-                    </a>
                 </li>  
+                @if (auth()->user()->isSuperAdmin())
+                    <li class="nav-item">
+                        <a href="{{route('slides.index')}}" class="nav-link {{ Route::is('slides.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-film"></i>
+                            <p>Banners</p>
+                        </a>
+                    </li>
+                @endif  
+                  
                 <li class="nav-item">
                     <a href="{{route('menus.index')}}" class="nav-link {{ Route::is('menus.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-list"></i>

@@ -17,6 +17,7 @@ class PostGb extends Model
         'post',
         'path',
         'cover',
+        'watermark',
         'order_img',
     ];
 

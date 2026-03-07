@@ -22,7 +22,7 @@ class PropertyRssController extends Controller
         });
 
         return response()
-            ->view('web.'.$this->config->template.'.rss.properties', compact('properties'))
+            ->view('web.rss.properties', compact('properties'))
             ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }

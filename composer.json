@@ -9,7 +9,7 @@
         "coffeecode/cropper": "^2.0",
         "coffeecode/optimizer": "^2.1",
         "guzzlehttp/guzzle": "^7.2",
-        "intervention/image": "^2.7",
+        "intervention/image": "^3.11",
         "jeroennoten/laravel-adminlte": "^3.11",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",

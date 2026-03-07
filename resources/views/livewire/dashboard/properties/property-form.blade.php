@@ -54,7 +54,7 @@
         <form wire:submit.prevent="save" autocomplete="off">
             <!-- Conteúdo da aba Dados -->
             <div x-show="tab === 'dados'" x-transition>
-                <div class="bg-white" x-data="{ sale: @entangle('sale'), location: @entangle('location') }">
+                <div class="bg-white">
                     <div class="card-body text-muted">
                         <div class="row">                           
                             <div class="col-12 col-md-6 col-lg-5">   
@@ -122,10 +122,22 @@
                                     @enderror
                                 </div>
                             </div>
-                            <div class="col-12 col-md-3 col-lg-2"> 
+                            <div class="col-12 col-md-3 col-lg-3"> 
                                 <div class="form-group">
-                                    <label class="labelforms"><b>Hóspedes</b></label>
+                                    <label class="labelforms"><b>Max. Hóspedes</b></label>
                                     <input type="text" class="form-control" wire:model="capacity">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 col-lg-3"> 
+                                <div class="form-group">
+                                    <label class="labelforms"><b>Max. Hóspedes Extras</b></label>
+                                    <input type="text" class="form-control" wire:model="capacity">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 col-lg-3"> 
+                                <div class="form-group">
+                                    <label class="labelforms"><b>Mínimo de diárias</b></label>
+                                    <input type="text" class="form-control" wire:model="aditional_person">
                                 </div>
                             </div>
                         </div>
@@ -133,7 +145,10 @@
                         <div class="row">
                             <div class="col-12"> 
                                 <div class="form-group">
-                                    <label class="labelforms text-muted"><b>Deseja exibir os valores?</b> <small class="text-info">(valores exibidos no layout do cliente)</small></label>
+                                    <label class="labelforms text-muted">
+                                        <b>Deseja exibir os valores?</b>
+                                        <small class="text-info">(valores exibidos no layout do cliente)</small>
+                                    </label>
                                     <div class="form-check">
                                         <input id="display_valuessim" class="form-check-input" type="radio" value="1" wire:model="display_values">
                                         <label for="display_valuessim" class="form-check-label mr-5">Sim</label>
@@ -142,16 +157,115 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12 col-md-3 col-lg-2"> 
+
+                            {{-- Campo: Valor da Locação --}}
+                            <div class="col-12 col-md-3 col-lg-3"> 
                                 <div class="form-group"
-                                    x-data="maskMoeda(@entangle('rental_value'))"
-                                    x-init="init()"         
-                                    >
-                                    <label class="labelforms text-muted"><b>Locação</b></label>
-                                    <input type="text" class="form-control">
+                                    x-data="{
+                                        display: '',
+                                        init() {
+                                            // Inicializa com o valor do Livewire, se existir
+                                            let v = '{{ $rental_value ?? '' }}';
+                                            if (v) this.display = this.toDisplay(parseFloat(v));
+                                        },
+                                        toDisplay(num) {
+                                            if (isNaN(num)) return '';
+                                            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        },
+                                        toRaw(str) {
+                                            // '1.200,50' → '1200.50'
+                                            return str.replace(/\./g, '').replace(',', '.');
+                                        },
+                                        onInput(e) {
+                                            let raw = e.target.value.replace(/\D/g, '');
+                                            if (!raw) { this.display = ''; this.$wire.set('rental_value', null); return; }
+                                            let num = parseInt(raw, 10) / 100;
+                                            this.display = this.toDisplay(num);
+                                            this.$wire.set('rental_value', num.toFixed(2));
+                                        }
+                                    }"
+                                >
+                                    <label class="labelforms text-muted"><b>Valor da Locação</b></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        :value="display"
+                                        @input="onInput($event)"
+                                        placeholder="Ex: 1.200,50"
+                                        inputmode="numeric"
+                                    />
                                 </div>
-                            </div> 
+                            </div>
+
+                            {{-- Campo: Valor Hóspede Adicional --}}
+                            <div class="col-12 col-md-3 col-lg-3"> 
+                                <div class="form-group"
+                                    x-data="{
+                                        display: '',
+                                        init() {
+                                            let v = '{{ $value_aditional ?? '' }}';
+                                            if (v) this.display = this.toDisplay(parseFloat(v));
+                                        },
+                                        toDisplay(num) {
+                                            if (isNaN(num)) return '';
+                                            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        },
+                                        onInput(e) {
+                                            let raw = e.target.value.replace(/\D/g, '');
+                                            if (!raw) { this.display = ''; this.$wire.set('value_aditional', null); return; }
+                                            let num = parseInt(raw, 10) / 100;
+                                            this.display = this.toDisplay(num);
+                                            this.$wire.set('value_aditional', num.toFixed(2));
+                                        }
+                                    }"
+                                >
+                                    <label class="labelforms text-muted"><b>Valor Hóspede Adicional</b></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        :value="display"
+                                        @input="onInput($event)"
+                                        placeholder="Ex: 200,00"
+                                        inputmode="numeric"
+                                    />
+                                </div>
+                            </div>
+
+                            {{-- Campo: Taxa de Limpeza --}}
+                            <div class="col-12 col-md-3 col-lg-3"> 
+                                <div class="form-group"
+                                    x-data="{
+                                        display: '',
+                                        init() {
+                                            let v = '{{ $cleaning_fee ?? '' }}';
+                                            if (v) this.display = this.toDisplay(parseFloat(v));
+                                        },
+                                        toDisplay(num) {
+                                            if (isNaN(num)) return '';
+                                            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        },
+                                        onInput(e) {
+                                            let raw = e.target.value.replace(/\D/g, '');
+                                            if (!raw) { this.display = ''; this.$wire.set('cleaning_fee', null); return; }
+                                            let num = parseInt(raw, 10) / 100;
+                                            this.display = this.toDisplay(num);
+                                            this.$wire.set('cleaning_fee', num.toFixed(2));
+                                        }
+                                    }"
+                                >
+                                    <label class="labelforms text-muted"><b>Taxa de Limpeza</b></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        :value="display"
+                                        @input="onInput($event)"
+                                        placeholder="Ex: 150,00"
+                                        inputmode="numeric"
+                                    />
+                                </div>
+                            </div>
                         </div>
+
                         <hr class="my-4 border-gray-300">
                         <div class="row mb-2">
                             <div class="col-12 mb-2"> 
@@ -686,6 +800,14 @@
                                             class="absolute bottom-1 left-1 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded hover:bg-black">
                                         {{ $savedImage->cover ? 'Remover capa' : 'Definir capa' }}
                                     </button>
+
+                                    @if (!$savedImage->watermark)
+                                        <button type="button" title="Inserir Marca d'água"
+                                            wire:click="applyWatermarkImage({{ $savedImage->id }})"
+                                            class="absolute bottom-1 right-1 bg-yellow-500 px-2 py-1 rounded">
+                                            <i class="fas fa-copyright"></i>
+                                        </button>
+                                    @endif                                    
                                 </div>
                             @endforeach
 
@@ -723,6 +845,8 @@
                             </div>
                         </div>
                     </div>
+
+
                 </div>
             </div>
 
@@ -821,41 +945,7 @@
     </div>
 </div>
 
-<script>
-
-    document.addEventListener('swal', function(e) {
-        const data = e.detail[0];
-        Swal.fire({
-            title: data.title,
-            text: data.text,
-            icon: data.icon,
-            confirmButtonText: 'OK'
-        })
-    });
-
-    document.addEventListener('atualizado', function() {
-        Swal.fire({
-            title: 'Sucesso!',
-            text: "Imóvel atualizado com sucesso!",
-            icon: 'success',
-            timerProgressBar: true,
-            showConfirmButton: false,
-            timer: 3000 // Fecha automaticamente após 3 segundos
-        });
-    });
-
-    document.addEventListener('cadastrado', function() {
-        Swal.fire({
-            title: 'Sucesso!',
-            text: "Imóvel cadastrado com sucesso!",
-            icon: 'success',
-            timerProgressBar: true,
-            showConfirmButton: true,
-            timer: 3000 // Fecha automaticamente após 3 segundos
-        }).then(() => {
-            window.location.href = `/admin/imoveis/${property}/editar`;
-        });
-    });
+<script>    
     
     document.addEventListener("livewire:navigated", () => {
         $('#description').summernote({
@@ -932,29 +1022,7 @@
         initFlatpickr();
     });
 
-    function maskMoeda(livewireValue) {
-        return {
-            display: '',
-            raw: livewireValue,
-            init() {
-                this.display = this.format(this.raw);
-
-                this.$watch('display', value => {
-                    let number = value.replace(/\D/g, '');
-                    this.raw = number ? (number / 100) : null;
-                    this.display = this.format(this.raw);
-                });
-            },
-            format(value) {
-                if (!value) return '';
-                return (parseFloat(value)).toLocaleString('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                });
-            }
-        }
-    }
-
+    
     function imageGallery() {
         return {
             showModal: false,

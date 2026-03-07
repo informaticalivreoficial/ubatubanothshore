@@ -23,26 +23,32 @@
             </p>
 
             {{-- Search bar --}}
-            <form action="{{ route('web.property.search') }}" method="GET" class="fade-up-delay-3 search-bar rounded-2xl p-4 shadow-2xl max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+            <form action="{{ route('web.property.search') }}" method="GET" 
+            class="fade-up-delay-3 
+             bg-white/20 backdrop-blur-md 
+             border border-white/30
+             rounded-2xl p-6 shadow-2xl 
+             max-w-3xl mx-auto 
+             grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
                 {{-- Check-in --}}
                 <div class="flex flex-col gap-1">
-                    <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-in</label>
-                    <input type="date" name="check_in"
+                    <label class="text-xs font-medium text-white uppercase tracking-wider px-1">Check-in</label>
+                    <input type="date" id="check_in" name="check_in"
                         class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
                         value="{{ request('check_in') }}">
                 </div>
 
                 {{-- Check-out --}}
                 <div class="flex flex-col gap-1">
-                    <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-out</label>
-                    <input type="date" name="check_out"
+                    <label class="text-xs font-medium text-white uppercase tracking-wider px-1">Check-out</label>
+                    <input type="date" id="check_out" name="check_out"
                         class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
                         value="{{ request('check_out') }}">
                 </div>
 
                 {{-- Hóspedes --}}
                 <div class="flex flex-col gap-1">
-                    <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Hóspedes</label>
+                    <label class="text-xs font-medium text-white uppercase tracking-wider px-1">Hóspedes</label>
                     <input type="number" name="guests" min="1" class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary"
                         value="{{ request('guests', 1) }}">
                 </div>
@@ -106,6 +112,21 @@
 
 @push('scripts')
     <script>
-        
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const checkin = flatpickr("#check_in", {
+                dateFormat: "d/m/Y",
+                minDate: "today",
+                onChange: function(selectedDates){
+                    checkout.set("minDate", selectedDates[0]);
+                }
+            });
+
+            const checkout = flatpickr("#check_out", {
+                dateFormat: "d/m/Y",
+                minDate: "today"
+            });
+
+        });
     </script>
 @endpush

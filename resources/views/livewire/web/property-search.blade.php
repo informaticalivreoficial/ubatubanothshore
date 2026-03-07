@@ -6,14 +6,14 @@
                 {{-- Check-in --}}
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-in</label>
-                    <input type="date" wire:model="check_in"
+                    <input type="date" id="check_in" wire:model="check_in" wire:ignore
                         class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all">
                 </div>
 
                 {{-- Check-out --}}
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-medium text-primary/60 uppercase tracking-wider px-1">Check-out</label>
-                    <input type="date" wire:model="check_out"
+                    <input type="date" id="check_out" wire:model="check_out" wire:ignore
                         class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all">
                 </div>
 
@@ -69,3 +69,24 @@
         
     </section>
 </div>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const checkin = flatpickr("#check_in", {
+                dateFormat: "d/m/Y",
+                minDate: "today",
+                onChange: function(selectedDates){
+                    checkout.set("minDate", selectedDates[0]);
+                }
+            });
+
+            const checkout = flatpickr("#check_out", {
+                dateFormat: "d/m/Y",
+                minDate: "today"
+            });
+
+        });
+    </script>
+@endpush

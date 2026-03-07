@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard\Properties;
 
 use App\Http\Requests\Admin\StoreUpdatePropertyRequest;
+use App\Models\Config;
 use App\Models\Property;
 use App\Models\PropertyGb;
 use Illuminate\Support\Facades\Http;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\WithFileUploads;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class PropertyForm extends Component
 {
@@ -17,7 +20,7 @@ class PropertyForm extends Component
 
     public ?Property $property = null;
 
-    public array $types = ['venda', 'locacao'];
+    //public array $types = ['venda', 'locacao'];
 
     public array $images = [];
     public $savedImages = [];
@@ -26,7 +29,8 @@ class PropertyForm extends Component
     public ?string $expired_at = null;
 
     public $category, $type,
-       $rental_value, $location_period, $iptu, $construction_year,
+       $rental_value, $location_period, $iptu, $construction_year, $min_nights,
+       $cleaning_fee, $aditional_person, $value_aditional,
        $reference, $condominium, $description, $additional_notes, $politica_cancelamento,
        $dormitories, $capacity, $suites, $bathrooms, $rooms, $garage, $covered_garage,
        $total_area, $useful_area, $measures,
@@ -186,15 +190,23 @@ class PropertyForm extends Component
     // Salvar (create ou update)
     public function save(string $mode = 'draft')
     {
-        try {            
+        
+        try {       
+            //dd('entrou no save');     
             // Validação principal            
             $validated = $this->validate((new StoreUpdatePropertyRequest())->rules()); 
+
+            // Campos de moeda
+            $validatedData['rental_value'] = $this->rental_value ? str_replace([',','R$',' '], ['', '.', ''], $this->rental_value) : 0;
+            $validatedData['value_aditional'] = $this->value_aditional ? str_replace([',','R$',' '], ['', '.', ''], $this->value_aditional) : 0;
+            $validatedData['cleaning_fee'] = $this->cleaning_fee ? str_replace([',','R$',' '], ['', '.', ''], $this->cleaning_fee) : 0;
+
             // Converte array de metatags em string para o banco
             $validated['metatags'] = implode(',', $this->metatags ?? []);
             // status depende do botão
             $validated['status'] = $mode === 'published' ? 1 : 0;  
                       
-
+            
             foreach ($this->booleanFields as $field) {
                 $validated[$field] = (bool) $this->{$field};
             }            
@@ -206,26 +218,43 @@ class PropertyForm extends Component
 
                 // Validação das imagens
                 $this->validate([
-                    'images.*' => 'image|max:2048',
+                    'images.*' => 'image|mimes:jpeg,jpg,png,webp,heic|max:2048',
                 ]);                
 
-                $maxImages = env('MAX_PROPERTY_IMAGES', 40);
+                $maxImages = env('MAX_PROPERTY_IMAGES', 35);
                 $existingImages = $this->property->images()->count();
                 $allowed = $maxImages - $existingImages;
                 if (count($this->images ?? []) > $allowed) {
-                    $this->dispatch('swal', [
+                    $this->dispatch('swal:warning', [
                         'title' => 'Atenção!',
-                        'text' => "Você já atingiu o limite máximo de {$maxImages} imagens para este imóvel.",
+                        'text' => "Este imóvel tem um limite de {$maxImages} imagens.",
+                        //'timer' => 2000,
                         'icon' => 'warning',
-                    ]);
+                        'showConfirmButton' => false
+                    ]);                    
                     return;
                 }
 
-                // Salvar imagens
-                foreach ($this->images as $index => $image) {
-                    if ($index >= $allowed) break; // garante que só serão salvas as permitidas
+                $manager = new ImageManager(new Driver());
 
-                    $path = $image->store('properties/' . $this->property->id, 'public');
+                foreach ($this->images as $index => $image) {
+
+                    if ($index >= $allowed) break;
+
+                    $filename = uniqid() . '.webp';
+                    $path = 'properties/' . $this->property->id . '/' . $filename;
+
+                    // abrir imagem
+                    $img = $manager->read($image->getRealPath());
+
+                    // redimensionar (opcional mas recomendado)
+                    $img->scaleDown(width: 1920);
+
+                    // converter para webp
+                    $encoded = $img->toWebp(85);
+
+                    // salvar no storage
+                    Storage::disk('public')->put($path, $encoded);
 
                     $maxOrder = PropertyGb::where('property', $this->property->id)->max('order_img') ?? 0;
 
@@ -234,28 +263,32 @@ class PropertyForm extends Component
                         'path' => $path,
                         'cover' => $this->cover ?? null,
                         'order_img' => $maxOrder + $index + 1,
+                        'watermark' => false
                     ]);
-                }
+                }  
     
                 // Limpar imagens temporárias
                 $this->reset('images');
-                $this->dispatch(['atualizado']);
-            }else{
-                //Criar
-                if (!$this->sale && !$this->location) {
-                    $this->dispatch('swal', [
-                        'title' => 'Erro!',
-                        'icon'  => 'error',
-                        'text'  => 'Selecione pelo menos uma finalidade (Venda ou Locação).'
-                    ]);
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        'sale' => 'Selecione pelo menos uma finalidade (Venda ou Locação).',
-                    ]);
-                }
+
+                $this->dispatch('swal:success', [
+                    'title' => 'Sucesso!',
+                    'text' => 'Imóvel atualizado com sucesso!',
+                    'timer' => 2000,
+                    'showConfirmButton' => false
+                ]);
+            }else{               
                 
                 $property = Property::create($validated);
                 $this->reset('images');
-                $this->dispatch(['cadastrado']);
+
+                $this->dispatch('swal:success', [
+                    'title' => 'Sucesso!',
+                    'text' => 'Imóvel cadastrado com sucesso!',
+                    'timer' => 2000,
+                    'showConfirmButton' => false,
+                    'redirectUrl' => route('property.edit', ['property' => $property->id]),
+                ]);
+                
                 $this->property = $property; // Atualiza a propriedade para o novo registro
             }
 
@@ -344,5 +377,35 @@ class PropertyForm extends Component
         } catch (\Exception $e) {
             $this->toastError('Erro ao atualizar ordem das imagens: ' . $e->getMessage());
         }
+    }
+
+    public function applyWatermarkImage($imageId)
+    {
+        $image = PropertyGb::find($imageId);
+
+        if ($image->watermarked) {
+            return;
+        }
+
+        $config = Config::first();
+
+        $manager = new ImageManager(new Driver());
+
+        $img = $manager->read(storage_path('app/public/'.$image->path));
+        $watermark = $manager->read(storage_path('app/public/'.$config->watermark));
+
+        $img->place($watermark, 'bottom-right', 30, 30);
+        $img->save();
+
+        $image->update([
+            'watermark' => true
+        ]);
+
+        $this->dispatch('swal:success', [
+            'title' => false,
+            'text' => 'Marca d’água aplicada!',
+            'timer' => 2000,
+            'showConfirmButton' => false
+        ]);
     }
 }

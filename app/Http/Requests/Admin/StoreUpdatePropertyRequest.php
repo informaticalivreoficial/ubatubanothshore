@@ -32,8 +32,10 @@ class StoreUpdatePropertyRequest extends FormRequest
             'status'        => 'nullable|integer',
 
             // Pricing and Values
-            'display_values' => 'nullable|boolean', 
-            'rental_value'   => 'nullable|numeric',
+            'display_values'     => 'nullable|boolean', 
+            'rental_value'       => 'nullable|numeric',
+            'cleaning_fee'       => 'nullable|numeric',
+            'value_aditional'    => 'nullable|numeric',
             
             // Basic Info
             'reference'         => 'nullable|string|max:255',
@@ -47,6 +49,10 @@ class StoreUpdatePropertyRequest extends FormRequest
             'description'       => 'nullable|string',
             'additional_notes'  => 'nullable|string',
             'politica_cancelamento'  => 'nullable|string',
+            'min_nights'        => 'nullable|integer',
+            'capacity'        => 'nullable|integer',
+            'aditional_person'              => 'nullable|integer',
+
             'dormitories'       => 'required|integer',
             'suites'            => 'nullable|integer',
             'bathrooms'         => 'nullable|integer',
@@ -126,15 +132,15 @@ class StoreUpdatePropertyRequest extends FormRequest
             'publication_type'      => 'nullable|integer',                            
         ];
     }
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            $sale     = $this->input('sale', false);
-            $location = $this->input('location', false);
+    // public function withValidator($validator)
+    // {
+    //     $validator->after(function ($validator) {
+    //         $sale     = $this->input('sale', false);
+    //         $location = $this->input('location', false);
 
-            if (!$sale && !$location) {
-                $validator->errors()->add('sale', 'Selecione pelo menos uma finalidade (Venda ou Locação).');
-            }
-        });
-    }
+    //         if (!$sale && !$location) {
+    //             $validator->errors()->add('sale', 'Selecione pelo menos uma finalidade (Venda ou Locação).');
+    //         }
+    //     });
+    // }
 }

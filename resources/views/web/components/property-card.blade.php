@@ -1,15 +1,36 @@
 @props(['property'])
 
-<a href="{{route('web.property',['slug' => $property->slug])}}"
-   class="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+<div class="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
 
     {{-- Imagem --}}
     <div class="relative aspect-[4/3] bg-gray-100">
-        <img
+        <a href="{{route('web.property',['slug' => $property->slug])}}">
+            <img
             src="{{ $property->cover() }}"
             alt="{{ $property->title }}"
             class="w-full h-full object-cover"
             loading="lazy">
+        </a>
+
+        @auth
+        @if(!auth()->user()->client)
+            <a href="{{ route('property.edit', $property->id) }}"
+                class="absolute bottom-2 right-2 bg-black/50 hover:bg-black/70 text-white p-1.5 rounded-full transition"
+                title="Editar imóvel">
+
+                <svg xmlns="http://www.w3.org/2000/svg" 
+                    class="w-4 h-4" 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor" 
+                    stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M16.862 3.487a2.1 2.1 0 013.03 2.9l-10.5 11.3L6 18l.5-3.4 10.362-11.113z"/>
+                </svg>
+
+            </a>
+        @endif
+        @endauth
 
         {{-- Bairro --}}
         @if ($property->neighborhood)
@@ -35,9 +56,11 @@
     {{-- Conteúdo --}}
     <div class="p-4">
 
-        <h3 class="text-xl font-bold line-clamp-2">
-            {{ $property->title }}
-        </h3>
+        <a href="{{route('web.property',['slug' => $property->slug])}}">
+            <h3 class="text-xl font-bold line-clamp-2">
+                {{ $property->title }}
+            </h3>
+        </a>
 
         {{-- Headline --}}
         @if($property->headline)
@@ -80,4 +103,4 @@
             @endif
         </ul>
     </div>
-</a>
+</div>

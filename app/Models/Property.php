@@ -97,7 +97,7 @@ class Property extends Model
 
         //SEO
         'title', 'slug', 'status', 'views', 'metatags', 'headline',
-        'display_marked_water', 'youtube_video', 'caption_img_cover', 'google_map',
+        'youtube_video', 'caption_img_cover', 'google_map',
         'experience', 'highlight', 'publication_type'
     ];
 
@@ -211,9 +211,9 @@ class Property extends Model
                     ->orderBy('cover', 'DESC'); // cover primeiro (1 antes de 0)
     }
 
-    public function imagesmarkedwater()
+    public function hasImagesWithoutWatermark()
     {
-        return $this->hasMany(PropertyGb::class, 'property', 'id')->whereNull('watermark')->count();
+        return $this->images->where('watermark', false)->isNotEmpty();
     }
 
     public function reviews()
@@ -234,11 +234,11 @@ class Property extends Model
         $hasReservation = $this->reservations()
             ->where('status', '!=', 'cancelled')
             ->where(function ($query) use ($checkin, $checkout) {
-                $query->whereBetween('checkin', [$checkin, $checkout])
-                    ->orWhereBetween('checkout', [$checkin, $checkout])
+                $query->whereBetween('check_in', [$checkin, $checkout])
+                    ->orWhereBetween('check_out', [$checkin, $checkout])
                     ->orWhere(function ($q) use ($checkin, $checkout) {
-                        $q->where('checkin', '<=', $checkin)
-                            ->where('checkout', '>=', $checkout);
+                        $q->where('check_in', '<=', $checkin)
+                            ->where('check_out', '>=', $checkout);
                     });
             })
             ->exists();
@@ -357,11 +357,6 @@ class Property extends Model
     public function setDisplayValuesAttribute($value)
     {
         $this->attributes['display_values'] = ($value == true || $value == '1' ? 1 : 0);
-    }
-
-    public function setDisplayMarkedWaterAttribute($value)
-    {
-        $this->attributes['display_marked_water'] = ($value == true || $value == '1' ? 1 : 0);
     }
 
     public function setStatusAttribute($value)

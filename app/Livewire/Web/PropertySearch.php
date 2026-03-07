@@ -59,11 +59,11 @@ class PropertySearch extends Component
         if ($this->check_in && $this->check_out) {
             $query->whereDoesntHave('reservations', function ($q) {
                 $q->where(function ($q2) {
-                    $q2->whereBetween('start_date', [$this->check_in, $this->check_out])
-                       ->orWhereBetween('end_date', [$this->check_in, $this->check_out])
+                    $q2->whereBetween('check_in', [$this->check_in, $this->check_out])
+                       ->orWhereBetween('check_out', [$this->check_in, $this->check_out])
                        ->orWhere(function ($q3) {
-                           $q3->where('start_date', '<=', $this->check_in)
-                              ->where('end_date', '>=', $this->check_out);
+                           $q3->where('check_in', '<=', $this->check_in)
+                              ->where('check_out', '>=', $this->check_out);
                        });
                 });
             });

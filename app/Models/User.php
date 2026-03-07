@@ -59,9 +59,22 @@ class User extends Authenticatable
         'superadmin' => 'boolean',
     ];
 
+    // Verifica se o usuário é superadmin (nível máximo)
+    public function isSuperAdmin(): bool
+    {
+        return $this->superadmin === true;
+    }
+
+    // Verifica se o usuário pode editar imóveis (superadmin, admin ou editor)
     public function canEditProperties(): bool
     {
         return $this->admin || $this->superadmin || $this->editor;
+    }
+
+    // Só admin e editor, sem superadmin
+    public function isAdminOrEditor(): bool
+    {
+        return $this->admin || $this->editor;
     }
 
     /**

@@ -88,9 +88,9 @@
                                                 <button 
                                                     type="button" 
                                                     wire:click="applyWatermark({{ $property->id }})"
-                                                    class="btn btn-xs {{ $property->display_marked_water ? 'btn-warning' : 'btn-secondary' }}"
+                                                    class="btn btn-xs {{ $property->hasImagesWithoutWatermark() ? 'btn-warning' : 'btn-secondary' }}"
                                                     title="Inserir Marca d'água"
-                                                    @if($property->display_marked_water) disabled @endif
+                                                    @if(!$property->hasImagesWithoutWatermark()) disabled @endif
                                                 >
                                                     <i class="fas fa-copyright"></i>
                                                 </button>

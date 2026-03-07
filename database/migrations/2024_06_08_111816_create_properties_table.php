@@ -114,7 +114,6 @@ return new class extends Migration
             $table->boolean('vista_para_mar')->nullable();
             $table->boolean('wifi')->nullable();
             
-            $table->boolean('display_marked_water')->nullable(); 
             $table->text('youtube_video')->nullable(); 
             
             $table->bigInteger('views')->default('0');

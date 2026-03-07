@@ -41,15 +41,15 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     Route::get('/imoveis', [PropertyController::class, 'index'])->name('properties');
     Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
     Route::get('/pesquisar-imoveis', [PropertyController::class, 'search'])->name('property.search');
-
     Route::get('/checkout/{property}', [PropertyController::class, 'checkout'])->name('checkout');
+    
     Route::get('/atendimento', [PageController::class, 'contact'])->name('contact');
     Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');
     Route::get('/termos-e-condicoes', [PageController::class, 'terms'])->name('terms');
     Route::get('/avaliacao/{token}', [PageController::class, 'review'])->name('review');
     Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
 
-    //Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
+    Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
 
 //     /** FEED */
 //     Route::get('feed', [FeedController::class, 'feed'])->name('feed');
