@@ -48,14 +48,7 @@ Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
     Route::get('/termos-e-condicoes', [PageController::class, 'terms'])->name('terms');
     Route::get('/avaliacao/{token}', [PageController::class, 'review'])->name('review');
     Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
-
     Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
-
-//     /** FEED */
-//     Route::get('feed', [FeedController::class, 'feed'])->name('feed');
-    
-//     Route::get('/sitemap', [WebController::class, 'sitemap'])->name('sitemap');
-
 });
 
 Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], function () {
