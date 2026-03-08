@@ -5,6 +5,7 @@
     <meta name="language" content="pt-br" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="copyright" content="{{$configuracoes->init_date}} - {{$configuracoes->app_name}}">
+    <meta name="msvalidate.01" content="AB238289F13C246C5E386B6770D9F10E" />
     
     {!! $head ?? '' !!}     
     
