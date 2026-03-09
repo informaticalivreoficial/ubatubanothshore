@@ -49,9 +49,14 @@
                     @click="tab = 'seo'">
                 🔍 Seo
             </button>
+            <button type="button"
+                    class="px-4 py-2 text-sm font-medium rounded-t-lg focus:outline-none transition-all duration-200"
+                    :class="tab === 'season' ? 'bg-white border-l border-t border-r text-blue-600' : 'text-gray-500 hover:text-blue-500'"
+                    @click="tab = 'season'">
+                📅 Temporada
+            </button>
         </div>
-
-        <form wire:submit.prevent="save" autocomplete="off">
+        
             <!-- Conteúdo da aba Dados -->
             <div x-show="tab === 'dados'" x-transition>
                 <div class="bg-white">
@@ -439,11 +444,15 @@
                             <div class="col-12">
                                 <livewire:dashboard.properties.calendar :property="$property" />
                             </div>
-                        </div>                        
+                        </div> 
+                        
+                        
                                                 
                     </div>
                 </div>
             </div>
+
+
             <div x-show="tab === 'estrutura'" x-transition>
                 <div class="bg-white p-4">
                     <div class="row mb-4">
@@ -705,7 +714,7 @@
                     </div>
                 </div>
             </div>
-            
+        
             <div x-show="tab === 'imagens'" x-transition class="relative">
 
                 <div
@@ -860,78 +869,90 @@
             <div x-show="tab === 'seo'" x-transition>
                 <div class="bg-white p-4">
                     <div class="row mb-2 text-muted">                                   
-                            <div class="col-12 col-md-6 col-lg-6">   
-                                <div class="form-group">
-                                    <label class="labelforms"><b>Headline</b></label>
-                                    <input type="text" class="form-control" wire:model="headline">
-                                </div>                                                    
+                        <div class="col-12 col-md-6 col-lg-6">   
+                            <div class="form-group">
+                                <label class="labelforms"><b>Headline</b></label>
+                                <input type="text" class="form-control" wire:model="headline">
+                            </div>                                                    
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-6"> 
+                            <div class="form-group">
+                                <label class="labelforms"><b>Experiência</b></label>
+                                <select class="form-control" wire:model="experience">
+                                    <option value=""> Selecione </option>
+                                    <option value="Cobertura">Cobertura</option>
+                                    <option value="Alto Padrão">Alto Padrão</option>
+                                    <option value="De Frente para o Mar">De Frente para o Mar</option>
+                                    <option value="Condomínio Fechado">Condomínio Fechado</option>
+                                    <option value="Compacto">Compacto</option>
+                                    <option value="Lojas e Salas">Lojas e Salas</option>
+                                </select>
                             </div>
-                            <div class="col-12 col-md-6 col-lg-6"> 
-                                <div class="form-group">
-                                    <label class="labelforms"><b>Experiência</b></label>
-                                    <select class="form-control" wire:model="experience">
-                                        <option value=""> Selecione </option>
-                                        <option value="Cobertura">Cobertura</option>
-                                        <option value="Alto Padrão">Alto Padrão</option>
-                                        <option value="De Frente para o Mar">De Frente para o Mar</option>
-                                        <option value="Condomínio Fechado">Condomínio Fechado</option>
-                                        <option value="Compacto">Compacto</option>
-                                        <option value="Lojas e Salas">Lojas e Salas</option>
-                                    </select>
-                                </div>
-                            </div>                                    
-                            <div class="col-12 mb-1"> 
-                                <div class="form-group">
-                                    <label class="labelforms"><b>MetaTags</b></label>
-                                    <div 
-                                        x-data="{
-                                            tags: @entangle('metatags'),
-                                            input: '',
-                                            addTag() {
-                                                const trimmed = this.input.trim();
-                                                if (trimmed && !this.tags.includes(trimmed)) {
-                                                    this.tags.push(trimmed);
-                                                }
-                                                this.input = '';
-                                            },
-                                            removeTag(index) {
-                                                this.tags.splice(index, 1);
+                        </div>                                    
+                        <div class="col-12 mb-1"> 
+                            <div class="form-group">
+                                <label class="labelforms"><b>MetaTags</b></label>
+                                <div 
+                                    x-data="{
+                                        tags: @entangle('metatags'),
+                                        input: '',
+                                        addTag() {
+                                            const trimmed = this.input.trim();
+                                            if (trimmed && !this.tags.includes(trimmed)) {
+                                                this.tags.push(trimmed);
                                             }
-                                        }"
-                                        class="p-4 border rounded shadow"
-                                        >
-                                        <div class="flex flex-wrap gap-2 mb-2">
-                                            <template x-for="(tag, index) in tags" :key="index">
-                                                <span class="flex items-center bg-teal-500 text-white px-3 py-1 rounded-full">
-                                                    <span x-text="tag"></span>
-                                                    <button type="button" @click="removeTag(index)" class="ml-2 hover:text-gray-200">&times;</button>
-                                                </span>
-                                            </template>
-                                        </div>                                    
-                                        <input 
-                                            type="text" 
-                                            x-model="input" 
-                                            @keydown.enter.prevent="addTag"
-                                            placeholder="Digite uma tag e pressione Enter"
-                                            class="border border-gray-300 rounded px-3 py-2 w-full"
-                                        >
-                                    </div>
+                                            this.input = '';
+                                        },
+                                        removeTag(index) {
+                                            this.tags.splice(index, 1);
+                                        }
+                                    }"
+                                    class="p-4 border rounded shadow"
+                                    >
+                                    <div class="flex flex-wrap gap-2 mb-2">
+                                        <template x-for="(tag, index) in tags" :key="index">
+                                            <span class="flex items-center bg-teal-500 text-white px-3 py-1 rounded-full">
+                                                <span x-text="tag"></span>
+                                                <button type="button" @click="removeTag(index)" class="ml-2 hover:text-gray-200">&times;</button>
+                                            </span>
+                                        </template>
+                                    </div>                                    
+                                    <input 
+                                        type="text" 
+                                        x-model="input" 
+                                        @keydown.enter.prevent="addTag"
+                                        placeholder="Digite uma tag e pressione Enter"
+                                        class="border border-gray-300 rounded px-3 py-2 w-full"
+                                    >
                                 </div>
                             </div>
-                            <div class="col-12"> 
-                                <div class="form-group">
-                                    <label class="labelforms"><b>Youtube Vídeo</b></label>
-                                    <textarea id="inputDescription" class="form-control" rows="5" wire:model="youtube_video"></textarea> 
-                                </div>
-                            </div> 
-                            <div class="col-12">   
-                                <label class="labelforms"><b>Mapa do Google</b> <small class="text-info">(Copie o código de incorporação do Google Maps e cole abaixo)</small></label>
-                                <textarea id="inputDescription" class="form-control" rows="5" wire:model="google_map"></textarea>                                                      
+                        </div>
+                        <div class="col-12"> 
+                            <div class="form-group">
+                                <label class="labelforms"><b>Youtube Vídeo</b></label>
+                                <textarea id="inputDescription" class="form-control" rows="5" wire:model="youtube_video"></textarea> 
                             </div>
                         </div> 
-                    </div>
+                        <div class="col-12">   
+                            <label class="labelforms"><b>Mapa do Google</b> <small class="text-info">(Copie o código de incorporação do Google Maps e cole abaixo)</small></label>
+                            <textarea id="inputDescription" class="form-control" rows="5" wire:model="google_map"></textarea>                                                      
+                        </div>
+                    </div> 
                 </div>
             </div>
+
+            <div x-show="tab === 'season'" x-transition>
+                <div class="bg-white p-4">
+                    <div class="card-body text-muted">
+                        <div class="row">                           
+                            <div class="col-12">
+                                <livewire:dashboard.properties.seasons :property="$property" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+
             <div class="row text-right p-4 bg-white">
                 <div class="col-12 mb-4">
                     <button 
@@ -947,7 +968,7 @@
                     class="btn btn-success"><i class="nav-icon fas fa-check mr-2"></i>{{ $property->exists ? 'Atualizar e Publicar' : 'Salvar e Publicar' }}</button>
                 </div>
             </div>
-        </form>
+       
     </div>
 </div>
 

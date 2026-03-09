@@ -43,6 +43,8 @@ class CheckoutPage extends Component
 
     public $disabledDates = [];
 
+    public $seasonApplied = false;
+
     public function mount(Property $property, $check_in, $check_out, $guests)
     {
         $this->property = $property;
@@ -177,20 +179,46 @@ class CheckoutPage extends Component
             return;
         }
 
-        $checkIn = Carbon::parse($this->check_in);
+        $checkIn  = Carbon::parse($this->check_in);
         $checkOut = Carbon::parse($this->check_out);
 
         if ($checkOut->lte($checkIn)) {
             return;
         }
 
-        $this->nights = $checkIn->diffInDays($checkOut);
-
+        $this->nights     = $checkIn->diffInDays($checkOut);
         $this->cleaning_fee = $this->property->cleaning_fee ?? 0;
 
-        $this->subtotal = $this->property->rental_value * $this->nights;
+        // ✅ Cálculo dia a dia considerando temporadas
+        $seasons = $this->property->seasons()
+            ->where('start_date', '<=', $checkOut->toDateString())
+            ->where('end_date', '>=', $checkIn->toDateString())
+            ->get();
 
-        // 🔥 EXTRA GUESTS (MESMA LÓGICA DO BOOKING FORM)
+        $this->subtotal = 0;
+        $this->seasonApplied = false; // ✅ reseta
+        $current = $checkIn->copy();
+
+        while ($current->lt($checkOut)) {
+
+            $season = $seasons->first(function ($s) use ($current) {
+                return $current->between(
+                    Carbon::parse($s->start_date),
+                    Carbon::parse($s->end_date)
+                );
+            });
+
+            if ($season) {
+                $this->seasonApplied = true; // ✅ marca se usou temporada
+                $this->subtotal += $season->price_per_day;
+            } else {
+                $this->subtotal += $this->property->rental_value;
+            }
+
+            $current->addDay();
+        }
+
+        // 🔥 Extra guests
         $this->extraGuests = max(
             0,
             (int) $this->guests - (int) $this->property->aditional_person
@@ -201,11 +229,8 @@ class CheckoutPage extends Component
             $this->property->value_aditional *
             $this->nights;
 
-        // 💰 TOTAL FINAL
-        $this->total =
-            $this->subtotal +
-            $this->extraTotal +
-            $this->cleaning_fee;
+        // 💰 Total final
+        $this->total = $this->subtotal + $this->extraTotal + $this->cleaning_fee;
     }
 
     public function render()

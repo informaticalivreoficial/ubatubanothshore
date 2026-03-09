@@ -194,10 +194,11 @@
 
                             <div class="flex justify-between mb-2">
                                 <span class="text-sm text-gray-600">
-                                    R$ {{ number_format($property->rental_value, 2, ',', '.') }}
-                                    x {{ $nights }} noite(s)
+                                    {{ $nights }} noite(s)
+                                    @if($seasonApplied)
+                                        <span class="text-xs text-gray-400">(temporadas aplicadas)</span>
+                                    @endif
                                 </span>
-
                                 <span class="text-sm text-gray-700">
                                     R$ {{ number_format($subtotal, 2, ',', '.') }}
                                 </span>

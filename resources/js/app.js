@@ -3,11 +3,11 @@ import './bootstrap';
 import Swal from 'sweetalert2'
 window.Swal = Swal
 
-import flatpickr from "flatpickr";
-import { Portuguese } from "flatpickr/dist/l10n/pt.js";
+import flatpickr from "flatpickr"
+import { Portuguese } from "flatpickr/dist/l10n/pt.js"
 
-flatpickr.localize(Portuguese);
-window.flatpickr = flatpickr;
+window.flatpickr = flatpickr
+window.FlatpickrPortuguese = Portuguese
 
 import { Calendar } from '@fullcalendar/core'
 import dayGridPlugin from '@fullcalendar/daygrid'

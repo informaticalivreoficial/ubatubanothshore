@@ -3,12 +3,41 @@
 @tailwind components;
 @tailwind utilities;
 
+.flatpickr-calendar * {
+    box-sizing: border-box;
+}
+
+.flatpickr-calendar {
+    font-size: 14px;
+}
+
+.flatpickr-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flatpickr-weekday {
+    text-align: center;
+}
+
+.flatpickr-day.selected {
+    @apply bg-green-600 border-green-600 text-white;
+}
+
+.flatpickr-day.inRange {
+    @apply bg-green-100;
+}
 
 
 @layer base {
   body {
     @apply font-sans text-text-main bg-white overflow-x-hidden;
-  }
+  }  
+
+  
+
+ 
 
   h1, h2, h3, h4, h5 {
     @apply font-heading;

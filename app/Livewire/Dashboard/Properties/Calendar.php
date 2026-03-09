@@ -3,6 +3,7 @@
 namespace App\Livewire\Dashboard\Properties;
 
 use App\Models\Property;
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
@@ -12,28 +13,32 @@ class Calendar extends Component
 
     public function mount(Property $property)
     {
-        $this->property = $property;
+        $this->property = $property->load([
+            'reservations',
+            'blockedDates',
+            'seasons'
+        ]);
     }
 
     public function getEvents()
     {
         $events = [];
 
+        // RESERVAS
         foreach ($this->property->reservations as $reservation) {
 
             if ($reservation->status !== 'cancelled') {
 
                 $events[] = [
-                    'title' => 'Reserva: ' . $reservation->guest_name,
-                    'start' => $reservation->check_in,
-                    'end' => $reservation->check_out,
+                    'title'  => 'Reserva: ' . $reservation->guest_name,
+                    'start'  => $reservation->check_in,
+                    'end'    => $reservation->check_out,
                     'allDay' => true,
-                    'color' => match($reservation->status) {
+                    'color'  => match($reservation->status) {
                         'confirmed' => '#22c55e',
                         'finished'  => '#3b82f6',
-                        default     => '#ef4444', // pending
+                        default     => '#ef4444',
                     },
-                    'type' => 'reservation',
                     'extendedProps' => [
                         'type' => 'reservation',
                         'url'  => route('reservations.edit', $reservation),
@@ -42,15 +47,39 @@ class Calendar extends Component
             }
         }
 
+        // BLOQUEIOS
         foreach ($this->property->blockedDates as $blocked) {
 
             $events[] = [
-                'title' => 'Bloqueado',
-                'start' => $blocked->date,
+                'title'  => 'Bloqueado',
+                'start'  => $blocked->date,
                 'allDay' => true,
-                'color' => '#374151',
-                'type' => 'blocked',
+                'color'  => '#374151',
+                'extendedProps' => [
+                    'type' => 'blocked',
+                ],
             ];
+        }
+
+        // TEMPORADAS
+        foreach ($this->property->seasons as $season) {
+
+            $start = \Carbon\Carbon::parse($season->start_date);
+            $end   = \Carbon\Carbon::parse($season->end_date);
+
+            while ($start <= $end) {
+                $events[] = [
+                    'title'           => 'R$ ' . number_format($season->price_per_day, 2, ',', '.'),
+                    'start'           => $start->toDateString(),
+                    'display'         => 'background',
+                    'backgroundColor' => '#16a3b7', // cor fixa para todas as temporadas
+                    'extendedProps'   => [
+                        'type' => 'season',
+                    ],
+                ];
+
+                $start->addDay();
+            }
         }
 
         return $events;

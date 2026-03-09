@@ -85,7 +85,7 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], functi
     // Route::get('templates', [TemplateController::class, 'index'])->name('templates.index');
 
     /** Imóveis */
-    Route::get('imoveis/{property}/calendario', ReservationCalendar::class)->name('property.calendar');
+    //Route::get('imoveis/{property}/calendario', ReservationCalendar::class)->name('property.calendar');
     Route::get('imoveis/{property}/editar', PropertyForm::class)->name('property.edit');
     Route::get('imoveis/cadastrar', PropertyForm::class)->name('properties.create');
     Route::get('imoveis', Properties::class)->name('properties.index');

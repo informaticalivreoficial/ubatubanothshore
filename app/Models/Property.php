@@ -260,23 +260,36 @@ class Property extends Model
         $checkin = Carbon::parse($checkin);
         $checkout = Carbon::parse($checkout);
 
+        $seasons = $this->seasons()->get();
+
         $total = 0;
 
-        for ($date = $checkin; $date < $checkout; $date->addDay()) {
+        for ($date = $checkin->copy(); $date < $checkout; $date->addDay()) {
 
-            $season = $this->seasons()
-                ->where('start_date', '<=', $date)
-                ->where('end_date', '>=', $date)
-                ->first();
+            $season = $seasons->first(fn($season) =>
+                $date->between($season->start_date, $season->end_date)
+            );
 
-            if ($season) {
-                $total += $season->price_per_night;
-            } else {
-                $total += $this->rental_value; // valor padrão
-            }
+            $total += $season
+                ? $season->price_per_night
+                : $this->rental_value;
         }
 
         return $total;
+    }
+
+    public function getPriceForDate($date)
+    {
+        $season = $this->seasons()
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->first();
+
+        if ($season) {
+            return $season->price_per_day;
+        }
+
+        return $this->price_per_day; // preço padrão da propriedade
     }
 
     public function getContentWebAttribute()

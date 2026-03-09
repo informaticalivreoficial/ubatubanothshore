@@ -97,7 +97,7 @@ class BookingForm extends Component
             return;
         }
 
-        $checkIn = Carbon::parse($this->check_in);
+        $checkIn  = Carbon::parse($this->check_in);
         $checkOut = Carbon::parse($this->check_out);
 
         if ($checkOut->lte($checkIn)) {
@@ -114,13 +114,35 @@ class BookingForm extends Component
             return;
         }
 
-        // 🔥 AQUI ESTAVA FALTANDO
         $this->extraGuests = max(
             0,
             (int) $this->guests - (int) $this->property->aditional_person
         );
 
-        $this->dailyTotal = $this->property->rental_value * $this->nights;
+        // ✅ Cálculo dia a dia considerando temporadas
+        $seasons = $this->property->seasons()
+            ->where('start_date', '<=', $checkOut)
+            ->where('end_date', '>=', $checkIn)
+            ->get();
+
+        $this->dailyTotal = 0;
+        $current = $checkIn->copy();
+
+        while ($current->lt($checkOut)) {
+
+            $season = $seasons->first(function ($s) use ($current) {
+                return $current->between(
+                    Carbon::parse($s->start_date),
+                    Carbon::parse($s->end_date)
+                );
+            });
+
+            $this->dailyTotal += $season
+                ? $season->price_per_day
+                : $this->property->rental_value;
+
+            $current->addDay();
+        }
 
         $this->extraTotal =
             $this->extraGuests *

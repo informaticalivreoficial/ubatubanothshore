@@ -104,40 +104,64 @@
     </button>
 </div>
 
+@push('styles')
+    <style>
+        
+    </style>
+@endpush
+
 @push('scripts')
     <script>
+        
         function dateRangePicker() {
             return {
                 init() {
 
                     let disabledDates = JSON.parse(this.$el.dataset.disabled)
-                        .map(date => new Date(date + "T00:00:00"));
-
-                    //console.log('Datas desabilitadas:', disabledDates);
+                    .map(date => {
+                        const [y, m, d] = date.split('-').map(Number)
+                        return new Date(y, m - 1, d) // ✅ horário local, sem UTC
+                    })                    
 
                     flatpickr(this.$refs.picker, {
                         mode: "range",
-                        dateFormat: "d/m/Y",
+                        dateFormat: "Y-m-d",
                         altInput: true,
                         altFormat: "d/m/Y",
                         showMonths: 2,
-                        minDate: "today",
-                        //locale: flatpickr.l10ns.pt,
+                        minDate: new Date(),
+                        locale: FlatpickrPortuguese, // ✅
                         rangeSeparator: " até ",
                         disable: disabledDates,
+                        utc: false,
+                        onReady: function(selectedDates, dateStr, instance) {
+                            instance.set('locale', {
+                                ...instance.l10n,
+                                firstDayOfWeek: 1
+                            });
+                        },
+
+                        
 
                         onChange: (selectedDates) => {
                             if (selectedDates.length === 2) {
 
-                                let formatToISO = (date) =>
-                                    date.toISOString().split('T')[0];
+                                let formatToISO = (date) => {
+                                    const y = date.getFullYear()
+                                    const m = String(date.getMonth() + 1).padStart(2, '0')
+                                    const d = String(date.getDate()).padStart(2, '0')
+                                    return `${y}-${m}-${d}`
+                                }
 
                                 @this.set('check_in', formatToISO(selectedDates[0]));
                                 @this.set('check_out', formatToISO(selectedDates[1]));
                                 @this.call('calculate');
                             }
+                            
                         }
                     });
+
+                    //console
                 }
             }
         }

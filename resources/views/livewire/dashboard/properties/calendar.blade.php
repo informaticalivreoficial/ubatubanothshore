@@ -11,7 +11,7 @@ function calendarComponent(events) {
 
     return {
 
-        calendar: null,
+        calendar: null,        
 
         initCalendar() {
 
@@ -23,7 +23,7 @@ function calendarComponent(events) {
                 height: 'auto',
                 selectable: true,
                 selectMirror: true,
-                events: events,
+                events: events, 
 
                 select: async (info) => {
 
@@ -67,6 +67,8 @@ function calendarComponent(events) {
 
                 eventClick: async (info) => {
 
+                    if (info.event.extendedProps.type === 'season') return
+
                     if (info.event.extendedProps.type === 'reservation') {
                         window.open(info.event.extendedProps.url, '_blank')
                         return
@@ -93,21 +95,33 @@ function calendarComponent(events) {
 
                     }
 
+                },
+
+                eventDidMount: (info) => {
+                    if (info.event.extendedProps.type === 'season') {
+                        info.el.style.color = '#ffffff'
+                        info.el.style.fontWeight = '600'
+                    }
                 }
 
             })
+            
 
             this.calendar.render()
 
             // 🔄 atualizar calendário
             Livewire.on('refreshCalendar', (events) => {
+                this.calendar.pauseRendering()
                 this.calendar.removeAllEvents()
                 events[0].forEach(event => {
                     this.calendar.addEvent(event)
                 })
-            })
+                this.calendar.resumeRendering()
+            })            
 
         }
+
+        
 
     }
 
