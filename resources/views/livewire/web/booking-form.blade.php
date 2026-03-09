@@ -49,10 +49,14 @@
             <div class="border-t pt-4 space-y-2 text-sm">
 
                 {{-- Diária --}}
-                <div class="flex justify-between">
+                <div class="flex justify-between">                    
                     <span>
-                        R$ {{ number_format($property->rental_value, 2, ',', '.') }}
-                        x {{ $nights }} noite(s)
+                        {{ $nights }} noite(s) X
+                        @if ($seasonApplied)
+                            <span class="text-xs text-gray-400">(temporadas aplicadas)</span>
+                        @else    
+                            R$ {{ number_format($property->rental_value, 2, ',', '.') }}
+                        @endif                        
                     </span>
                     <span>
                         R$ {{ number_format($dailyTotal, 2, ',', '.') }}

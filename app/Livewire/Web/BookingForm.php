@@ -27,6 +27,9 @@ class BookingForm extends Component
 
     public $disabledDates = [];
 
+    public $seasonApplied = false;
+    public $seasonMinNightsError = null;
+
     public function mount(Property $property)
     {
         $this->property = $property;
@@ -114,18 +117,38 @@ class BookingForm extends Component
             return;
         }
 
+        // ✅ Busca temporadas que se sobrepõem ao período
+        $seasons = $this->property->seasons()
+            ->where('start_date', '<=', $checkOut->toDateString())
+            ->where('end_date', '>=', $checkIn->toDateString())
+            ->get();
+
+        // ✅ Valida período completo da temporada
+        foreach ($seasons as $season) {
+            $seasonStart  = Carbon::parse($season->start_date);
+            $seasonEnd    = Carbon::parse($season->end_date);
+            $seasonNights = $seasonStart->diffInDays($seasonEnd) + 1;
+
+            $startsInSeason = $checkIn->between($seasonStart, $seasonEnd);
+            $endsInSeason   = $checkOut->subDay()->between($seasonStart, $seasonEnd);
+
+            if ($startsInSeason || $endsInSeason) {
+                if (!$checkIn->eq($seasonStart) || !$checkOut->addDay()->eq($seasonEnd->addDay())) {
+                    $this->dateError = "A temporada '{$season->label}' exige reserva do período completo: {$seasonStart->format('d/m/Y')} até {$seasonEnd->format('d/m/Y')} ({$seasonNights} noite(s)).";
+                    $this->reset(['dailyTotal', 'total', 'extraGuests', 'extraTotal']);
+                    return;
+                }
+            }
+        }
+
         $this->extraGuests = max(
             0,
             (int) $this->guests - (int) $this->property->aditional_person
         );
 
-        // ✅ Cálculo dia a dia considerando temporadas
-        $seasons = $this->property->seasons()
-            ->where('start_date', '<=', $checkOut)
-            ->where('end_date', '>=', $checkIn)
-            ->get();
+        $this->dailyTotal    = 0;
+        $this->seasonApplied = false;
 
-        $this->dailyTotal = 0;
         $current = $checkIn->copy();
 
         while ($current->lt($checkOut)) {
@@ -137,9 +160,12 @@ class BookingForm extends Component
                 );
             });
 
-            $this->dailyTotal += $season
-                ? $season->price_per_day
-                : $this->property->rental_value;
+            if ($season) {
+                $this->seasonApplied  = true;
+                $this->dailyTotal    += $season->price_per_day;
+            } else {
+                $this->dailyTotal += $this->property->rental_value;
+            }
 
             $current->addDay();
         }

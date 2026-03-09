@@ -49,12 +49,14 @@
                     @click="tab = 'seo'">
                 🔍 Seo
             </button>
-            <button type="button"
-                    class="px-4 py-2 text-sm font-medium rounded-t-lg focus:outline-none transition-all duration-200"
-                    :class="tab === 'season' ? 'bg-white border-l border-t border-r text-blue-600' : 'text-gray-500 hover:text-blue-500'"
-                    @click="tab = 'season'">
-                📅 Temporada
-            </button>
+            @if ($property->exists)
+                <button type="button"
+                        class="px-4 py-2 text-sm font-medium rounded-t-lg focus:outline-none transition-all duration-200"
+                        :class="tab === 'season' ? 'bg-white border-l border-t border-r text-blue-600' : 'text-gray-500 hover:text-blue-500'"
+                        @click="tab = 'season'">
+                    📅 Temporada
+                </button>
+            @endif            
         </div>
         
             <!-- Conteúdo da aba Dados -->
@@ -136,13 +138,13 @@
                             <div class="col-12 col-md-3 col-lg-3"> 
                                 <div class="form-group">
                                     <label class="labelforms"><b>Max. Hóspedes Extras</b></label>
-                                    <input type="text" class="form-control" wire:model="capacity">
+                                    <input type="text" class="form-control" wire:model="aditional_person">
                                 </div>
                             </div>
                             <div class="col-12 col-md-3 col-lg-3"> 
                                 <div class="form-group">
                                     <label class="labelforms"><b>Mínimo de diárias</b></label>
-                                    <input type="text" class="form-control" wire:model="aditional_person">
+                                    <input type="text" class="form-control" wire:model="min_nights">
                                 </div>
                             </div>
                         </div>
@@ -440,11 +442,13 @@
                             </div>
                         </div> 
 
-                        <div class="row mb-2">
-                            <div class="col-12">
-                                <livewire:dashboard.properties.calendar :property="$property" />
+                        @if ($property->exists)
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <livewire:dashboard.properties.calendar :property="$property" />
+                                </div>
                             </div>
-                        </div> 
+                        @endif                       
                         
                         
                                                 
@@ -941,17 +945,19 @@
                 </div>
             </div>
 
-            <div x-show="tab === 'season'" x-transition>
-                <div class="bg-white p-4">
-                    <div class="card-body text-muted">
-                        <div class="row">                           
-                            <div class="col-12">
-                                <livewire:dashboard.properties.seasons :property="$property" />
+            @if ($property->exists)
+                <div x-show="tab === 'season'" x-transition>
+                    <div class="bg-white p-4">
+                        <div class="card-body text-muted">
+                            <div class="row">                           
+                                <div class="col-12">
+                                    <livewire:dashboard.properties.seasons :property="$property" />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div> 
+            @endif             
 
             <div class="row text-right p-4 bg-white">
                 <div class="col-12 mb-4">
