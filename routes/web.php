@@ -4,6 +4,7 @@ use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Livewire\Dashboard\Dashboard;
 use App\Livewire\Dashboard\{
+    NotificationsList,
     Settings,
 };
 use App\Livewire\Dashboard\Users\{
@@ -29,6 +30,7 @@ use App\Livewire\Dashboard\Properties\Properties;
 use App\Livewire\Dashboard\Properties\PropertyForm;
 use App\Livewire\Dashboard\Properties\ReservationCalendar;
 use App\Livewire\Dashboard\Reports\PropertiesReport;
+use App\Livewire\Dashboard\Reservations\BlockedDates;
 use App\Livewire\Dashboard\Sitemap\SitemapGenerator;
 use App\Livewire\Dashboard\Slides\SlideForm;
 use App\Livewire\Dashboard\Slides\Slides;
@@ -58,8 +60,9 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], functi
 
     //******************************* Sitemap *********************************************/
     Route::get('sitemap-generator', SitemapGenerator::class)->name('sitemap.generator');
-
     Route::get('/relatorios/imoveis', PropertiesReport::class)->name('reports.properties');
+
+    Route::get('notificacoes', NotificationsList::class)->name('notifications.index'); 
 
     
     // Route::put('listas/email/{id}', [NewsletterController::class, 'newsletterUpdate'])->name('listas.newsletter.update');
@@ -90,7 +93,7 @@ Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], functi
     Route::get('reservas/{reservation}/editar', ReservationForm::class)->name('reservations.edit');
     Route::get('reservas/cadastrar', ReservationForm::class)->name('reservations.create');
     Route::get('reservas', Reservations::class)->name('reservations.index');
-
+    
     //*********************** Slides ********************************************/
     Route::get('slides/{slide}/editar', SlideForm::class)->name('slides.edit');
     Route::get('slides/cadastrar', SlideForm::class)->name('slides.create');

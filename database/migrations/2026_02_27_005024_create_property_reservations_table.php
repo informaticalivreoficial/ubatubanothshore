@@ -46,7 +46,7 @@ return new class extends Migration
             $table->integer('guests')->default(1);
 
             $table->enum('origin', ['admin', 'site']);
-            $table->enum('status', ['pending', 'confirmed', 'cancelled']);
+            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'finished'])->default('pending');
 
             $table->timestamps();
 

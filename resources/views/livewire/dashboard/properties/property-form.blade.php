@@ -433,7 +433,13 @@
                                     {{ $politica_cancelamento ?? "100% reembolso até 30 dias antes chegada.\n50% reembolso até 14 dias antes chegada."}}
                                 </textarea>                                                      
                             </div>
-                        </div>  
+                        </div> 
+
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <livewire:dashboard.properties.calendar :property="$property" />
+                            </div>
+                        </div>                        
                                                 
                     </div>
                 </div>

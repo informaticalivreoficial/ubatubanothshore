@@ -9,6 +9,16 @@ import { Portuguese } from "flatpickr/dist/l10n/pt.js";
 flatpickr.localize(Portuguese);
 window.flatpickr = flatpickr;
 
+import { Calendar } from '@fullcalendar/core'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
+import ptBrLocale from '@fullcalendar/core/locales/pt-br'
+
+window.Calendar = Calendar
+window.dayGridPlugin = dayGridPlugin
+window.interactionPlugin = interactionPlugin
+window.ptBrLocale = ptBrLocale
+
 document.addEventListener('livewire:init', () => {
 
     window.Alpine.data('cookieConsent', () => ({

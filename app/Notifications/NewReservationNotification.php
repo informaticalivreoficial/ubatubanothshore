@@ -43,6 +43,8 @@ class NewReservationNotification extends Notification
     public function toDatabase($notifiable)
     {
         return [
+            'message' => 'Nova reserva',
+            'url' => url('/admin/reservas/' . $this->reservation->id . '/editar'),
             'reservation_id' => $this->reservation->id,
             'guest_name' => $this->reservation->guest_name,
             'check_in' => $this->reservation->check_in,
