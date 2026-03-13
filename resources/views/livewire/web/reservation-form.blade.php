@@ -196,10 +196,10 @@ placeholder-gray-400 transition"
                         >
                             Continuar para pagamento
                         </button>
+                    @else
+                        {{-- ✅ Brick só aparece após clicar no botão --}}
+                        <div id="mp-payment-brick" x-data x-init="initMPBrick()"></div>
                     @endif
-
-                    {{-- Bricks --}}
-                    <div id="mp-payment-brick" x-data x-init="initMPBrick()"></div>
 
                 @endif
 
@@ -375,6 +375,7 @@ placeholder-gray-400 transition"
             }
         });
     }
+    
 </script>
 
     <script>
