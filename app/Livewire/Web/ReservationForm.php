@@ -114,6 +114,8 @@ class ReservationForm extends Component
                 'external_reference' => (string) $this->reservation->id, 
                 'description'        => 'Reserva: ' . $this->reservation->property->title,
                 'payment_method_id'  => $formData['payment_method_id'],
+                
+                'issuer_id'          => $formData['issuer_id'] ?? null,
                 'token'              => $formData['token'] ?? null,
                 'installments'       => $formData['installments'] ?? 1,
                 'payer' => [
@@ -143,7 +145,9 @@ class ReservationForm extends Component
             }
 
         } catch (MPApiException $e) {            
-            session()->flash('error', 'Erro ao processar pagamento.');
+            logger($e->getApiResponse()->getContent());
+
+            dd($e->getApiResponse()->getContent());
         }
     }
 
