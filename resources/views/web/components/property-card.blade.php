@@ -72,15 +72,15 @@
         {{-- Dados principais --}}
         <div class="mt-3 flex flex-wrap gap-3 text-sm text-gray-600">
             @if($property->capacity)
-                <span>{{ $property->capacity }} hóspedes</span>
+                <span>{{ $property->capacity + $property->aditional_person }} hóspedes</span>
             @endif
 
             @if($property->dormitories)
-                <span>{{ $property->dormitories }} quarto</span>
+                <span>{{ $property->dormitories }} quarto(s)</span>
             @endif
 
             @if($property->bathrooms)
-                <span>{{ $property->bathrooms }} banheiro</span>
+                <span>{{ $property->bathrooms }} banheiro(s)</span>
             @endif
 
             @if($property->garage)

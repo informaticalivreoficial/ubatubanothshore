@@ -29,7 +29,7 @@
             <div class="row">
                 <div class="col-12 col-md-6 col-lg-6">
                     <div class="form-group">
-                        <label class="labelforms"><b>Genero</b></label>
+                        <label class="labelforms"><b>Imóvel</b></label>
                         <select class="form-control" wire:model="property_id">
                             @foreach($properties as $id => $title)
                                 <option value="{{ $id }}">
@@ -41,7 +41,7 @@
                 </div>
                 <div class="col-12 col-md-6 col-lg-6">
                     <div class="form-group">
-                        <label class="labelforms"><b>Nome do hóspede</b></label>
+                        <label class="labelforms"><b>Hóspede responsável</b></label>
                         <input type="text" class="form-control @error('guest_name') is-invalid @enderror" id="guest_name" placeholder="Nome" wire:model="guest_name">
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                 </div>
                 <div class="col-12 col-md-4 col-lg-4">
                     <div class="form-group">
-                        <label class="labelforms"><b>Genero</b></label>
+                        <label class="labelforms"><b>Status</b></label>
                         <select class="form-control" wire:model="status">
                             <option value="pending">Pendente</option>
                             <option value="confirmed">Confirmada</option>
@@ -128,7 +128,7 @@
                     <div class="form-group">
                         <label class="labelforms"><b>Hóspedes</b></label>
                         <input 
-                            type="number"
+                            type="text"
                             class="form-control @error('guests') is-invalid @enderror"
                             wire:model.live="guests"
                             min="1"
@@ -150,13 +150,13 @@
                 <div class="col-12 col-md-2 col-lg-2">
                     <div class="form-group">
                         <label class="labelforms"><b>Valor Diária</b></label>
-                        <input type="text" class="form-control" id="daily_total" wire:model="daily_total">
+                        <input type="text" class="form-control" id="daily_total" wire:model.live="daily_total">
                     </div>
                 </div>
                 <div class="col-12 col-md-3 col-lg-3">
                     <div class="form-group">
                         <label class="labelforms"><b>Taxa limpeza</b></label>
-                        <input type="text" class="form-control" id="cleaning_fee" wire:model="cleaning_fee">
+                        <input type="text" class="form-control" id="cleaning_fee" wire:model.live="cleaning_fee">
                     </div>
                 </div>
                 <div class="col-12 col-md-3 col-lg-3">

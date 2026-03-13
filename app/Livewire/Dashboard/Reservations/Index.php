@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Dashboard\Reservations;
 
+use App\Mail\ReservationFormLinkMail;
 use App\Models\PropertyReservation;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -47,19 +49,15 @@ class Index extends Component
         $this->reset('showModal', 'selectedReservation');
     }
 
-    public function sendPaymentLink($id)
+    public function sendFormLink($id)
     {
         $reservation = PropertyReservation::findOrFail($id);
 
-        // aqui você pode gerar link de pagamento
-        // ou enviar email
-
-        // exemplo simples
         Mail::to($reservation->guest_email)
-            ->send(new ReservationPaymentLinkMail($reservation));
+            ->send(new ReservationFormLinkMail($reservation));
 
         $this->dispatch('notify', 'Link enviado para o cliente!');
-    }
+    }    
 
     public function render()
     {

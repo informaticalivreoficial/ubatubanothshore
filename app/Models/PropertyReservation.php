@@ -23,15 +23,21 @@ class PropertyReservation extends Model
         'daily_total',
         'notes',
         'guests',
+        'guests_info',
         'cleaning_fee',
         'total_value',
         'origin',
         'status',
+        'stripe_session_id',
+        'payment_status',
+        'paid_at',
+        'expired_at',
     ];
 
     protected $casts = [
         'check_in' => 'date',
         'check_out' => 'date',
+        'guests_info' => 'array',
     ];
 
     // protected static function booted()

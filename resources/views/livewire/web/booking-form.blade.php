@@ -137,7 +137,8 @@
                         locale: FlatpickrPortuguese, // ✅
                         rangeSeparator: " até ",
                         disable: disabledDates,
-                        utc: false,
+                        maxDate: "{{ $property->getRawOriginal('expired_at') }}",
+                        
                         onReady: function(selectedDates, dateStr, instance) {
                             instance.set('locale', {
                                 ...instance.l10n,
@@ -166,6 +167,7 @@
                     });
 
                     //console
+                    
                 }
             }
         }

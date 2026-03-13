@@ -44,9 +44,23 @@ return new class extends Migration
             $table->decimal('total_value', 10, 2);
             $table->text('notes')->nullable();
             $table->integer('guests')->default(1);
+            $table->json('guests_info')->nullable();
 
             $table->enum('origin', ['admin', 'site']);
-            $table->enum('status', ['pending', 'confirmed', 'cancelled', 'finished'])->default('pending');
+            $table->enum('status', [
+                'pending', 
+                'confirmed', 
+                'cancelled', 
+                'finished', 
+                'waiting_payment', 
+                'paid', 
+                'expired'
+            ])->default('pending');
+
+            $table->string('stripe_session_id')->nullable();
+            $table->string('payment_status')->nullable();
+            $table->timestamp('paid_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
 
             $table->timestamps();
 

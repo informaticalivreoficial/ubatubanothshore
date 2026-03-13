@@ -37,4 +37,9 @@ return [
         'token' => env('GITHUB_TOKEN'),
     ],
 
+    'mercadopago' => [
+        'key' => env('MERCADOPAGO_PUBLIC_KEY'),
+        'token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+    ],
+
 ];

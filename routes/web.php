@@ -18,9 +18,11 @@ use App\Livewire\Dashboard\Roles\Index as RoleIndex;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\{
     HomeController,
+    MercadoPagoWebhookController,
     PageController,
     PropertyController,
     PropertyRssController,
+    ReservationPaymentController,
 };
 use App\Livewire\Dashboard\Menu\Index;
 use App\Livewire\Dashboard\Posts\CatPosts;
@@ -36,14 +38,28 @@ use App\Livewire\Dashboard\Slides\SlideForm;
 use App\Livewire\Dashboard\Slides\Slides;
 use App\Livewire\Dashboard\Reservations\Index as Reservations;
 use App\Livewire\Dashboard\Reservations\ReservationForm;
+use App\Livewire\Web\ReservationForm as WebReservationForm;
 
-Route::group(['namespace' => 'Web', 'as' => 'web.'], function () {
+Route::group(['as' => 'web.'], function () {
     
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/imoveis', [PropertyController::class, 'index'])->name('properties');
     Route::get('/imovel/{slug}', [PropertyController::class, 'show'])->name('property');
     Route::get('/pesquisar-imoveis', [PropertyController::class, 'search'])->name('property.search');
     Route::get('/checkout/{property}', [PropertyController::class, 'checkout'])->name('checkout');
+
+    Route::get('/finalizar-reserva/{token}', WebReservationForm::class)->name('reservation.form');
+    Route::get('/reserva/sucesso/{reservation}', [ReservationPaymentController::class, 'success'])
+    ->name('reservation.success');
+
+    Route::get('/reserva/cancelada/{reservation}', [ReservationPaymentController::class, 'cancel'])
+    ->name('reservation.cancel');
+
+    Route::get('/reserva/pendente/{reservation}', [ReservationPaymentController::class, 'pending'])
+    ->name('reservation.pending');
+
+    Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle'])
+    ->name('webhook.mercadopago');
     
     Route::get('/atendimento', [PageController::class, 'contact'])->name('contact');
     Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');

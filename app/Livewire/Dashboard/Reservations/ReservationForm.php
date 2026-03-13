@@ -165,21 +165,50 @@ class ReservationForm extends Component
 
         $property = Property::find($this->property_id);
 
-        $checkin = Carbon::parse($this->check_in);
-        $checkout = Carbon::parse($this->check_out);
+        $checkIn  = Carbon::parse($this->check_in);
+        $checkOut = Carbon::parse($this->check_out);
 
-        $this->nights = $checkin->diffInDays($checkout);
+        if ($checkOut->lte($checkIn)) {
+            return;
+        }
 
-        $daily = $property->rental_value * $this->nights;
+        $this->nights = $checkIn->diffInDays($checkOut);
 
+        // ✅ Cálculo dia a dia considerando temporadas
+        $seasons = $property->seasons()
+            ->where('start_date', '<=', $checkOut->toDateString())
+            ->where('end_date', '>=', $checkIn->toDateString())
+            ->get();
+
+        $dailyTotal = 0;
+        $current = $checkIn->copy();
+
+        while ($current->lt($checkOut)) {
+
+            $season = $seasons->first(function ($s) use ($current) {
+                return $current->between(
+                    Carbon::parse($s->start_date),
+                    Carbon::parse($s->end_date)
+                );
+            });
+
+            $dailyTotal += $season
+                ? $season->price_per_day
+                : $property->rental_value;
+
+            $current->addDay();
+        }
+
+        $this->daily_total = $dailyTotal;
+
+        // Extra hóspedes
         $extra = 0;
-
         if ($this->guests > $property->aditional_person) {
             $extraGuests = $this->guests - $property->aditional_person;
             $extra = $extraGuests * $property->value_aditional * $this->nights;
         }
 
-        $this->total_value = $daily + $extra + $this->cleaning_fee;
+        $this->total_value = $dailyTotal + $extra + $this->cleaning_fee;
     }
 
     public function updated($field)
@@ -189,9 +218,16 @@ class ReservationForm extends Component
             'check_out',
             'guests',
             'cleaning_fee',
+            'daily_total', // ✅
+            'nights',      // ✅
         ])) {
-            $this->calculateTotal();
+            $this->recalculateFromInputs();
         }
+    }
+
+    public function recalculateFromInputs()
+    {
+        $this->total_value = $this->daily_total + $this->cleaning_fee;
     }
 
     public function updatedPropertyId($value)

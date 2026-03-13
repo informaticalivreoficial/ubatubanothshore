@@ -54,7 +54,7 @@
                     Ao clicar neste botão, concordo com os
                     <a target="_blank" href="{{ route('web.privacy') }}" class="text-blue-600 hover:underline">Política de Privacidade</a>
                     e
-                    <a href="#" class="text-blue-600 hover:underline">Termos de serviço</a>
+                    <a target="_blank" href="{{ route('web.terms') }}" class="text-blue-600 hover:underline">Termos de serviço</a>
                     </p>
 
                 </div>
@@ -162,6 +162,19 @@
                                         min="1"
                                         wire:model.live="guests"
                                         class="w-full border rounded-md px-3 py-2 text-sm">
+                                </div>
+
+                                {{-- Hóspedes --}}
+                                <div class="flex justify-between items-center">
+                                    <div class="flex gap-2">
+                                        <button type="button"
+                                            wire:click="decreaseGuests"
+                                            class="border w-8 h-8 rounded">-</button>
+
+                                        <button type="button"
+                                            wire:click="increaseGuests"
+                                            class="border w-8 h-8 rounded">+</button>
+                                    </div>
                                 </div>
 
                                 <div class="flex justify-end gap-2 pt-2">
@@ -295,6 +308,7 @@
                         locale: flatpickr.l10ns.pt,
                         rangeSeparator: " até ",
                         disable: disabledDates,
+                        maxDate: "{{ $property->getRawOriginal('expired_at') }}",
 
                         onChange: (selectedDates) => {
                             if (selectedDates.length === 2) {

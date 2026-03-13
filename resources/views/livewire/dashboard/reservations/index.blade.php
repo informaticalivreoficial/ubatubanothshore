@@ -34,8 +34,11 @@
                             >
                                 <option value="">Todos status</option>
                                 <option value="pending">Pendente</option>
+                                <option value="waiting_payment">Aguardando pagamento</option>
+                                <option value="paid">Pago</option>
                                 <option value="confirmed">Confirmada</option>
                                 <option value="cancelled">Cancelada</option>
+                                <option value="expired">Expirada</option>
                                 <option value="finished">Finalizada</option>
                             </select>
 
@@ -75,8 +78,11 @@
                                 @php
                                     $colors = [
                                         'pending' => 'bg-yellow-100 text-yellow-800',
+                                        'waiting_payment' => 'bg-orange-100 text-orange-800',
+                                        'paid' => 'bg-emerald-100 text-emerald-800',
                                         'confirmed' => 'bg-green-100 text-green-800',
                                         'cancelled' => 'bg-red-100 text-red-800',
+                                        'expired' => 'bg-gray-100 text-gray-800',
                                         'finished' => 'bg-blue-100 text-blue-800',
                                     ];
                                 @endphp
@@ -113,10 +119,33 @@
                                     wire:change="updateStatus({{ $reservation->id }}, $event.target.value)"
                                     class="border rounded px-2 py-1 text-xs"
                                 >
-                                    <option value="pending" @selected($reservation->status === 'pending')>Pendente</option>
-                                    <option value="confirmed" @selected($reservation->status === 'confirmed')>Confirmada</option>
-                                    <option value="cancelled" @selected($reservation->status === 'cancelled')>Cancelada</option>
-                                    <option value="finished" @selected($reservation->status === 'finished')>Finalizada</option>
+                                    <option value="pending" @selected($reservation->status === 'pending')>
+                                        Pendente
+                                    </option>
+
+                                    <option value="waiting_payment" @selected($reservation->status === 'waiting_payment')>
+                                        Aguardando pagamento
+                                    </option>
+
+                                    <option value="paid" @selected($reservation->status === 'paid')>
+                                        Pago
+                                    </option>
+
+                                    <option value="confirmed" @selected($reservation->status === 'confirmed')>
+                                        Confirmada
+                                    </option>
+
+                                    <option value="cancelled" @selected($reservation->status === 'cancelled')>
+                                        Cancelada
+                                    </option>
+
+                                    <option value="expired" @selected($reservation->status === 'expired')>
+                                        Expirada
+                                    </option>
+
+                                    <option value="finished" @selected($reservation->status === 'finished')>
+                                        Finalizada
+                                    </option>
                                 </select>
                             </td>
                         </tr>
@@ -218,11 +247,11 @@
                     @if($selectedReservation->status === 'pending')
 
                         <button
-                            wire:click="sendPaymentLink({{ $selectedReservation->id }})"
+                            wire:click="sendFormLink({{ $selectedReservation->id }})"
                             class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
                         >
-                            Enviar link de pagamento
-                        </button>
+                            Enviar Formulário da Reserva
+                        </button>                        
 
                     @endif
 

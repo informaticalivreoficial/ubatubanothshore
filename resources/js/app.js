@@ -19,6 +19,9 @@ window.dayGridPlugin = dayGridPlugin
 window.interactionPlugin = interactionPlugin
 window.ptBrLocale = ptBrLocale
 
+import IMask from 'imask';
+window.IMask = IMask;
+
 document.addEventListener('livewire:init', () => {
 
     window.Alpine.data('cookieConsent', () => ({

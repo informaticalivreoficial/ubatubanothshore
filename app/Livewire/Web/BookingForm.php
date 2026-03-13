@@ -77,7 +77,7 @@ class BookingForm extends Component
 
     public function increaseGuests()
     {
-        if ($this->guests < $this->property->capacity) {
+        if ($this->guests < ($this->property->capacity + $this->property->aditional_person)) {
             $this->guests++;
             $this->calculate(); // 👈 recalcula
         }
@@ -102,11 +102,16 @@ class BookingForm extends Component
 
         $checkIn  = Carbon::parse($this->check_in);
         $checkOut = Carbon::parse($this->check_out);
+        $expiredAt = Carbon::parse($this->property->getRawOriginal('expired_at'));
 
         if ($checkOut->lte($checkIn)) {
             $this->dateError = 'A data de check-out deve ser posterior ao check-in.';
             $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal']);
             return;
+        }
+
+        if ($checkOut > $expiredAt) {
+            $this->dateError = 'A reserva não pode ultrapassar a data disponível.';
         }
 
         $this->nights = $checkIn->diffInDays($checkOut);

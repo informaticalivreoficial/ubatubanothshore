@@ -4,6 +4,7 @@ namespace App\Livewire\Web;
 
 use App\Mail\AdminReservationNotification;
 use App\Mail\ClientReservationReceived;
+use App\Mail\ReservationFormLinkMail;
 use App\Models\Property;
 use App\Models\PropertyBlockedDate;
 use App\Models\PropertyReservation;
@@ -61,7 +62,11 @@ class CheckoutPage extends Component
 
         // 🔹 Datas de reservas
         $reservations = PropertyReservation::where('property_id', $property->id)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['waiting_payment', 'confirmed'])
+            ->where(function ($q) {
+                $q->whereNull('expires_at')
+                ->orWhere('expires_at','>', now());
+            })
             ->get();
 
         foreach ($reservations as $reservation) {
@@ -137,7 +142,8 @@ class CheckoutPage extends Component
                 'origin' => 'site',
                 'daily_total' => $this->property->rental_value,
                 'total_value' => $this->total,
-                'status' => 'pending',
+                'status' => 'waiting_payment',
+                'expires_at' => now()->addMinutes(30),
             ]);            
 
             $admin = User::where('admin', true)->first();
@@ -147,8 +153,7 @@ class CheckoutPage extends Component
             }            
 
             // 📧 Email para cliente
-            //Mail::to($client->email)
-            //    ->send(new ClientReservationReceived($reservation));
+            Mail::to($this->email)->send(new ReservationFormLinkMail($reservation));
         });
 
         $this->reset(['name', 'email', 'phone', 'notes']);
@@ -159,7 +164,7 @@ class CheckoutPage extends Component
     private function validateAvailability()
     {
         $exists = PropertyReservation::where('property_id', $this->property->id)
-            ->where('status', '!=', 'cancelled')
+            ->whereIn('status', ['waiting_payment', 'confirmed'])
             ->where(function ($query) {
                 $query->where('check_in', '<', $this->check_out)
                     ->where('check_out', '>', $this->check_in);
@@ -231,6 +236,22 @@ class CheckoutPage extends Component
 
         // 💰 Total final
         $this->total = $this->subtotal + $this->extraTotal + $this->cleaning_fee;
+    }
+
+    public function increaseGuests()
+    {
+        if ($this->guests < ($this->property->capacity + $this->property->aditional_person)) {
+            $this->guests++;
+            $this->calculateTotal(); // 👈 recalcula
+        }
+    }
+
+    public function decreaseGuests()
+    {
+        if ($this->guests > 1) {
+            $this->guests--;
+            $this->calculateTotal(); // 👈 recalcula
+        }
     }
 
     public function render()
