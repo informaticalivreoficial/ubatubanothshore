@@ -64,8 +64,8 @@ class CheckoutPage extends Component
         $reservations = PropertyReservation::where('property_id', $property->id)
             ->whereIn('status', ['waiting_payment', 'confirmed'])
             ->where(function ($q) {
-                $q->whereNull('expires_at')
-                ->orWhere('expires_at','>', now());
+                $q->whereNull('expired_at')
+                ->orWhere('expired_at','>', now());
             })
             ->get();
 
@@ -143,7 +143,7 @@ class CheckoutPage extends Component
                 'daily_total' => $this->property->rental_value,
                 'total_value' => $this->total,
                 'status' => 'waiting_payment',
-                'expires_at' => now()->addMinutes(30),
+                'expired_at' => now()->addMinutes(30),
             ]);            
 
             $admin = User::where('admin', true)->first();
