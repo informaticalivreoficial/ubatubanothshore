@@ -45,13 +45,7 @@ jobs:
           chown -R www:www storage bootstrap/cache          
 
           echo "🧹 Limpando caches"
-          php artisan optimize:clear
-
-          echo "⚙️ Rebuilding caches"
-          php artisan config:cache
-          php artisan route:cache
-          php artisan view:cache
-          php artisan event:cache
+          php artisan optimize:clear          
 
           echo "🚀 Deploy finalizado!"
           
