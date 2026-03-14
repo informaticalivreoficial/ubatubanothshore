@@ -26,6 +26,14 @@ class CatPost extends Model
         'status' => 'boolean',
     ];
 
+    protected static function booted()
+    {
+        // 🔹 Gerar slug automaticamente
+        static::saving(function ($property) {
+            $property->setSlug();
+        });        
+    }
+
     /**
      * Scopes
      */
@@ -71,14 +79,22 @@ class CatPost extends Model
 
     public function setSlug()
     {
-        if(!empty($this->title)){
-            $category = CatPost::where('title', $this->title)->first(); 
-            if(!empty($category) && $category->id != $this->id){
-                $this->attributes['slug'] = Str::slug($this->title) . '-' . $this->id;
-            }else{
-                $this->attributes['slug'] = Str::slug($this->title);
-            }            
-            $this->save();
+        if (!empty($this->title)) {
+    
+            $baseSlug = Str::slug($this->title);
+            $slug = $baseSlug;
+            $count = 1;
+    
+            while (
+                CatPost::where('slug', $slug)
+                    ->where('id', '!=', $this->id)
+                    ->exists()
+            ) {
+                $slug = $baseSlug . '-' . str_pad($count, 2, '0', STR_PAD_LEFT);
+                $count++;
+            }
+    
+            $this->attributes['slug'] = $slug;
         }
     }
 }
