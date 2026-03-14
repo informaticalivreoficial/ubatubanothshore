@@ -64,6 +64,12 @@ Route::group(['as' => 'web.'], function () {
     Route::get('/avaliacao/{token}', [PageController::class, 'review'])->name('review');
     Route::get('/pagina/{slug}', [PageController::class, 'page'])->name('page');
     Route::get('/rss/imoveis', [PropertyRssController::class, 'index'])->name('rss.properties');
+
+    //Blog
+     Route::get('/blog/artigo/{slug}', [HomeController::class, 'artigo'])->name('blog.artigo');
+     Route::get('/blog/noticia/{slug}', [HomeController::class, 'noticia'])->name('blog.noticia');
+     Route::get('/blog/categoria/{slug}', [HomeController::class, 'blogCategory'])->name('blog.category');
+     Route::get('/blog', [HomeController::class, 'blog'])->name('blog.index');
 });
 
 Route::group(['middleware' => ['auth', 'verified'], 'prefix' => 'admin'], function () {
