@@ -52,7 +52,7 @@ class MercadoPagoWebhookController extends Controller
 
         if ($payment->status === 'approved') {
             $reservation->update([
-                'status'     => 'paid',
+                'status'     => 'confirmed',
                 'payment_id' => $payment->id,
             ]);
 
