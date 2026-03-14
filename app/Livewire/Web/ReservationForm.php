@@ -61,7 +61,7 @@ class ReservationForm extends Component
         match ($this->reservation->status) {
             'confirmed', 'paid'      => $this->redirect(route('web.reservation.success', $this->reservation->id)),
             'cancelled'              => $this->redirect(route('web.reservation.cancel', $this->reservation->id)),
-            'waiting_payment'        => $this->redirect(route('web.reservation.pending', $this->reservation->id)),
+            'pending'                => $this->redirect(route('web.reservation.pending', $this->reservation->id)),
             default                  => null,
         };
 
