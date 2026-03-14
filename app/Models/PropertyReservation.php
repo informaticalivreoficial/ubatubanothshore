@@ -28,7 +28,7 @@ class PropertyReservation extends Model
         'total_value',
         'origin',
         'status',
-        'stripe_session_id',
+        'payment_id',
         'payment_status',
         'paid_at',
         'expired_at',

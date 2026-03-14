@@ -54,10 +54,11 @@ return new class extends Migration
                 'finished', 
                 'waiting_payment', 
                 'paid', 
-                'expired'
+                'expired',
+                'refunded',
             ])->default('pending');
 
-            $table->string('stripe_session_id')->nullable();
+            $table->string('payment_id')->nullable();
             $table->string('payment_status')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamp('expired_at')->nullable();

@@ -58,10 +58,12 @@ class ReservationForm extends Component
     {
         $this->reservation = PropertyReservation::where('review_token', $token)->firstOrFail();
 
-        // impedir reserva duplicada
-        if ($this->reservation->status === 'finished') {
-            abort(403, 'Reserva já finalizada!');
-        }
+        match ($this->reservation->status) {
+            'confirmed', 'paid'      => $this->redirect(route('web.reservation.success', $this->reservation->id)),
+            'cancelled'              => $this->redirect(route('web.reservation.cancel', $this->reservation->id)),
+            'waiting_payment'        => $this->redirect(route('web.reservation.pending', $this->reservation->id)),
+            default                  => null,
+        };
 
         if($this->reservation->user->email === $this->reservation->guest_email 
             && $this->reservation->user->cpf !== null) {

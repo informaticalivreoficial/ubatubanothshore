@@ -39,9 +39,9 @@
 
         <div class="mt-8">
 
-            <a href="{{ route('web.home') }}"
+            <a href="{{ route('web.reservation.form', $reservation->review_token) }}"
                class="inline-block px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition">
-                Voltar para o site
+                Finalizar Reserva
             </a>
 
         </div>
