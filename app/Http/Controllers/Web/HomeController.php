@@ -95,15 +95,15 @@ class HomeController extends Controller
 
         $postsTags = Post::where('type', 'artigo')->postson()->limit(3)->get();
         $categorias = CatPost::orderBy('title', 'ASC')
-                ->where('type', 'artigo')
-                ->whereNull('id_pai')
-                ->with(['children' => function($q) {
-                    $q->where('status', 1)
-                    ->withCount(['posts' => fn($q) => $q->where('status', 1)])
-                    ->having('posts_count', '>', 0);
-                }])
-                ->available()
-                ->get();
+            ->where('type', 'artigo')
+            ->whereNull('id_pai')
+            ->with(['children' => function($q) {
+                $q->where('status', 1)
+                ->withCount(['posts' => fn($q) => $q->where('status', 1)])
+                ->having('posts_count', '>', 0);
+            }])
+            ->get()
+            ->filter(fn($cat) => $cat->children->count() > 0);
         $postsMais = Post::orderBy('views', 'DESC')->where('type', 'artigo')->limit(3)->postson()->get();
         
         $post->views = $post->views + 1;
@@ -138,7 +138,8 @@ class HomeController extends Controller
                     ->having('posts_count', '>', 0);
                 }])
                 ->available()
-                ->get();
+                ->get()
+                ->filter(fn($cat) => $cat->children->count() > 0);
         $postsMais = Post::orderBy('views', 'DESC')->where('type', 'noticia')->limit(3)->postson()->get();
         
         $post->views = $post->views + 1;
