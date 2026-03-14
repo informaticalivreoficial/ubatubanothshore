@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\PropertyReservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Payment\PaymentClient;
 
@@ -12,11 +13,6 @@ class MercadoPagoWebhookController extends Controller
 {
     public function handle(Request $request)
     {
-        \Log::info('MP Webhook recebido', $request->all());
-
-        // Valida assinatura (recomendado em produção)
-        // $this->validateSignature($request);
-
         $type = $request->input('type') ?? $request->input('topic');
 
         if ($type !== 'payment') {
@@ -31,26 +27,33 @@ class MercadoPagoWebhookController extends Controller
 
         MercadoPagoConfig::setAccessToken(config('services.mercadopago.token'));
 
-        $client  = new PaymentClient();
-        $payment = $client->get($paymentId);
+        $client = new PaymentClient();
 
-        \Log::info('MP Payment status', [
+        try {
+            $payment = $client->get($paymentId);
+        } catch (\Exception $e) {
+            Log::error("Webhook MP: erro ao buscar pagamento {$paymentId} - " . $e->getMessage());
+            return response()->json(['error' => 'mp api error'], 500);
+        }
+
+        Log::info('MP Payment status', [
             'id'     => $payment->id,
             'status' => $payment->status,
         ]);
 
-        // Busca reserva pelo external_reference
         $reservation = PropertyReservation::find($payment->external_reference);
 
         if (!$reservation) {
+            Log::warning("Webhook MP: reserva não encontrada para payment {$paymentId}");
             return response()->json(['error' => 'reservation not found'], 404);
         }
 
         match ($payment->status) {
-            'approved' => $reservation->update(['status' => 'paid']),
-            'rejected' => $reservation->update(['status' => 'cancelled']),
-            'refunded' => $reservation->update(['status' => 'refunded']),
-            default    => null,
+            'approved'     => $reservation->update(['status' => 'confirmed']),
+            'rejected'     => $reservation->update(['status' => 'cancelled']),
+            'refunded'     => $reservation->update(['status' => 'refunded']),
+            'charged_back' => $reservation->update(['status' => 'refunded']),
+            default        => Log::info("MP status não tratado: {$payment->status} | Reserva: {$reservation->id}"),
         };
 
         return response()->json(['ok' => true]);

@@ -22,6 +22,8 @@
     <link rel="icon" type="image/png" href="{{$configuracoes->getfaveicon()}}" />
     <link rel="shortcut icon" href="{{$configuracoes->getfaveicon()}}" type="image/x-icon"/> 
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     
@@ -113,7 +115,32 @@
                     Salvar preferências
                 </button>
             </div>
-        </div>    
+        </div> 
+        
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('toast', (data) => {
+                const colors = {
+                    success: '#28a745',
+                    error:   '#dc3545',
+                    warning: '#ffc107',
+                    info:    '#17a2b8',
+                };
+
+                Toastify({
+                    text: data[0].message,
+                    duration: 4000,
+                    gravity: 'top',
+                    position: 'right',
+                    style: {
+                        background: colors[data[0].type] ?? '#333',
+                    },
+                }).showToast();
+            });
+        });
+    </script>
     
     <script>
         // Listener genérico para todos os tipos de SweetAlert

@@ -4,6 +4,7 @@ namespace App\Livewire\Dashboard;
 
 use App\Models\Post;
 use App\Models\Property;
+use App\Models\PropertyReservation;
 use Livewire\Component;
 
 class Dashboard extends Component
@@ -18,6 +19,9 @@ class Dashboard extends Component
 
         $postsCount = Post::count();
         $postsYearCount = Post::whereYear('created_at', now()->year)->count();
+
+        $reservationsCount = PropertyReservation::count();
+        $reservationsYearCount = PropertyReservation::whereYear('created_at', now()->year)->count();
 
         $this->topproperties = Property::orderBy('views', 'desc')
             ->take(6)
@@ -35,6 +39,8 @@ class Dashboard extends Component
             'title' => $title,
             'topproperties' => $this->topproperties,
             'topposts' => $this->topposts,
+            'reservationsCount' => $reservationsCount,
+            'reservationsYearCount' => $reservationsYearCount
         ]);
     }
 }

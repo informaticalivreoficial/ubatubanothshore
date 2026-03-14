@@ -56,10 +56,7 @@ Route::group(['as' => 'web.'], function () {
     ->name('reservation.cancel');
 
     Route::get('/reserva/pendente/{reservation}', [ReservationPaymentController::class, 'pending'])
-    ->name('reservation.pending');
-
-    Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle'])
-    ->name('webhook.mercadopago');
+    ->name('reservation.pending');    
     
     Route::get('/atendimento', [PageController::class, 'contact'])->name('contact');
     Route::get('/politica-de-privacidade', [PageController::class, 'privacy'])->name('privacy');

@@ -3,18 +3,16 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {{-- FORMULÁRIO --}}
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-8 order-2 lg:order-1">
 
             {{-- DADOS DO TITULAR --}}
             <div class="bg-white rounded-2xl shadow-sm border p-6">
 
                 <h2 class="text-xl font-semibold text-gray-800 mb-6">
                     Titular da reserva
-                </h2>
+                </h2>                
 
-                <form wire:submit.prevent="preparePayment" class="space-y-6">
-
-                    <div>
+                    <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             Nome completo
                         </label>
@@ -28,7 +26,7 @@
                         >
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
                         <div 
                             x-data="{ disabled: false }"
@@ -85,12 +83,11 @@
                             type="email"
                             wire:model="guest_email" @disabled(true)
                             class="w-full h-12 px-4 text-sm border border-gray-300 rounded-xl
-focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-placeholder-gray-400 transition"
+                            focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
+                            placeholder-gray-400 transition"
                         >
                     </div>
-
-                </form>
+                
 
             </div>
 
@@ -185,7 +182,44 @@ placeholder-gray-400 transition"
             {{-- BOTÃO --}}
             <div class="bg-white rounded-2xl shadow-sm border p-6">
 
+                {{-- BOTÃO / BRICK --}}
+                @if(!$paymentStatus)
+                    @if(!$showPayment)
+                        <button
+                            wire:click="preparePayment"
+                            wire:loading.attr="disabled"
+                            type="button"
+                            class="w-full py-4 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition"
+                        >
+                            Continuar para pagamento
+                        </button>
+                    @else
+                        <div id="mp-payment-brick" wire:ignore></div>
+                    @endif
+                @endif
+
+                {{-- QR CODE — FORA do if acima --}}
+                @if($pixQrCodeBase64)
+                    <div class="text-center space-y-4">
+                        <p class="font-semibold text-gray-800">Escaneie o QR Code para pagar</p>
+                        <img 
+                            src="data:image/png;base64,{{ $pixQrCodeBase64 }}" 
+                            width="192" 
+                            height="192"
+                            class="mx-auto w-48 h-48"
+                            alt="QR Code PIX"
+                        >
+                        <p class="text-xs text-gray-500 break-all">{{ $pixQrCode }}</p>
+                        <button
+                            onclick="navigator.clipboard.writeText('{{ $pixQrCode }}')"
+                            class="px-4 py-2 bg-green-600 text-white rounded-xl text-sm"
+                        >
+                            Copiar código PIX
+                        </button>
+                    </div>
+                @endif
                 
+
 
             </div>
 
@@ -194,7 +228,7 @@ placeholder-gray-400 transition"
 
 
         {{-- RESUMO DA RESERVA --}}
-        <div class="space-y-6">
+        <div class="space-y-6 order-1 lg:order-2">
 
             {{-- IMÓVEL --}}
             <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
@@ -294,68 +328,91 @@ placeholder-gray-400 transition"
 </div>
 </div>
 
+@php
+    $nameParts = explode(' ', $guest_name ?? '');
+    $firstName = $nameParts[0] ?? '';
+    $lastName  = implode(' ', array_slice($nameParts, 1));
+@endphp
+
 @push('scripts')
     <script src="https://sdk.mercadopago.com/js/v2"></script>
-    
-<script>
-    document.addEventListener('livewire:initialized', () => {
 
-    const observer = new MutationObserver(() => {
+    <script>
+        document.addEventListener('livewire:initialized', () => {
 
-        const brick = document.getElementById('mp-payment-brick');
+            const wire = Livewire.find(
+                document.querySelector('[wire\\:id]').getAttribute('wire:id')
+            );
 
-        if (brick && !window.mpBrickLoaded) {
-            window.mpBrickLoaded = true;
-            initMPBrick();
-        }
+            const payerData = {
+                entityType: 'individual',
+                email: @json($guest_email),
+                firstName: @json($firstName),
+                lastName: @json($lastName),
+                identification: {
+                    type: 'CPF',
+                    number: @json(preg_replace('/\D/', '', $guest_cpf ?? ''))
+                }
+            };
 
-    });
+            Livewire.on('redirect-to', ({ url }) => {
+                window.location.href = url;
+            });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+            const observer = new MutationObserver(() => {
+                const brick = document.getElementById('mp-payment-brick');
+                if (brick && !window.mpBrickLoaded) {
+                    window.mpBrickLoaded = true;
+                    initMPBrick();
+                }
+            });
 
-});
+            observer.observe(document.body, { childList: true, subtree: true });
 
-async function initMPBrick() {
+            async function initMPBrick() {
 
-    const mp = new MercadoPago('{{ config('services.mercadopago.key') }}', {
-        locale: 'pt-BR'
-    });
+                const mp = new MercadoPago('{{ config('services.mercadopago.key') }}', {
+                    locale: 'pt-BR'
+                });
 
-    const bricks = mp.bricks();
+                const bricks = mp.bricks();
 
-    await bricks.create("payment", "mp-payment-brick", {
-        initialization: {
-            amount: Number({{ $reservation->total_value }})
-        },
+                await bricks.create("payment", "mp-payment-brick", {
+                    initialization: {
+                        amount: Number({{ $reservation->total_value }}),
+                        payer: payerData
+                    },
 
-        customization: {
-            paymentMethods: {
-                creditCard: 'all',
-                debitCard: 'all',
-                bankTransfer: ['pix'],
-                maxInstallments: 12
+                    customization: {
+                        paymentMethods: {
+                            creditCard: 'all',
+                            debitCard: 'all',
+                            bankTransfer: ['pix'],
+                            maxInstallments: 12
+                        }
+                    },
+
+                    callbacks: {
+                        onReady: () => {
+                            console.log("Brick pronto");
+                        },
+
+                        onSubmit: async ({ formData }) => {
+                            try {
+                                await wire.processPayment(JSON.parse(JSON.stringify(formData)));
+                            } catch (error) {
+                                console.error('Erro no pagamento:', error);
+                                return false;
+                            }
+                        },
+
+                        onError: (error) => {
+                            console.error("MercadoPago error:", error);
+                        }
+                    }
+                });
             }
-        },
 
-        callbacks: {
-            onReady: () => {
-                console.log("Brick pronto");
-            },
-
-            onSubmit: async ({ formData }) => {
-                await $wire.processPayment(formData);
-                return false;
-            },
-
-            onError: (error) => {
-                console.error("MercadoPago error:", error);
-            }
-        }
-    });
-
-}
-    
-</script>
-
-    
+        });
+    </script>
 @endpush

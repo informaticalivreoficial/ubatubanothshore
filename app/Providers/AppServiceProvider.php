@@ -24,15 +24,20 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        //Menu
-        $Links = \App\Models\Menu::whereNull('id_pai')->orderby('created_at', 'DESC')
-                        ->available()
-                        ->get();        
-        View()->share('Links', $Links);
+        try {
+            $Links = \App\Models\Menu::whereNull('id_pai')
+                            ->orderby('created_at', 'DESC')
+                            ->available()
+                            ->get();        
+            View()->share('Links', $Links);
 
-        $configuracoes = \App\Models\Config::first(); 
-        View()->share('configuracoes', $configuracoes);         
+            $configuracoes = \App\Models\Config::first(); 
+            View()->share('configuracoes', $configuracoes);
+        } catch (\Exception $e) {
+            View()->share('Links', collect());
+            View()->share('configuracoes', null);
+        }
 
-        Paginator::useBootstrap();        
+        Paginator::useBootstrap();         
     }
 }

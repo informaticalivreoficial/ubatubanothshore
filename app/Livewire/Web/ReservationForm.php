@@ -5,6 +5,7 @@ namespace App\Livewire\Web;
 use App\Models\PropertyReservation;
 use App\Models\User;
 use Livewire\Component;
+use App\Traits\WithToastr;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Exceptions\MPApiException;
@@ -12,6 +13,8 @@ use MercadoPago\Client\Payment\PaymentClient;
 
 class ReservationForm extends Component
 {
+    use WithToastr;
+
     public $reservation;
 
     public $guest_name;
@@ -21,11 +24,10 @@ class ReservationForm extends Component
 
     public $guests = [];
 
-    public $paymentStatus = null;
-    public $pixQrCode = null;
-    public $pixQrCodeBase64 = null; 
-
+    public ?string $pixQrCode = null;
+    public ?string $pixQrCodeBase64 = null;
     public bool $showPayment = false;
+    public ?string $paymentStatus = null;
 
     protected function rules()
     {
@@ -87,7 +89,7 @@ class ReservationForm extends Component
 
     public function preparePayment()
     {
-        $this->validate();
+        $this->validate();        
 
         User::where('email', $this->guest_email)->update([
             'cpf' => preg_replace('/\D/', '', $this->guest_cpf),
@@ -103,10 +105,10 @@ class ReservationForm extends Component
     }
 
     public function processPayment(array $formData)
-    {
+    {        
         MercadoPagoConfig::setAccessToken(config('services.mercadopago.token'));
 
-        $client = new PaymentClient();
+        $client = new PaymentClient();        
 
         try {
             $payment = $client->create([
@@ -127,27 +129,44 @@ class ReservationForm extends Component
                     ]
                 ],
                 ...($formData['payment_method_id'] === 'pix' ? [
-                    'date_of_expiration' => now()->addMinutes(30)->toIso8601String(),
+                    'date_of_expiration' => now()->addMinutes(30)->format('Y-m-d\TH:i:s.000\-03:00'),
                 ] : []),
-            ]);
+            ]);            
 
             $this->paymentStatus = $payment->status;
 
             if ($payment->status === 'approved') {
-                $this->reservation->update(['status' => 'paid']);
+                $this->reservation->update([
+                    'status' => 'confirmed',
+                    'payment_id' => $payment->id,
+                    'paid_at'    => now(),
+                ]);
                 $this->redirect(route('web.reservation.success', $this->reservation->id));
+            }            
+
+            if ($payment->status === 'pending' || $payment->status === 'in_process') {                
+
+                $this->reservation->update([
+                    'status'     => 'waiting_payment',
+                    'payment_id' => $payment->id,
+                ]);
+
+                // PIX — mostra QR Code
+                if ($payment->payment_method_id === 'pix') {
+                    $this->pixQrCode       = $payment->point_of_interaction->transaction_data->qr_code;
+                    $this->pixQrCodeBase64 = $payment->point_of_interaction->transaction_data->qr_code_base64;
+                }
+
+                $this->showPayment = false; // ← esconde o brick
             }
 
-            if ($payment->status === 'pending') {
-                $this->pixQrCode       = $payment->point_of_interaction->transaction_data->qr_code;
-                $this->pixQrCodeBase64 = $payment->point_of_interaction->transaction_data->qr_code_base64;
-                $this->reservation->update(['status' => 'waiting_payment']);
+            if ($payment->status === 'rejected') {
+                $reason = $payment->status_detail ?? 'unknown';
+                $this->toastError('Pagamento recusado. Verifique os dados do cartão.');
             }
 
-        } catch (MPApiException $e) {            
-            logger($e->getApiResponse()->getContent());
-
-            dd($e->getApiResponse()->getContent());
+        } catch (MPApiException $e) {    
+            $this->toastError('Erro ao processar pagamento. Tente novamente.');
         }
     }
 

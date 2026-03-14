@@ -53,8 +53,24 @@
                         </div>            
                     </div>
                 </div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-yellow">
+                            <a href="{{ route('reservations.index') }}" title="Reservas">
+                                <i class="fa far fa-calendar"></i>
+                            </a>
+                        </span>            
+                        <div class="info-box-content">
+                            <span class="info-box-text"><b>Reservas</b></span>
+                            <span class="info-box-text">{{ now()->year }}: {{ $reservationsYearCount }}</span>
+                            <span class="info-box-text">Total: {{ $reservationsCount }}</span>
+                        </div>            
+                    </div>
+                </div>
             </div>
+
             <livewire:dashboard.reports.dashboard-stats />  
+
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">

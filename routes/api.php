@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\PropertyReservationController;
+use App\Http\Controllers\Web\MercadoPagoWebhookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +18,6 @@ Route::prefix('v1')->group(function () {
         Route::post('/reservations', [PropertyReservationController::class, 'store']);
     });
 });
+
+Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle'])
+    ->name('webhook.mercadopago');
