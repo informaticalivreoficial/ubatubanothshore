@@ -4,6 +4,7 @@ namespace App\Livewire\Web;
 
 use App\Models\PropertyReservation;
 use App\Models\User;
+use App\Notifications\ReservationConfirmedNotification;
 use Livewire\Component;
 use App\Traits\WithToastr;
 use MercadoPago\MercadoPagoConfig;
@@ -143,6 +144,13 @@ class ReservationForm extends Component
                     'payment_id' => $payment->id,
                     'paid_at'    => now(),
                 ]);
+
+                // Notifica
+                User::where('admin', true)
+                    ->orWhere('superadmin', true)
+                    ->get()
+                    ->each->notify(new ReservationConfirmedNotification($this->reservation));
+
                 $this->redirect(route('web.reservation.success', $this->reservation->id));
             }            
 

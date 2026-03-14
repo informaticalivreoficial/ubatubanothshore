@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\PropertyReservation;
+use App\Models\User;
+use App\Notifications\ReservationConfirmedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use MercadoPago\MercadoPagoConfig;
@@ -48,13 +50,29 @@ class MercadoPagoWebhookController extends Controller
             return response()->json(['error' => 'reservation not found'], 404);
         }
 
-        match ($payment->status) {
-            'approved'     => $reservation->update(['status' => 'confirmed']),
-            'rejected'     => $reservation->update(['status' => 'cancelled']),
-            'refunded'     => $reservation->update(['status' => 'refunded']),
-            'charged_back' => $reservation->update(['status' => 'refunded']),
-            default        => Log::info("MP status não tratado: {$payment->status} | Reserva: {$reservation->id}"),
-        };
+        if ($payment->status === 'approved') {
+            $reservation->update([
+                'status'     => 'paid',
+                'payment_id' => $payment->id,
+            ]);
+
+            User::where('admin', true)
+                ->orWhere('superadmin', true)
+                ->get()
+                ->each->notify(new ReservationConfirmedNotification($reservation));
+        }
+
+        if ($payment->status === 'rejected') {
+            $reservation->update(['status' => 'cancelled']);
+        }
+
+        if (in_array($payment->status, ['refunded', 'charged_back'])) {
+            $reservation->update(['status' => 'refunded']);
+        }
+
+        if (!in_array($payment->status, ['approved', 'rejected', 'refunded', 'charged_back'])) {
+            Log::info("MP status não tratado: {$payment->status} | Reserva: {$reservation->id}");
+        }
 
         return response()->json(['ok' => true]);
     }

@@ -14,7 +14,7 @@
 
     **Total:** R$ {{ number_format($reservation->total_value, 2, ',', '.') }}
 
-@component('mail::button', ['url' => url('/admin/reservas/' . $reservation->id) . '/editar'])
+@component('mail::button', ['url' => url('/admin/reservas/' . $reservation->id . '/editar')])
     Ver Reserva
 @endcomponent
 
