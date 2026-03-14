@@ -97,7 +97,11 @@ class HomeController extends Controller
         $categorias = CatPost::orderBy('title', 'ASC')
                 ->where('type', 'artigo')
                 ->whereNull('id_pai')
-                ->with(['children' => fn($q) => $q->where('status', 1)])
+                ->with(['children' => function($q) {
+                    $q->where('status', 1)
+                    ->withCount(['posts' => fn($q) => $q->where('status', 1)])
+                    ->having('posts_count', '>', 0);
+                }])
                 ->available()
                 ->get();
         $postsMais = Post::orderBy('views', 'DESC')->where('type', 'artigo')->limit(3)->postson()->get();
@@ -128,7 +132,11 @@ class HomeController extends Controller
         $categorias = CatPost::orderBy('title', 'ASC')
                 ->where('type', 'noticia')
                 ->whereNull('id_pai')
-                ->with(['children' => fn($q) => $q->where('status', 1)])
+                ->with(['children' => function($q) {
+                    $q->where('status', 1)
+                    ->withCount(['posts' => fn($q) => $q->where('status', 1)])
+                    ->having('posts_count', '>', 0);
+                }])
                 ->available()
                 ->get();
         $postsMais = Post::orderBy('views', 'DESC')->where('type', 'noticia')->limit(3)->postson()->get();
