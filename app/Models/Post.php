@@ -46,47 +46,16 @@ class Post extends Model
     {
         parent::boot();
 
-        // Antes de salvar (criar ou atualizar)
-        static::saving(function ($post) {
-            if (empty($post->slug) && !empty($post->title)) {
-                $post->slug = $post->generateUniqueSlug($post->title);
-            }
-        });
-    }
-
-    /**
-     * Gera um slug único
-    */
-    public function generateUniqueSlug($title)
-    {
-        $slug = Str::slug($title);
-        $originalSlug = $slug;
-        $counter = 1;
-
-        // Verifica se já existe, excluindo o próprio post em caso de edição
-        while (static::where('slug', $slug)
-                    ->where('id', '!=', $this->id ?? 0)
-                    ->exists()) {
-            $slug = $originalSlug . '-' . $counter;
-            $counter++;
-        }
-
-        return $slug;
-    }
-
-    /**
-     * Método manual para atualizar o slug (se necessário)
-    */
-    public function updateSlug()
-    {
-        if (!empty($this->title)) {
-            $this->slug = $this->generateUniqueSlug($this->title);
-            $this->save();
-        }
-    }
+        
+    }      
 
     protected static function booted()
     {
+        // 🔹 Gerar slug automaticamente
+        static::saving(function ($property) {
+            $property->setSlug();
+        });
+
         static::deleting(function ($post) {
             // Deleta imagens físicas e registros relacionados
             foreach ($post->images as $image) {
@@ -222,6 +191,27 @@ class Post extends Model
         }
         return date('d/m/Y', strtotime($value));
     }
+
+    public function setSlug()
+    {
+        if (!empty($this->title)) {
+    
+            $baseSlug = Str::slug($this->title);
+            $slug = $baseSlug;
+            $count = 1;
+    
+            while (
+                Post::where('slug', $slug)
+                    ->where('id', '!=', $this->id)
+                    ->exists()
+            ) {
+                $slug = $baseSlug . '-' . str_pad($count, 2, '0', STR_PAD_LEFT);
+                $count++;
+            }
+    
+            $this->attributes['slug'] = $slug;
+        }
+    } 
     
     private function convertStringToDate(?string $param)
     {

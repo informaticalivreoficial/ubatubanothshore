@@ -94,7 +94,12 @@ class HomeController extends Controller
         $post = Post::where('slug', $request->slug)->postson()->first();
 
         $postsTags = Post::where('type', 'artigo')->postson()->limit(3)->get();
-        $categorias = CatPost::orderBy('title', 'ASC')->where('type', 'artigo')->get();
+        $categorias = CatPost::orderBy('title', 'ASC')
+                ->where('type', 'artigo')
+                ->whereNull('id_pai')
+                ->with(['children' => fn($q) => $q->where('status', 1)])
+                ->available()
+                ->get();
         $postsMais = Post::orderBy('views', 'DESC')->where('type', 'artigo')->limit(3)->postson()->get();
         
         $post->views = $post->views + 1;
