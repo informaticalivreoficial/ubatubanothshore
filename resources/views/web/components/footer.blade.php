@@ -10,6 +10,7 @@
 
             {{-- Links --}}
             <nav class="flex flex-wrap justify-center gap-6 text-sm text-white/70">
+                <a href="{{ route('web.blog.index') }}" class="hover:text-accent transition-colors">Blog</a>
                 <a href="{{ route('web.privacy') }}" class="hover:text-accent transition-colors">Política de Privacidade</a>
                 <a href="{{ route('web.terms') }}" class="hover:text-accent transition-colors">Termos e Condições</a>
                 <button @click="openModal()"  class="hover:text-accent transition-colors">Preferências de cookies</button>

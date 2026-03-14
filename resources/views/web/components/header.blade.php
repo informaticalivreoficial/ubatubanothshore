@@ -80,6 +80,11 @@
 
                 @endforeach
             @endif
+
+            <a href="{{ route('web.blog.index') }}" target="_self" class="hover:text-primary transition font-bold">
+                Blog
+            </a>
+
             <a href="{{ route('web.contact') }}" target="_self" class="hover:text-primary transition font-bold">
                 Atendimento
             </a>
@@ -130,6 +135,13 @@
             <button id="close-mobile" class="mb-6 text-2xl">
                 ✕
             </button>
+
+            <a href="{{ route('web.home') }}" target="_self" class="block text-lg font-medium border-b pb-3">
+                Início
+            </a>
+            <a href="{{ route('web.properties') }}" target="_self" class="block text-lg font-medium border-b pb-3">
+                Todos os Imóveis
+            </a>
 
             @if (!empty($Links) && $Links->count())                            
                 @foreach($Links as $menuItem)
@@ -184,6 +196,14 @@
 
                 @endforeach
             @endif
+
+            <a href="{{ route('web.blog.index') }}" target="_self" class="block text-lg font-medium border-b pb-3">
+                Blog
+            </a>
+            
+            <a href="{{ route('web.contact') }}" target="_self" class="block text-lg font-medium border-b pb-3">
+                Atendimento
+            </a>
 
 
             <!-- SOCIAL -->

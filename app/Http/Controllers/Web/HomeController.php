@@ -125,13 +125,18 @@ class HomeController extends Controller
         $post = Post::where('slug', $request->slug)->postson()->first();
 
         $postsTags = Post::where('type', 'noticia')->postson()->limit(3)->get();
-        $categorias = CatPost::orderBy('title', 'ASC')->where('type', 'noticia')->get();
+        $categorias = CatPost::orderBy('title', 'ASC')
+                ->where('type', 'noticia')
+                ->whereNull('id_pai')
+                ->with(['children' => fn($q) => $q->where('status', 1)])
+                ->available()
+                ->get();
         $postsMais = Post::orderBy('views', 'DESC')->where('type', 'noticia')->limit(3)->postson()->get();
         
         $post->views = $post->views + 1;
         $post->save();
 
-        $head = $this->seo->render('Blog - ' . $post->title ?? env('APP_NAME'),
+        $head = $this->seo->render('Notícia - ' . $post->title ?? env('APP_NAME'),
             $post->title,
             route('web.blog.noticia', ['slug' => $post->slug]),
             $post->cover() ?? $this->config->getmetaimg()
