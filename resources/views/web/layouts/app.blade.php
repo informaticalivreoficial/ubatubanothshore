@@ -28,9 +28,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
+        [x-cloak] { display: none !important; }
         body { font-family: 'DM Sans', sans-serif; color: #1a2e1a; }           
     </style>
-
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
