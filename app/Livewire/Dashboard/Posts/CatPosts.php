@@ -41,28 +41,7 @@ class CatPosts extends Component
         }
 
         $this->resetPage();
-    }
-
-    public function render()
-    {
-        $title = 'Categorias de Posts';
-        $searchableFields = ['title','content','slug'];
-        $categories = CatPost::query()
-            ->whereNull('id_pai')
-            ->when($this->search, function ($query) use ($searchableFields) {
-                $query->where(function ($q) use ($searchableFields) {
-                    foreach ($searchableFields as $field) {
-                        $q->orWhere($field, 'LIKE', "%{$this->search}%");
-                    }
-                });
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
-        return view('livewire.dashboard.posts.cat-posts',[
-            'title' => $title,
-            'categories' => $categories,
-        ]);
-    }
+    }    
 
     public function toggleStatus($id)
     {
@@ -124,6 +103,27 @@ class CatPosts extends Component
             'icon'  => 'success',
             'timer' => 2000,
             'showConfirmButton' => false,
+        ]);
+    }
+
+    public function render()
+    {
+        $title = 'Categorias de Posts';
+        $searchableFields = ['title','content','slug'];
+        $categories = CatPost::query()
+            ->whereNull('id_pai')
+            ->when($this->search, function ($query) use ($searchableFields) {
+                $query->where(function ($q) use ($searchableFields) {
+                    foreach ($searchableFields as $field) {
+                        $q->orWhere($field, 'LIKE', "%{$this->search}%");
+                    }
+                });
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate($this->perPage);
+        return view('livewire.dashboard.posts.cat-posts',[
+            'title' => $title,
+            'categories' => $categories,
         ]);
     }
 }

@@ -18,9 +18,7 @@ class PropertyForm extends Component
 {
     use WithFileUploads;
 
-    public ?Property $property = null;
-
-    //public array $types = ['venda', 'locacao'];
+    public ?Property $property = null;    
 
     public array $images = [];
     public $savedImages = [];
@@ -407,5 +405,22 @@ class PropertyForm extends Component
             'timer' => 2000,
             'showConfirmButton' => false
         ]);
+    }
+
+    public function updatedImages(): void
+    {
+        $hasHeic = collect($this->images)->contains(function ($image) {
+            return strtolower($image->getClientOriginalExtension()) === 'heic';
+        });
+
+        if ($hasHeic) {
+            $this->dispatch('swal:warning', [
+                'title' => 'Formato não suportado!',
+                'text'  => 'Imagens no formato HEIC (iPhone) não são aceitas. Converta para JPG ou PNG antes de enviar.',
+                'icon'  => 'warning',
+            ]);
+
+            $this->reset('images');
+        }
     }
 }

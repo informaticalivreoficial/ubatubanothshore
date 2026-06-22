@@ -132,7 +132,7 @@
 
             const message = "Atendimento {{ $configuracoes->app_name }}";
 
-            const phone = "{{ $configuracoes->whatsapp_number }}";
+            const phone = "{{ $configuracoes->whatsapp }}";
 
             const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
 
