@@ -4,19 +4,11 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Application Name
-    |--------------------------------------------------------------------------
-    |
-    | This value is the name of your application. This value is used when the
-    | framework needs to place the application's name in a notification or
-    | any other location as required by the application or its packages.
-    |
-    */
+    
 
     'name' => env('APP_NAME', 'Laravel'),
+
+    'api_token' => env('API_TOKEN', 'your-default-api-token-here'),
 
     'desenvolvedor_url' => env('DESENVOLVEDOR_URL', 'https://informaticalivre.com.br'),
     'desenvolvedor_email' => env('DESENVOLVEDOR_EMAIL', 'suporte@informaticalivre.com.br'),

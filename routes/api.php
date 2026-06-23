@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\PropertyReservationController;
 use App\Http\Controllers\Web\MercadoPagoWebhookController;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\Route;
 
 
@@ -21,3 +22,5 @@ Route::prefix('v1')->group(function () {
 
 Route::post('/webhook/mercadopago', [MercadoPagoWebhookController::class, 'handle'])
     ->name('webhook.mercadopago');
+
+Route::middleware('api.token')->post('/posts', [PostController::class, 'store']);

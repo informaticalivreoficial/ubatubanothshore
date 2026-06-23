@@ -58,5 +58,5 @@ class NotificationsList extends Component
         return view('livewire.dashboard.notifications-list', [
             'notifications' => $notifications
         ]);
-    }
+    }    
 }

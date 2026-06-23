@@ -32,7 +32,7 @@
         body { font-family: 'DM Sans', sans-serif; color: #1a2e1a; }           
     </style>
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/front.js'])
 
     @stack('styles')
 </head>
