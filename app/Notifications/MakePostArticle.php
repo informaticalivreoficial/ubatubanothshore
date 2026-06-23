@@ -29,7 +29,7 @@ class MakePostArticle extends Notification
             ->when($this->post->excerpt, function (MailMessage $mail) {
                 return $mail->line('Resumo: ' . $this->post->excerpt);
             })
-            ->action('Revisar artigo', url('/admin/posts/' . $this->post->id . '/edit'))
+            ->action('Revisar artigo', route('posts.edit', $this->post))
             ->line('Assim que revisado, você pode publicá-lo no painel.');
     }
 
@@ -41,7 +41,7 @@ class MakePostArticle extends Notification
             'message' => "Artigo {$this->post->title}",
             'description' => "O artigo está aguardando revisão.",
             'color' => 'success',
-            'url' => url('/admin/posts/' . $this->post->id . '/edit'),
+            'url' => route('posts.edit', $this->post)
         ];
     }
 }

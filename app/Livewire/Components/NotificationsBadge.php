@@ -9,7 +9,7 @@ class NotificationsBadge extends Component
     public function render()
     {
         return view('livewire.components.notifications-badge', [
-            'unreadNotificationsCount' => auth()->user()->unreadNotifications->count(),
+            'unreadNotificationsCount' => auth()->user()->unreadNotifications()->count(),
         ]);
-    }
+    }    
 }

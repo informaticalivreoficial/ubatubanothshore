@@ -54,10 +54,19 @@ class Post extends Model
 
     protected static function booted()
     {
-        // 🔹 Gerar slug automaticamente
-        static::saving(function ($property) {
-            $property->setSlug();
-        });
+        static::saving(function ($post) {
+            $post->setSlug();
+
+            $content = html_entity_decode(strip_tags($post->content));
+
+            $words = str_word_count(
+                mb_strtolower($content),
+                0,
+                'àáâãäåçèéêëìíîïñòóôõöùúûüýÿ'
+            );
+
+            $post->readingTime = max(1, ceil($words / 200));
+        });       
 
         static::deleting(function ($post) {
             // Deleta imagens físicas e registros relacionados

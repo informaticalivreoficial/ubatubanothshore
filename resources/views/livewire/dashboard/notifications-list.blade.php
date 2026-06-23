@@ -32,64 +32,78 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body p-0">
+
             @forelse($notifications as $notification)
-                <div
-                    class="group d-flex align-items-start p-3 border-bottom
-                    transition-all duration-200 ease-in-out
-                    hover:bg-slate-50 hover:shadow-sm
-                    {{ is_null($notification->read_at) ? 'bg-slate-100' : 'bg-white' }}"
-                >
+
+                @php
+                    $type = $notification->data['type'] ?? 'default';
+
+                    $icon = match($type) {
+                        // 'invoice_paid'       => 'fas fa-money-bill-wave',
+                        // 'company_created'    => 'fas fa-building',
+                        // 'reservation_created'=> 'fas fa-calendar-check',
+                        // 'support_ticket'     => 'fas fa-life-ring',
+                        'subscription'       => 'fas fa-credit-card',
+                        'ArticleCreated'     => 'fas fa-file-alt',
+                        'ReservationCreated' => 'fas fa-calendar-check',
+                        default              => 'fas fa-bell',
+                    };
+
+                    $color = match($notification->data['color'] ?? '') {
+                        'success' => 'success',
+                        'danger'  => 'danger',
+                        'warning' => 'warning',
+                        'info'    => 'info',
+                        default   => 'secondary',
+                    };
+                @endphp
+
+                <div class="
+                    d-flex align-items-start p-3 border-bottom
+                    {{ is_null($notification->read_at) ? 'bg-light' : 'bg-white' }}
+                ">
+
                     {{-- Ícone --}}
                     <div class="mr-3 mt-1">
-                        <span class="
-                            inline-flex items-center justify-center
-                            rounded-full bg-yellow-100 text-yellow-600
-                            p-2
-                            transition-transform duration-200
-                            group-hover:scale-110
-                        ">
-                            <i class="fas fa-bell"></i>
+                        <span class="badge badge-{{ $color }} p-3">
+                            <i class="{{ $icon }}"></i>
                         </span>
                     </div>
 
                     {{-- Conteúdo --}}
                     <div class="flex-grow-1">
-                        <p class="mb-1 font-weight-bold">
-                            Reserva: {{ $notification->data['reservation_id'] }}
+
+                        <h6 class="mb-1 font-weight-bold text-dark">
+                            {{ $notification->data['title'] ?? 'Nova notificação' }}
+                        </h6>
+
+                        <p class="mb-1 text-muted">
+                            {{ $notification->data['message'] ?? '' }}
                         </p>
 
-                        @php
-                            $checkin = $notification->data['check_in'] ?? null;
-                            $checkout = $notification->data['check_out'] ?? null;
-                        @endphp
-
-                        <small class="text-muted d-block">
-                            Cliente: 
-                            <strong>
-                                {{ $notification->data['guest_name'] ?? 'Sistema' }}
-                                - Checkin: {{ $checkin ? \Carbon\Carbon::parse($checkin)->format('d/m/Y') : '' }}
-                                - Checkout: {{ $checkout ? \Carbon\Carbon::parse($checkout)->format('d/m/Y') : '' }}
-                            </strong>
-                        </small>
+                        @if(!empty($notification->data['description']))
+                            <small class="text-muted d-block">
+                                {{ $notification->data['description'] }}
+                            </small>
+                        @endif
 
                         <small class="text-muted">
                             <i class="far fa-clock mr-1"></i>
                             {{ $notification->created_at->diffForHumans() }}
                         </small>
+
                     </div>
 
                     {{-- Ações --}}
                     <div class="ml-3 text-right">
-                        @if(isset($notification->data['url']))
+
+                        @if(!empty($notification->data['url']))
                             <a
                                 href="{{ $notification->data['url'] }}"
-                                target="_blank"
-                                wire:click="markAsRead('{{ $notification->id }}')"
-                                class="btn btn-sm btn-outline-primary"
-                                title="Visualizar"
+                                class="btn btn-sm btn-outline-primary mb-1"
                             >
-                                <i class="fas fa-search "></i>
+                                <i class="fas fa-eye"></i>
                             </a>
                         @endif
 
@@ -97,19 +111,35 @@
                             <button
                                 wire:click="markAsRead('{{ $notification->id }}')"
                                 class="btn btn-sm btn-outline-success"
-                                title="Marcar como Lida"
                             >
-                                <i class="fas fa-check "></i>
+                                <i class="fas fa-check"></i>
                             </button>
                         @endif
+
                     </div>
+
                 </div>
+
             @empty
-                <div class="text-center text-muted py-5">
-                    <i class="far fa-bell-slash fa-3x mb-3"></i>
-                    <p>Nenhuma notificação encontrada</p>
+
+                <div class="text-center py-5">
+
+                    <div class="mb-3">
+                        <i class="far fa-bell-slash fa-4x text-muted"></i>
+                    </div>
+
+                    <h5 class="text-muted">
+                        Nenhuma notificação encontrada
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Quando houver novas notificações elas aparecerão aqui.
+                    </p>
+
                 </div>
+
             @endforelse
+
         </div>
 
         {{-- Paginação --}}

@@ -65,6 +65,22 @@ class NotificationsDropdown extends Component
         }
     }
 
+    public function openNotification($id)
+    {
+        $notification = auth()->user()
+            ->notifications()
+            ->where('id', $id)
+            ->first();
+
+        if (!$notification) {
+            return;
+        }
+
+        $notification->markAsRead();
+
+        $this->redirect($notification->data['url'] ?? '/');
+    }
+
     public function markAllAsRead()
     {
         if (!Auth::check()) {
