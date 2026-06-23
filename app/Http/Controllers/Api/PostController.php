@@ -54,6 +54,7 @@ class PostController extends Controller
         'Trilhas e Passeios'            => ['id' => 25, 'pai' => 21],
         'Dicas de restaurantes'         => ['id' => 23, 'pai' => 21],
         'Dicas de praias'               => ['id' => 22, 'pai' => 21],
+        //'Praias'               => ['id' => 22, 'pai' => 21],
     ];
 
     public function store(Request $request)
@@ -75,8 +76,8 @@ class PostController extends Controller
             'imageUrl'        => 'nullable|string',
         ]);
 
-        $categoryName = $data['category'] ?? 'Geral';
-        $categoryData = $this->categoryMap[$categoryName] ?? $this->categoryMap['Geral'];
+        $categoryName = $data['category'] ?? 'Cachoeiras';
+        $categoryData = $this->categoryMap[$categoryName] ?? $this->categoryMap['Cachoeiras'];
 
         $payload = [
             'title'            => $data['title'],
@@ -97,6 +98,10 @@ class PostController extends Controller
 
         $image = null;
 
+        logger()->info('Iniciando geração da imagem', [
+            'prompt' => $data['imageUrl']
+        ]);
+
         // 🖼️ baixa e salva a imagem do Stable Diffusion
         if (!empty($data['imageUrl'])) {
 
@@ -107,7 +112,7 @@ class PostController extends Controller
         }
 
         Notification::send(
-            User::role('super-admin')->get(),
+            User::where(['superadmin' => true, 'admin' => true])->get(),
             new MakePostArticle($post)
         );
 
