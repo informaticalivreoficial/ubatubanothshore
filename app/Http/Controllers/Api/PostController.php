@@ -53,8 +53,8 @@ class PostController extends Controller
         'Cachoeiras'                    => ['id' => 24, 'pai' => 21],
         'Trilhas e Passeios'            => ['id' => 25, 'pai' => 21],
         'Dicas de restaurantes'         => ['id' => 23, 'pai' => 21],
-        //'Dicas de praias'               => ['id' => 22, 'pai' => 21],
-        'Praias'               => ['id' => 22, 'pai' => 21],
+        'Dicas de praias'               => ['id' => 22, 'pai' => 21],
+        //'Praias'               => ['id' => 22, 'pai' => 21],
     ];
 
     public function store(Request $request)
