@@ -187,7 +187,7 @@
                                         }
                                     }"
                                 >
-                                    <label class="labelforms text-muted"><b>Valor Locação Individual (1 hóspede)</b></label>
+                                    <label class="labelforms text-muted"><b>Valor Individual (1 hóspede)</b></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -221,7 +221,7 @@
                                         }
                                     }"
                                 >
-                                    <label class="labelforms text-muted"><b>Valor Locação para 2 Hóspedes (total do casal)</b></label>
+                                    <label class="labelforms text-muted"><b>Valor para 2 Hóspedes ou casal</b></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -255,7 +255,7 @@
                                         }
                                     }"
                                 >
-                                    <label class="labelforms text-muted"><b>Valor por Hóspede Extra (a partir do 3º)</b></label>
+                                    <label class="labelforms text-muted"><b>Valor Hóspede Extra (a partir do 3º)</b></label>
                                     <input
                                         type="text"
                                         class="form-control"
