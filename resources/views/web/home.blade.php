@@ -1,6 +1,6 @@
 @extends('web.layouts.app')
 
-@section('title', 'Início — Catete Apartments')
+@section('title', 'Início — ' . $configuracoes->app_name)
 
 @section('content')
 
@@ -23,40 +23,120 @@
             </p>
 
             {{-- Search bar --}}
-            <form action="{{ route('web.property.search') }}" method="GET" 
-            class="fade-up-delay-3 
-             bg-white/20 backdrop-blur-md 
-             border border-white/30
-             rounded-2xl p-6 shadow-2xl 
-             max-w-3xl mx-auto 
-             grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                {{-- Check-in --}}
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-medium text-white uppercase tracking-wider px-1">Check-in</label>
-                    <input type="date" id="check_in" name="check_in"
-                        class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
-                        value="{{ request('check_in') }}">
-                </div>
+            <form
+                action="{{ route('web.property.search') }}"
+                method="GET"
+                x-data="searchCalendar({ guests: {{ max(1, (int) request('guests', 1)) }} })"
+                class="fade-up-delay-3 mx-auto mt-10 w-full max-w-4xl text-left"
+            >
+                <div class="rounded-[22px] border border-white/60 bg-white/95 p-5 shadow-2xl backdrop-blur-xl sm:p-6">
+                    <div class="mb-5 flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <p class="text-[10px] font-semibold uppercase tracking-[0.24em] text-accent">
+                                Planeje sua estadia
+                            </p>
+                            <h2 class="mt-1 font-heading text-xl font-semibold text-primary sm:text-2xl">
+                                Encontre o imóvel ideal
+                            </h2>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                            Disponibilidade e valores em tempo real
+                        </p>
+                    </div>
 
-                {{-- Check-out --}}
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-medium text-white uppercase tracking-wider px-1">Check-out</label>
-                    <input type="date" id="check_out" name="check_out"
-                        class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-all"
-                        value="{{ request('check_out') }}">
-                </div>
+                    <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-[1fr_1fr_0.85fr_auto] lg:items-end">
+                        {{-- Check-in --}}
+                        <div class="space-y-1.5">
+                            <span class="block px-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                Check-in
+                            </span>
+                            <div class="relative">
+                                <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-primary/45">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/>
+                                    </svg>
+                                </span>
+                                <input
+                                    type="date"
+                                    id="home-check-in"
+                                    name="check_in"
+                                    x-ref="checkin"
+                                    value="{{ request('check_in') }}"
+                                    placeholder="Selecione a entrada"
+                                    autocomplete="off"
+                                    class="h-12 w-full rounded-xl border border-sand bg-cream pl-10 pr-3 text-sm font-medium text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                                >
+                            </div>
+                        </div>
 
-                {{-- Hóspedes --}}
-                <div class="flex flex-col gap-1">
-                    <label class="text-xs font-medium text-white uppercase tracking-wider px-1">Hóspedes</label>
-                    <input type="number" name="guests" min="1" class="w-full bg-cream border border-sand rounded-xl px-3 py-2.5 text-sm text-primary"
-                        value="{{ request('guests', 1) }}">
-                </div>
+                        {{-- Check-out --}}
+                        <div class="space-y-1.5">
+                            <span class="block px-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                Check-out
+                            </span>
+                            <div class="relative">
+                                <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-primary/45">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/>
+                                    </svg>
+                                </span>
+                                <input
+                                    type="date"
+                                    id="home-check-out"
+                                    name="check_out"
+                                    x-ref="checkout"
+                                    value="{{ request('check_out') }}"
+                                    placeholder="Selecione a saída"
+                                    autocomplete="off"
+                                    class="h-12 w-full rounded-xl border border-sand bg-cream pl-10 pr-3 text-sm font-medium text-primary outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
+                                >
+                            </div>
+                        </div>
 
-                {{-- Botão --}}
-                <button type="submit" class="bg-white border border-blue-500 text-blue-500 text-sm font-medium px-6 py-2.5 rounded-xl transition-all hover:bg-[#f8f8f8]">
-                    Procurar
-                </button>
+                        {{-- Hóspedes --}}
+                        <div class="space-y-1.5">
+                            <span class="block px-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                Hóspedes
+                            </span>
+                            <div class="flex h-12 items-center justify-between rounded-xl border border-sand bg-cream px-2.5">
+                                <button
+                                    type="button"
+                                    @click="decrementGuests"
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg text-lg leading-none text-primary/50 transition hover:bg-white hover:text-primary"
+                                    aria-label="Diminuir hóspedes"
+                                >
+                                    −
+                                </button>
+                                <span class="text-sm font-semibold text-primary" x-text="guests"></span>
+                                <button
+                                    type="button"
+                                    @click="incrementGuests"
+                                    class="flex h-8 w-8 items-center justify-center rounded-lg text-lg leading-none text-primary/50 transition hover:bg-white hover:text-primary"
+                                    aria-label="Aumentar hóspedes"
+                                >
+                                    +
+                                </button>
+                            </div>
+                            <input
+                                type="hidden"
+                                name="guests"
+                                value="{{ max(1, (int) request('guests', 1)) }}"
+                                :value="guests"
+                            >
+                        </div>
+
+                        {{-- Botão --}}
+                        <button
+                            type="submit"
+                            class="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-white transition hover:bg-navy focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2"
+                        >
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            Buscar imóveis
+                        </button>
+                    </div>
+                </div>
             </form>
 
         </div>
@@ -109,24 +189,3 @@
         </section>
     @endif
 @endsection
-
-@push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            const checkin = flatpickr("#check_in", {
-                dateFormat: "d/m/Y",
-                minDate: "today",
-                onChange: function(selectedDates){
-                    checkout.set("minDate", selectedDates[0]);
-                }
-            });
-
-            const checkout = flatpickr("#check_out", {
-                dateFormat: "d/m/Y",
-                minDate: "today"
-            });
-
-        });
-    </script>
-@endpush

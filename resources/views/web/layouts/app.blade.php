@@ -55,7 +55,7 @@
         <div 
             x-cloak
             x-show="!accepted"
-            class="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 z-40"
+            class="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 z-40 no-print"
         >
             <div class="max-w-7xl mx-auto flex justify-between items-center">
                 <p>
@@ -79,7 +79,7 @@
             x-cloak
             x-show="open"
             x-transition
-            class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 no-print"
             @click.self="closeModal()"
         >
             <div class="bg-white text-black p-6 rounded w-96 relative">

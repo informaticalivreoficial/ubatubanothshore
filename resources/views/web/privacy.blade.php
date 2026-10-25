@@ -1,15 +1,14 @@
- 
 @extends('web.layouts.app')
 
 @section('content')
-    <div class="max-w-8xl mx-auto px-6 py-4">
-
-        <div class="flex flex-col lg:flex-row gap-8">
-            <div class="w-full">
-                <h2 class="text-2xl font-semibold mb-4 pt-6">Política de Privacidade</h2>
-                {!!$configuracoes->privacy_policy!!}
-            </div>
-        </div>
-
-    </div>
+    @include('web.components.legal-page', [
+        'title' => 'Política de Privacidade',
+        'description' => 'Entenda como a Ubatuba North Shore coleta, utiliza, armazena e protege os seus dados pessoais.',
+        'badge' => 'Privacidade e LGPD',
+        'icon' => 'shield',
+        'features' => ['Compromisso com a LGPD', 'Transparência', 'Segurança dos dados'],
+        'content' => $legal['html'],
+        'sections' => $legal['sections'],
+        'current' => 'privacy',
+    ])
 @endsection

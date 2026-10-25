@@ -2,37 +2,39 @@
 
 @section('content')
 
-<div class="max-w-7xl mx-auto px-6 lg:px-8 py-8 space-y-8">
+<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 
-    {{-- GALERIA --}}
-    <div class="max-w-7xl mx-auto p-4">
+    <nav class="mb-4 flex items-center gap-2 text-sm text-gray-500" aria-label="Breadcrumb">
+        <a href="{{ route('web.home') }}" class="transition-colors hover:text-blue-700">Início</a>
+        <span aria-hidden="true">/</span>
+        <a href="{{ route('web.properties') }}" class="transition-colors hover:text-blue-700">Imóveis</a>
+        <span aria-hidden="true">/</span>
+        <span class="truncate text-gray-700">{{ $property->title }}</span>
+    </nav>
 
-        <!-- Galeria de fotos do imóvel -->
+    <div class="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
         <div class="relative">
-            <!-- Grid de fotos -->
-            <div class="grid grid-cols-4 gap-2 h-[400px] rounded-xl overflow-hidden">
-                <!-- Foto principal -->
-                <div 
-                    class="col-span-2 row-span-2 relative bg-gray-200 cursor-pointer"
+            <div class="grid grid-cols-1 gap-2 sm:h-[420px] sm:grid-cols-4">
+                <div
+                    class="relative h-[260px] cursor-pointer overflow-hidden rounded-xl bg-gray-200 sm:col-span-2 sm:row-span-2 sm:h-full"
                     x-data
                     x-on:click="$dispatch('open-gallery', { index: 0 })">
-                    <img 
-                        src="{{ $property->cover() }}" 
+                    <img
+                        src="{{ $property->cover() }}"
                         alt="{{ $property->title }}"
-                        class="w-full h-full object-cover"
+                        class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                 </div>
-            
-                <!-- Fotos secundárias -->
+
                 @foreach($property->images->take(4) as $index => $image)
-                    <div 
-                        class="col-span-1 row-span-1 relative bg-gray-200 h-[200px] cursor-pointer group"
+                    <div
+                        class="relative hidden h-[206px] cursor-pointer overflow-hidden rounded-xl bg-gray-200 sm:block"
                         x-data
                         x-on:click="$dispatch('open-gallery', { index: {{ $loop->index + 1 }} })">
-                        <img 
-                            src="{{ $image->url_image }}" 
+                        <img
+                            src="{{ $image->url_image }}"
                             alt="{{ $property->title }}"
-                            class="w-full h-full object-cover"
+                            class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                         />
                     </div>
                 @endforeach
@@ -55,68 +57,84 @@
         <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Coluna principal -->
             <div class="md:col-span-2">
-                <!-- Título -->
-                <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">
+                        {{ $property->type }}
+                    </span>
+
+                    @if($property->highlight)
+                        <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
+                            Destaque
+                        </span>
+                    @endif
+                </div>
+
+                <h1 class="mt-3 text-2xl font-semibold text-gray-900 sm:text-3xl">
                     {{ $property->title }}
-                </h2>
-            
-                <!-- Localização detalhada -->
-                <p class="text-gray-600 mb-4">
-                    <span class="font-medium">{{ $property->neighborhood }}</span> • {{ $property->city }}, {{ $property->state }}
+                </h1>
+
+                <p class="mt-2 flex items-center gap-1.5 text-gray-600">
+                    <svg class="h-4 w-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span>
+                        {{ $property->neighborhood }}
+                        @if($property->neighborhood && $property->city)
+                            •
+                        @endif
+                        @if($property->city)
+                            {{ $property->city }}, {{ $property->state }}
+                        @endif
+                    </span>
                 </p>
 
-                <!-- Informações rápidas -->
-                <div class="flex flex-wrap gap-4 py-4 border-y border-gray-200">
-                    <div class="flex items-center gap-2">
-                        <span>{{ $property->type }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <span>
-                            {{ $property->capacity }} hóspedes
-                            @if ($property->aditional_person)
-                                + {{ $property->aditional_person }} hóspedes extras
-                            @endif
-                        </span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4v10l8 4 8-4V7z"></path>
-                        </svg>
-                        <span>{{ $property->dormitories }} quarto(s)</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                        </svg>
-                        <span>{{ $property->bathrooms }} banheiro(s)</span>
-                    </div>
-                </div>
-
-                <!-- Avaliação -->
                 @if($property->reviews_count > 0)
-                    <div class="flex items-center gap-2 mb-4 mt-4">
-                        <div class="flex items-center">
+                    <div class="mt-3 flex items-center gap-2 text-sm">
+                        <span class="flex items-center gap-1 font-semibold text-gray-900">
                             <span class="text-yellow-500">★</span>
-                            <span class="font-medium ml-1">{{ number_format($property->reviews_avg_rating, 1) }}</span>
-                        </div>
+                            {{ number_format($property->reviews_avg_rating, 1) }}
+                        </span>
                         <span class="text-gray-400">•</span>
-                        <span class="text-gray-500">{{ $property->reviews_count }} comentário(s)</span>
+                        <span class="text-gray-500">{{ $property->reviews_count }} avaliação(ões)</span>
                     </div>
-                @endif                
+                @endif
 
-                <!-- Descrição -->
-                <div class="mt-6 text-gray-600">
-                    <h3 class="font-semibold text-lg mb-2">Sobre este espaço</h3>            
-                    {!! $property->description !!}
+                <div class="mt-5 grid grid-cols-2 gap-3 border-y border-gray-200 py-4 sm:grid-cols-4">
+                    <div class="rounded-lg bg-gray-50 px-3 py-3">
+                        <p class="text-xs text-gray-500">Hóspedes</p>
+                        <p class="mt-1 font-semibold text-gray-900">
+                            {{ $property->capacity }}
+                            @if ($property->aditional_person)
+                                <span class="text-xs font-normal text-gray-500">+{{ $property->aditional_person }}</span>
+                            @endif
+                        </p>
+                    </div>
+
+                    <div class="rounded-lg bg-gray-50 px-3 py-3">
+                        <p class="text-xs text-gray-500">Quartos</p>
+                        <p class="mt-1 font-semibold text-gray-900">{{ $property->dormitories }}</p>
+                    </div>
+
+                    <div class="rounded-lg bg-gray-50 px-3 py-3">
+                        <p class="text-xs text-gray-500">Banheiros</p>
+                        <p class="mt-1 font-semibold text-gray-900">{{ $property->bathrooms }}</p>
+                    </div>
+
+                    <div class="rounded-lg bg-gray-50 px-3 py-3">
+                        <p class="text-xs text-gray-500">Vagas</p>
+                        <p class="mt-1 font-semibold text-gray-900">{{ $property->garage }}</p>
+                    </div>
                 </div>
 
-                <!-- Comodidades -->
-                <div class="mt-6">
-                    <h3 class="font-semibold text-lg mb-3">Facilidades</h3>
-                    @php
+                @if($property->description)
+                    <div class="mt-6 text-gray-600">
+                        <h3 class="mb-2 text-lg font-semibold">Sobre este espaço</h3>
+                        {!! $property->description !!}
+                    </div>
+                @endif
+
+                @php
                         $amenidades = [
                             'acesso_praia' => 'Acesso à Praia',
                             'adequado_criancas' => 'Adequado para Crianças',
@@ -167,20 +185,26 @@
                             'vista_para_mar' => 'Vista para o Mar',
                             'wifi' => 'Wi-Fi',
                         ];
+
+                        $amenidadesAtivas = collect($amenidades)
+                            ->filter(fn ($label, $campo) => $property->$campo);
                     @endphp
-                    <div class="grid grid-cols-2 gap-3">
-                        @foreach($amenidades as $campo => $label)
-                            @if($property->$campo)
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    <span>{{ $label }}</span>
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
+
+                    @if($amenidadesAtivas->isNotEmpty())
+                        <div class="mt-6">
+                            <h3 class="mb-3 text-lg font-semibold">Facilidades</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                @foreach($amenidadesAtivas as $campo => $label)
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        <span>{{ $label }}</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
 
                 <hr class="border-gray-300 mt-8">
 
@@ -217,32 +241,25 @@
                     </div>                    
                 </div>                
 
-                <div class="mb-6 mt-4">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Bom saber</h2>
-                    <p>{!! nl2br(e($property->additional_notes)) !!}</p>
-                </div>
+                @if($property->additional_notes)
+                    <div class="mb-6 mt-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-3">Bom saber</h2>
+                        <p class="text-gray-600">{!! nl2br(e($property->additional_notes)) !!}</p>
+                    </div>
+                @endif
 
-                <div class="mb-6 mt-4">
-                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Política de cancelamento</h2>
-                    <p>{!! nl2br(e($property->politica_cancelamento)) !!}</p>
-                </div>
+                @if($property->politica_cancelamento)
+                    <div class="mb-6 mt-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-3">Política de cancelamento</h2>
+                        <p class="text-gray-600">{!! nl2br(e($property->politica_cancelamento)) !!}</p>
+                    </div>
+                @endif
 
             </div>
 
-            <!-- Sidebar - Card de reserva -->
             <div class="md:col-span-1">
-                <div class="bg-white border border-gray-200 rounded-xl p-6 sticky top-6 shadow-sm">
-                    <div class="mb-3 mt-2">
-                        <p class="text-xs text-gray-500 mb-4">
-                            Selecione as datas e o número de hóspedes para ver o preço total por noite
-                        </p>
-                        <p class="text-xs mb-4 font-bold text-blue-700">
-                            Mínimo de {{ $property->min_nights }} diária(s)
-                        </p>
-
-                        <livewire:web.booking-form :$property />                    
-                        
-                    </div>                   
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm md:sticky md:top-24">
+                    <livewire:web.booking-form :$property />
                 </div>
             </div>
         </div>

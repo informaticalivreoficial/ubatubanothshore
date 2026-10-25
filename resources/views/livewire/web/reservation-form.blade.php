@@ -291,23 +291,36 @@
                     <div class="flex justify-between">
                         <span>{{ $reservation->nights }} noite(s)</span>
                         <span class="font-medium text-gray-800">
-                            R$ {{ number_format($reservation->daily_total * $reservation->nights, 2, ',', '.') }}
+                            R$ {{ number_format($reservation->daily_total, 2, ',', '.') }}
                         </span>
                     </div>
                     @php
-                        $hospede_extra = max(0, $reservation->guests - $reservation->property->aditional_person);
+                        $hospede_extra = \App\Support\PropertyPricing::extraGuests($reservation->property, $reservation->guests);
                     @endphp
-                    <div class="flex justify-between">
-                        <span>{{ ($hospede_extra) }} Hóspedes Extra(s)</span>
-                        <span class="font-medium text-gray-800">
-                            R$ {{ number_format($hospede_extra *($reservation->property->value_aditional * $reservation->nights), 2, ',', '.') }}
-                        </span>
-                    </div>                    
+                    @if($hospede_extra > 0)
+                        <div class="flex justify-between">
+                            <span>
+                                {{ $hospede_extra }} hóspede(s) extra(s)
+                                x R$ {{ number_format($reservation->property->value_aditional, 2, ',', '.') }}
+                                x {{ $reservation->nights }} noite(s)
+                            </span>
+                            <span class="font-medium text-gray-800">
+                                R$ {{ number_format($hospede_extra * ($reservation->property->value_aditional * $reservation->nights), 2, ',', '.') }}
+                            </span>
+                        </div>
+                    @endif
 
                     <div class="flex justify-between">
                         <span>Taxa de Limpeza</span>
                         <span class="font-medium text-gray-800">
                             R$ {{ number_format($reservation->cleaning_fee, 2, ',', '.') }}
+                        </span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span>Taxa de IPTU</span>
+                        <span class="font-medium text-gray-800">
+                            R$ {{ number_format($reservation->iptu_fee ?? 0, 2, ',', '.') }}
                         </span>
                     </div>
 

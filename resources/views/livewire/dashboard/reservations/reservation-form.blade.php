@@ -149,17 +149,23 @@
                 </div>
                 <div class="col-12 col-md-2 col-lg-2">
                     <div class="form-group">
-                        <label class="labelforms"><b>Valor Diária</b></label>
+                        <label class="labelforms"><b>Total diárias</b></label>
                         <input type="text" class="form-control" id="daily_total" wire:model.live="daily_total">
                     </div>
                 </div>
-                <div class="col-12 col-md-3 col-lg-3">
+                <div class="col-12 col-md-2 col-lg-2">
                     <div class="form-group">
                         <label class="labelforms"><b>Taxa limpeza</b></label>
                         <input type="text" class="form-control" id="cleaning_fee" wire:model.live="cleaning_fee">
                     </div>
                 </div>
-                <div class="col-12 col-md-3 col-lg-3">
+                <div class="col-12 col-md-2 col-lg-2">
+                    <div class="form-group">
+                        <label class="labelforms"><b>Taxa IPTU</b></label>
+                        <input type="text" class="form-control" id="iptu_fee" wire:model.live="iptu_fee">
+                    </div>
+                </div>
+                <div class="col-12 col-md-2 col-lg-2">
                     <div class="form-group">
                         <label class="labelforms"><b>Valor Total</b></label>
                         <input type="text" class="form-control" id="total_value" wire:model="total_value">

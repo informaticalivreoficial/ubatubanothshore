@@ -119,7 +119,7 @@ class PostController extends Controller
         return response()->json([
             'success'         => true,
             'post_id'         => $post->id,
-            'url'             => url('/blog/artigo/' . $post->slug),
+            'url'             => $post->url,
             'image'           => $image,
             'category'        => $categoryName,
             'title'           => $post->title,

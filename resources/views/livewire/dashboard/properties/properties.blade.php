@@ -51,13 +51,12 @@
                                 <div class="py-3 px-3">
                                     <div class="row">
                                         <div class="col-12 text-center mb-2">
-                                            @if($property->sale && !$property->location)
-                                                {{ $property->formatted_sale_value ? 'Venda ' . $property->formatted_sale_value : '-----' }}
-                                            @elseif($property->sale && $property->location)
-                                                {{ $property->formatted_sale_value ? 'Venda ' . $property->formatted_sale_value : '' }}
-                                                {{ $property->formatted_rental_value ? '/ Locação ' . $property->formatted_rental_value : '' }}
+                                            @if($property->formatted_rental_value || $property->formatted_rental_value_couple)
+                                                <span>1 hóspede {{ $property->formatted_rental_value ?? '-----' }}</span>
+                                                <span class="mx-1">/</span>
+                                                <span>2 hóspedes {{ $property->formatted_rental_value_couple ?? '-----' }}</span>
                                             @else
-                                                {{ $property->formatted_rental_value ? 'Locação ' . $property->formatted_rental_value : '-----' }}
+                                                -----
                                             @endif
                                         </div>
                                         <div class="col-12 text-center mb-2">                                            

@@ -5,12 +5,18 @@
 
             @if(!$success)
                 <!-- LEFT FORM -->
-                <div class="w-full lg:w-3/5">
+                <div class="order-2 w-full lg:order-1 lg:w-3/5">
 
                     <!-- Personal Info -->
                     <h2 class="text-xl font-bold text-gray-900 mb-5">Informe os seus dados</h2>
 
-                    <div class="grid grid-cols-3 gap-4 mb-4">
+                    @if($errors->has('check_in') || $errors->has('guests'))
+                        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
+                            {{ $errors->first('check_in') ?: $errors->first('guests') }}
+                        </div>
+                    @endif
+
+                    <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
                             <input type="text" wire:model.defer="name" placeholder="Nome" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
@@ -60,7 +66,7 @@
                 </div>
 
                 <!-- RIGHT CARD -->
-                <div class="w-full lg:w-2/5">
+                <div class="order-1 w-full lg:order-2 lg:w-2/5">
                     <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
 
                         <!-- Property -->
@@ -141,6 +147,10 @@
                                     x-data="dateRangePicker()"
                                     x-init="init()"
                                     data-disabled='@json($disabledDates)'
+                                    data-method="calculateTotal"
+                                    data-max-date="{{ $property->maxBookingDate() }}"
+                                    data-default='@json([$check_in, $check_out])'
+                                    data-months="1"
                                     class="space-y-2"
                                 >
 
@@ -160,8 +170,12 @@
                                     <label class="text-xs text-gray-500">Hóspedes</label>
                                     <input type="number"
                                         min="1"
+                                        max="{{ $property->capacity + $property->aditional_person }}"
                                         wire:model.live="guests"
                                         class="w-full border rounded-md px-3 py-2 text-sm">
+                                    @error('guests')
+                                        <span class="mt-1 block text-xs text-red-600">{{ $message }}</span>
+                                    @enderror
                                 </div>
 
                                 {{-- Hóspedes --}}
@@ -222,6 +236,8 @@
                                 <div class="flex justify-between mb-2 text-orange-600">
                                     <span class="text-sm">
                                         {{ $extraGuests }} hóspede(s) extra(s)
+                                        x R$ {{ number_format($property->value_aditional, 2, ',', '.') }}
+                                        x {{ $nights }} noite(s)
                                     </span>
                                     <span class="text-sm">
                                         R$ {{ number_format($extraTotal, 2, ',', '.') }}
@@ -229,7 +245,7 @@
                                 </div>
                             @endif
 
-                            <div class="flex justify-between mb-4">
+                            <div class="flex justify-between mb-2">
                                 <span class="text-sm text-gray-600">
                                     Taxa de Limpeza
                                 </span>
@@ -238,6 +254,20 @@
                                     R$ {{ number_format($cleaning_fee, 2, ',', '.') }}
                                 </span>
                             </div>
+
+                            @if($iptu_fee > 0)
+                                <div class="flex justify-between mb-4">
+                                    <span class="text-sm text-gray-600">
+                                        Taxa de IPTU
+                                    </span>
+
+                                    <span class="text-sm text-gray-700">
+                                        R$ {{ number_format($iptu_fee, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                            @else
+                                <div class="mb-2"></div>
+                            @endif
 
                             <hr class="border-gray-200 mb-4"/>
 
@@ -282,48 +312,10 @@
 
 @push('scripts')
     <script>
-        // ⚡ Ouve o evento disparado pelo Livewire
         window.addEventListener('reservation-success', () => {
             setTimeout(() => {
                 window.location.href = "{{ route('web.home') }}";
-            }, 5000); // 5 segundos
+            }, 5000);
         });
-
-        function dateRangePicker() {
-            return {
-                init() {
-
-                    let disabledDates = JSON.parse(this.$el.dataset.disabled)
-                        .map(date => new Date(date + "T00:00:00"));
-
-                    console.log('Datas desabilitadas:', disabledDates);
-
-                    flatpickr(this.$refs.picker, {
-                        mode: "range",
-                        dateFormat: "d/m/Y",
-                        altInput: true,
-                        altFormat: "d/m/Y",
-                        showMonths: 2,
-                        minDate: "today",
-                        locale: flatpickr.l10ns.pt,
-                        rangeSeparator: " até ",
-                        disable: disabledDates,
-                        maxDate: "{{ $property->getRawOriginal('expired_at') }}",
-
-                        onChange: (selectedDates) => {
-                            if (selectedDates.length === 2) {
-
-                                let formatToISO = (date) =>
-                                    date.toISOString().split('T')[0];
-
-                                @this.set('check_in', formatToISO(selectedDates[0]));
-                                @this.set('check_out', formatToISO(selectedDates[1]));
-                                @this.call('calculateTotal');
-                            }
-                        }
-                    });
-                }
-            }
-        }
     </script>
 @endpush

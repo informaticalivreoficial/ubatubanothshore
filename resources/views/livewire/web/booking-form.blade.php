@@ -1,74 +1,128 @@
-<div>
-    <div class="border rounded-lg p-4 space-y-4">
+@php
+    $individualPrice = $property->priceForGuests(1);
+    $couplePrice = $property->priceForGuests(2);
+    $maxGuests = $property->capacity + $property->aditional_person;
+@endphp
 
-        {{-- Datas --}}
+<div class="space-y-5">
+    <div>
+        <p class="text-xs font-medium uppercase tracking-wide text-gray-500">Diárias a partir de</p>
+        <div class="mt-1 flex items-baseline gap-1">
+            <span class="text-2xl font-bold text-gray-900">
+                R$ {{ number_format($individualPrice, 0, ',', '.') }}
+            </span>
+            <span class="text-sm text-gray-500">/ noite</span>
+        </div>
+
+        @if($couplePrice > $individualPrice)
+            <p class="mt-1 text-xs text-gray-500">
+                2 hóspedes: R$ {{ number_format($couplePrice, 0, ',', '.') }} / noite
+                <span class="text-gray-400">(total para os dois)</span>
+            </p>
+        @endif
+
+        <p class="mt-2 text-xs font-semibold text-blue-700">
+            Mínimo de {{ $property->min_nights }} diária(s)
+        </p>
+    </div>
+
+    @if($bookingClosed)
+        <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <p class="font-semibold">Reservas encerradas</p>
+            <p class="mt-1">Este imóvel não está mais disponível para novas reservas.</p>
+        </div>
+
+        <a
+            href="{{ route('web.properties') }}"
+            class="flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white py-3 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50"
+        >
+            Ver outros imóveis
+        </a>
+    @else
         <div
             wire:ignore
             x-data="dateRangePicker()"
             x-init="init()"
             data-disabled='@json($disabledDates)'
+            data-method="calculate"
+            data-max-date="{{ $maxBookingDate }}"
+            data-months="1"
             class="space-y-2"
         >
-
-            <label class="block text-sm font-medium">
-                Selecione as Datas
+            <label class="block text-sm font-medium text-gray-700">
+                Selecione as datas
             </label>
 
             <input
                 type="text"
                 x-ref="picker"
-                class="w-full border rounded p-2"
-                placeholder="Selecione check-in e check-out"
+                class="w-full cursor-pointer rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Check-in e check-out"
+                autocomplete="off"
             >
         </div>
 
         @if($dateError)
-            <div class="bg-red-50 text-red-600 text-sm p-2 rounded">
+            <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
                 {{ $dateError }}
             </div>
         @endif
 
-        {{-- Hóspedes --}}
-        <div class="flex justify-between items-center">
-            <span>{{ $guests }} hóspede(s)</span>
+        <div class="flex items-center justify-between rounded-lg border border-gray-300 px-4 py-3">
+            <div>
+                <p class="text-sm font-medium text-gray-800">Hóspedes</p>
+                <p class="text-xs text-gray-500">Máximo de {{ $maxGuests }}</p>
+            </div>
 
-            <div class="flex gap-2">
-                <button type="button"
+            <div class="flex items-center gap-3">
+                <button
+                    type="button"
                     wire:click="decreaseGuests"
-                    class="border w-8 h-8 rounded">-</button>
+                    @disabled($guests <= 1)
+                    class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Diminuir hóspedes"
+                >
+                    -
+                </button>
 
-                <button type="button"
+                <span class="w-5 text-center text-sm font-semibold text-gray-900">{{ $guests }}</span>
+
+                <button
+                    type="button"
                     wire:click="increaseGuests"
-                    class="border w-8 h-8 rounded">+</button>
+                    @disabled($guests >= $maxGuests)
+                    class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Aumentar hóspedes"
+                >
+                    +
+                </button>
             </div>
         </div>
 
-        {{-- Resumo --}}
         @if($nights > 0)
-
-            <div class="border-t pt-4 space-y-2 text-sm">
-
-                {{-- Diária --}}
-                <div class="flex justify-between">                    
-                    <span>
-                        {{ $nights }} noite(s) X
+            <div class="space-y-2 border-t border-gray-200 pt-4 text-sm">
+                <div class="flex justify-between gap-4">
+                    <span class="text-gray-600">
+                        {{ $nights }} noite(s) x
                         @if ($seasonApplied)
-                            <span class="text-xs text-gray-400">(temporadas aplicadas)</span>
-                        @else    
-                            R$ {{ number_format($property->rental_value, 2, ',', '.') }}
-                        @endif                        
+                            <span class="text-xs text-gray-400">(temporada)</span>
+                        @else
+                            R$ {{ number_format($property->priceForGuests($guests), 2, ',', '.') }}
+                            <span class="text-xs text-gray-400">
+                                ({{ $guests >= 2 ? 'total para os 2 primeiros hóspedes' : '1 hóspede' }})
+                            </span>
+                        @endif
                     </span>
-                    <span>
+                    <span class="font-medium text-gray-800">
                         R$ {{ number_format($dailyTotal, 2, ',', '.') }}
                     </span>
                 </div>
 
-                {{-- Adicional por pessoa --}}
                 @if($extraGuests > 0)
-                    <div class="flex justify-between text-orange-600">
+                    <div class="flex justify-between gap-4 text-orange-600">
                         <span>
-                            R$ {{ number_format($property->value_aditional, 2, ',', '.') }}
-                            x {{ $extraGuests }} pessoa(s) extra(s)
+                            {{ $extraGuests }} hóspede(s) extra(s)
+                            x R$ {{ number_format($property->value_aditional, 2, ',', '.') }}
                             x {{ $nights }} noite(s)
                         </span>
                         <span>
@@ -77,99 +131,42 @@
                     </div>
                 @endif
 
-                {{-- Limpeza --}}
                 @if($property->cleaning_fee)
-                    <div class="flex justify-between">
-                        <span>Taxa de limpeza</span>
-                        <span>
+                    <div class="flex justify-between gap-4">
+                        <span class="text-gray-600">Taxa de limpeza</span>
+                        <span class="font-medium text-gray-800">
                             R$ {{ number_format($property->cleaning_fee, 2, ',', '.') }}
                         </span>
                     </div>
                 @endif
 
-                <div class="border-t pt-3 flex justify-between font-bold text-lg">
+                @if($iptuFee > 0)
+                    <div class="flex justify-between gap-4">
+                        <span class="text-gray-600">Taxa de IPTU</span>
+                        <span class="font-medium text-gray-800">
+                            R$ {{ number_format($iptuFee, 2, ',', '.') }}
+                        </span>
+                    </div>
+                @endif
+
+                <div class="flex justify-between gap-4 border-t border-gray-200 pt-3 text-base font-bold text-gray-900">
                     <span>Total</span>
-                    <span>
-                        R$ {{ number_format($total, 2, ',', '.') }}
-                    </span>
+                    <span>R$ {{ number_format($total, 2, ',', '.') }}</span>
                 </div>
-
             </div>
-
         @endif
 
-    </div>
+        <button
+            wire:click="goToCheckout"
+            wire:loading.attr="disabled"
+            class="flex w-full items-center justify-center rounded-lg bg-blue-600 py-3.5 text-sm font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-wait disabled:opacity-70"
+        >
+            <span wire:loading.remove>Continuar para reserva</span>
+            <span wire:loading>Verificando...</span>
+        </button>
 
-    <button
-        wire:click="goToCheckout"
-        class="w-full bg-white font-bold border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-100 transition-colors mt-4"
-    >
-        Verificar Disponibilidade
-    </button>
+        <p class="text-center text-xs text-gray-500">
+            Você só conclui a reserva na próxima etapa.
+        </p>
+    @endif
 </div>
-
-@push('styles')
-    <style>
-        
-    </style>
-@endpush
-
-@push('scripts')
-    <script>
-        
-        function dateRangePicker() {
-            return {
-                init() {
-
-                    let disabledDates = JSON.parse(this.$el.dataset.disabled)
-                    .map(date => {
-                        const [y, m, d] = date.split('-').map(Number)
-                        return new Date(y, m - 1, d) // ✅ horário local, sem UTC
-                    })                    
-
-                    flatpickr(this.$refs.picker, {
-                        mode: "range",
-                        dateFormat: "Y-m-d",
-                        altInput: true,
-                        altFormat: "d/m/Y",
-                        showMonths: 2,
-                        minDate: new Date(),
-                        locale: FlatpickrPortuguese, // ✅
-                        rangeSeparator: " até ",
-                        disable: disabledDates,
-                        maxDate: "{{ $property->getRawOriginal('expired_at') }}",
-                        
-                        onReady: function(selectedDates, dateStr, instance) {
-                            instance.set('locale', {
-                                ...instance.l10n,
-                                firstDayOfWeek: 1
-                            });
-                        },
-
-                        
-
-                        onChange: (selectedDates) => {
-                            if (selectedDates.length === 2) {
-
-                                let formatToISO = (date) => {
-                                    const y = date.getFullYear()
-                                    const m = String(date.getMonth() + 1).padStart(2, '0')
-                                    const d = String(date.getDate()).padStart(2, '0')
-                                    return `${y}-${m}-${d}`
-                                }
-
-                                @this.set('check_in', formatToISO(selectedDates[0]));
-                                @this.set('check_out', formatToISO(selectedDates[1]));
-                                @this.call('calculate');
-                            }
-                            
-                        }
-                    });
-
-                    //console
-                    
-                }
-            }
-        }
-    </script>
-@endpush

@@ -2,18 +2,18 @@
 
 namespace App\Livewire\Web;
 
-use App\Mail\AdminReservationNotification;
-use App\Mail\ClientReservationReceived;
 use App\Mail\ReservationFormLinkMail;
 use App\Models\Property;
 use App\Models\PropertyBlockedDate;
 use App\Models\PropertyReservation;
 use App\Models\User;
 use App\Notifications\NewReservationNotification;
+use App\Support\PropertyPricing;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class CheckoutPage extends Component
@@ -21,21 +21,33 @@ class CheckoutPage extends Component
     public Property $property;
 
     public $check_in;
+
     public $check_out;
+
     public $guests;
 
     public $extraGuests = 0;
+
     public $extraTotal = 0;
 
     public $name;
+
     public $email;
+
     public $phone;
+
     public $notes;
+
     public $review_token;
 
     public $nights;
+
     public $subtotal;
+
     public $cleaning_fee;
+
+    public $iptu_fee;
+
     public $total;
 
     public $editingTrip = false;
@@ -53,8 +65,12 @@ class CheckoutPage extends Component
         $this->check_out = $check_out;
         $this->guests = $guests;
 
+        if ($property->isBookingClosed()) {
+            return redirect()->route('web.property', $property->slug);
+        }
+
         // validação básica
-        if (!$check_in || !$check_out) {
+        if (! $check_in || ! $check_out) {
             return redirect()->route('web.property', $property->slug);
         }
 
@@ -62,11 +78,7 @@ class CheckoutPage extends Component
 
         // 🔹 Datas de reservas
         $reservations = PropertyReservation::where('property_id', $property->id)
-            ->whereIn('status', ['waiting_payment', 'confirmed'])
-            ->where(function ($q) {
-                $q->whereNull('expired_at')
-                ->orWhere('expired_at','>', now());
-            })
+            ->where('status', '!=', 'cancelled')
             ->get();
 
         foreach ($reservations as $reservation) {
@@ -82,7 +94,7 @@ class CheckoutPage extends Component
         // 🔴 Datas bloqueadas manualmente
         $blockedDates = PropertyBlockedDate::where('property_id', $property->id)
             ->pluck('date')
-            ->map(fn($date) => Carbon::parse($date)->format('Y-m-d'))
+            ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
             ->toArray();
 
         // 🔥 Junta tudo e remove duplicados
@@ -103,9 +115,12 @@ class CheckoutPage extends Component
     public function confirmReservation()
     {
         $this->validate([
+            'check_in' => 'required|date|after_or_equal:today',
+            'check_out' => 'required|date|after:check_in',
+            'guests' => 'required|integer|min:1|max:'.$this->maxGuests(),
             'name' => 'required|min:3',
             'email' => 'required|email',
-            'phone' => 'required'
+            'phone' => 'required',
         ]);
 
         DB::transaction(function () {
@@ -121,7 +136,7 @@ class CheckoutPage extends Component
                     'client' => true,
                     'phone' => $this->phone,
                     'status' => 1,
-                    'password' => bcrypt(str()->random(10))
+                    'password' => bcrypt(str()->random(10)),
                 ]
             );
 
@@ -139,18 +154,19 @@ class CheckoutPage extends Component
                 'notes' => $this->notes,
                 'guests' => $this->guests,
                 'cleaning_fee' => $this->cleaning_fee,
+                'iptu_fee' => $this->iptu_fee,
                 'origin' => 'site',
-                'daily_total' => $this->property->rental_value,
+                'daily_total' => $this->subtotal,
                 'total_value' => $this->total,
                 'status' => 'waiting_payment',
                 'expired_at' => now()->addMinutes(30),
-            ]);            
+            ]);
 
             $admin = User::where('admin', true)->first();
 
             if ($admin) {
                 $admin->notify(new NewReservationNotification($reservation));
-            }            
+            }
 
             // 📧 Email para cliente
             Mail::to($this->email)->send(new ReservationFormLinkMail($reservation));
@@ -163,86 +179,64 @@ class CheckoutPage extends Component
 
     private function validateAvailability()
     {
-        $exists = PropertyReservation::where('property_id', $this->property->id)
-            ->whereIn('status', ['waiting_payment', 'confirmed'])
-            ->where(function ($query) {
-                $query->where('check_in', '<', $this->check_out)
-                    ->where('check_out', '>', $this->check_in);
-            })
-            ->exists();
+        if (! $this->property->isAvailable($this->check_in, $this->check_out)) {
+            throw ValidationException::withMessages([
+                'check_in' => 'Estas datas não estão mais disponíveis.',
+            ]);
+        }
 
-        if ($exists) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'check_in' => 'Estas datas não estão mais disponíveis.'
+        if ($this->nights < $this->property->min_nights) {
+            throw ValidationException::withMessages([
+                'check_in' => "Esta propriedade exige mínimo de {$this->property->min_nights} noite(s).",
+            ]);
+        }
+
+        $deadline = $this->property->bookingDeadline();
+
+        if ($deadline && Carbon::parse($this->check_out)->gt($deadline)) {
+            throw ValidationException::withMessages([
+                'check_in' => 'A reserva não pode ultrapassar a data disponível.',
             ]);
         }
     }
 
+    public function maxGuests(): int
+    {
+        return (int) $this->property->capacity + (int) $this->property->aditional_person;
+    }
+
     public function calculateTotal()
     {
-        if (!$this->check_in || !$this->check_out) {
+        if (! $this->check_in || ! $this->check_out) {
             return;
         }
 
-        $checkIn  = Carbon::parse($this->check_in);
+        $checkIn = Carbon::parse($this->check_in);
         $checkOut = Carbon::parse($this->check_out);
 
         if ($checkOut->lte($checkIn)) {
             return;
         }
 
-        $this->nights     = $checkIn->diffInDays($checkOut);
-        $this->cleaning_fee = $this->property->cleaning_fee ?? 0;
+        $this->guests = max(1, min((int) $this->guests, $this->maxGuests()));
 
-        // ✅ Cálculo dia a dia considerando temporadas
-        $seasons = $this->property->seasons()
-            ->where('start_date', '<=', $checkOut->toDateString())
-            ->where('end_date', '>=', $checkIn->toDateString())
-            ->get();
+        $quote = PropertyPricing::quote($this->property, $checkIn, $checkOut, (int) $this->guests);
 
-        $this->subtotal = 0;
-        $this->seasonApplied = false; // ✅ reseta
-        $current = $checkIn->copy();
-
-        while ($current->lt($checkOut)) {
-
-            $season = $seasons->first(function ($s) use ($current) {
-                return $current->between(
-                    Carbon::parse($s->start_date),
-                    Carbon::parse($s->end_date)
-                );
-            });
-
-            if ($season) {
-                $this->seasonApplied = true; // ✅ marca se usou temporada
-                $this->subtotal += $season->price_per_day;
-            } else {
-                $this->subtotal += $this->property->rental_value;
-            }
-
-            $current->addDay();
-        }
-
-        // 🔥 Extra guests
-        $this->extraGuests = max(
-            0,
-            (int) $this->guests - (int) $this->property->aditional_person
-        );
-
-        $this->extraTotal =
-            $this->extraGuests *
-            $this->property->value_aditional *
-            $this->nights;
-
-        // 💰 Total final
-        $this->total = $this->subtotal + $this->extraTotal + $this->cleaning_fee;
+        $this->nights = $quote['nights'];
+        $this->subtotal = $quote['daily_total'];
+        $this->extraGuests = $quote['extra_guests'];
+        $this->extraTotal = $quote['extra_total'];
+        $this->cleaning_fee = $quote['cleaning_fee'];
+        $this->iptu_fee = $quote['iptu_fee'];
+        $this->total = $quote['total_value'];
+        $this->seasonApplied = $quote['season_applied'];
     }
 
     public function increaseGuests()
     {
-        if ($this->guests < ($this->property->capacity + $this->property->aditional_person)) {
+        if ($this->guests < $this->maxGuests()) {
             $this->guests++;
-            $this->calculateTotal(); // 👈 recalcula
+            $this->calculateTotal();
         }
     }
 

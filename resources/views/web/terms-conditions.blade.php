@@ -1,14 +1,14 @@
 @extends('web.layouts.app')
 
 @section('content')
-    <div class="max-w-8xl mx-auto px-6 py-4">
-
-        <div class="flex flex-col lg:flex-row gap-8">
-            <div class="w-full">
-                <h2 class="text-2xl font-semibold mb-4 pt-6">Termos e Condições</h2>
-                {!!$configuracoes->terms_condicions!!}
-            </div>
-        </div>
-
-    </div>
+    @include('web.components.legal-page', [
+        'title' => 'Termos e Condições',
+        'description' => 'Conheça as regras para uso da plataforma, realização de reservas e contratação de imóveis.',
+        'badge' => 'Uso da plataforma',
+        'icon' => 'document',
+        'features' => ['Regras claras', 'Reservas seguras', 'Transparência'],
+        'content' => $legal['html'],
+        'sections' => $legal['sections'],
+        'current' => 'terms',
+    ])
 @endsection

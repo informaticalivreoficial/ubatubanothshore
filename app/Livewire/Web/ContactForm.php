@@ -9,12 +9,16 @@ use Livewire\Component;
 class ContactForm extends Component
 {
     public $nome;
+
     public $email;
+
     public $mensagem;
+
     public $success = false;
 
     // Campos honeypot (anti-spam)
     public $bairro;
+
     public $cidade;
 
     protected $rules = [
@@ -30,14 +34,14 @@ class ContactForm extends Component
 
     public function submit()
     {
-        if (!empty($this->bairro) || !empty($this->cidade)) {
+        if (! empty($this->bairro) || ! empty($this->cidade)) {
             return;
         }
 
         $validated = $this->validate();
-        
+
         Mail::send(new Atendimento($validated));
-        
+
         $this->reset(['nome', 'email', 'mensagem']);
         $this->success = true;
     }

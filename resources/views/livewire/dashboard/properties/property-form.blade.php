@@ -165,23 +165,18 @@
                                 </div>
                             </div>
 
-                            {{-- Campo: Valor da Locação --}}
+                            {{-- Campo: Valor da Locação Individual --}}
                             <div class="col-12 col-md-3 col-lg-3"> 
                                 <div class="form-group"
                                     x-data="{
                                         display: '',
                                         init() {
-                                            // Inicializa com o valor do Livewire, se existir
                                             let v = '{{ $rental_value ?? '' }}';
                                             if (v) this.display = this.toDisplay(parseFloat(v));
                                         },
                                         toDisplay(num) {
                                             if (isNaN(num)) return '';
                                             return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                                        },
-                                        toRaw(str) {
-                                            // '1.200,50' → '1200.50'
-                                            return str.replace(/\./g, '').replace(',', '.');
                                         },
                                         onInput(e) {
                                             let raw = e.target.value.replace(/\D/g, '');
@@ -192,13 +187,47 @@
                                         }
                                     }"
                                 >
-                                    <label class="labelforms text-muted"><b>Valor da Locação</b></label>
+                                    <label class="labelforms text-muted"><b>Valor Locação Individual (1 hóspede)</b></label>
                                     <input
                                         type="text"
                                         class="form-control"
                                         :value="display"
                                         @input="onInput($event)"
                                         placeholder="Ex: 1.200,50"
+                                        inputmode="numeric"
+                                    />
+                                </div>
+                            </div>
+
+                            {{-- Campo: Valor da Locação para Casal --}}
+                            <div class="col-12 col-md-3 col-lg-3">
+                                <div class="form-group"
+                                    x-data="{
+                                        display: '',
+                                        init() {
+                                            let v = '{{ $rental_value_couple ?? '' }}';
+                                            if (v) this.display = this.toDisplay(parseFloat(v));
+                                        },
+                                        toDisplay(num) {
+                                            if (isNaN(num)) return '';
+                                            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        },
+                                        onInput(e) {
+                                            let raw = e.target.value.replace(/\D/g, '');
+                                            if (!raw) { this.display = ''; this.$wire.set('rental_value_couple', null); return; }
+                                            let num = parseInt(raw, 10) / 100;
+                                            this.display = this.toDisplay(num);
+                                            this.$wire.set('rental_value_couple', num.toFixed(2));
+                                        }
+                                    }"
+                                >
+                                    <label class="labelforms text-muted"><b>Valor Locação para 2 Hóspedes (total do casal)</b></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        :value="display"
+                                        @input="onInput($event)"
+                                        placeholder="Ex: 1.800,00"
                                         inputmode="numeric"
                                     />
                                 </div>
@@ -226,7 +255,7 @@
                                         }
                                     }"
                                 >
-                                    <label class="labelforms text-muted"><b>Valor Hóspede Adicional</b></label>
+                                    <label class="labelforms text-muted"><b>Valor por Hóspede Extra (a partir do 3º)</b></label>
                                     <input
                                         type="text"
                                         class="form-control"
@@ -267,6 +296,40 @@
                                         :value="display"
                                         @input="onInput($event)"
                                         placeholder="Ex: 150,00"
+                                        inputmode="numeric"
+                                    />
+                                </div>
+                            </div>
+
+                            {{-- Campo: Taxa de IPTU --}}
+                            <div class="col-12 col-md-3 col-lg-3">
+                                <div class="form-group"
+                                    x-data="{
+                                        display: '',
+                                        init() {
+                                            let v = '{{ $iptu_fee ?? '' }}';
+                                            if (v) this.display = this.toDisplay(parseFloat(v));
+                                        },
+                                        toDisplay(num) {
+                                            if (isNaN(num)) return '';
+                                            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                        },
+                                        onInput(e) {
+                                            let raw = e.target.value.replace(/\D/g, '');
+                                            if (!raw) { this.display = ''; this.$wire.set('iptu_fee', null); return; }
+                                            let num = parseInt(raw, 10) / 100;
+                                            this.display = this.toDisplay(num);
+                                            this.$wire.set('iptu_fee', num.toFixed(2));
+                                        }
+                                    }"
+                                >
+                                    <label class="labelforms text-muted"><b>Taxa de IPTU</b></label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        :value="display"
+                                        @input="onInput($event)"
+                                        placeholder="Ex: 100,00"
                                         inputmode="numeric"
                                     />
                                 </div>

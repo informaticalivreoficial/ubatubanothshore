@@ -4,35 +4,37 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\CatPost;
-use App\Models\Property;
-use App\Support\Seo;
 use App\Models\Config;
 use App\Models\Post;
+use App\Models\Property;
+use App\Support\Seo;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    protected $seo, $config;
+    protected $seo;
+
+    protected $config;
 
     public function __construct()
     {
-        $this->seo = new Seo();
+        $this->seo = new Seo;
         $this->config = Config::where('id', 1)->first();
     }
 
     public function index()
     {
         $properties = Property::available()
-            ->withCount(['reviews as reviews_count' => function($query) {
+            ->withCount(['reviews as reviews_count' => function ($query) {
                 $query->where('approved', true);
             }])
-            ->withAvg(['reviews as reviews_avg_rating' => function($query) {
+            ->withAvg(['reviews as reviews_avg_rating' => function ($query) {
                 $query->where('approved', true);
             }], 'rating')
             ->latest()
             ->take(8)
-            ->get();  
-            
+            ->get();
+
         $head = $this->seo->render($this->config->app_name ?? env('APP_NAME'),
             $this->config->information ?? env('APP_NAME'),
             route('web.home'),
@@ -43,120 +45,129 @@ class HomeController extends Controller
             'head' => $head,
             'properties' => $properties,
         ]);
-    } 
-    
+    }
+
     public function blog()
     {
-        $posts = Post::where(function ($query) {
-                    $query->where('type', 'artigo')
-                          ->orWhere('type', 'noticia');
-                })
-                ->postson()
-                ->orderBy('created_at', 'DESC')
-                ->paginate(21);
+        $posts = Post::with('categoryObject')
+            ->whereIn('type', ['artigo', 'noticia'])
+            ->postson()
+            ->orderByDesc('created_at')
+            ->paginate(21);
 
-        $head = $this->seo->render('Blog - ' . $this->config->app_name ?? env('APP_NAME'),
+        $head = $this->seo->render('Blog - '.$this->config->app_name ?? env('APP_NAME'),
             'Confira nossos artigos e notícias sobre o mercado imobiliário.',
             route('web.blog.index'),
             $this->config->getmetaimg() ?? url(asset('theme/images/image.jpg'))
         );
 
-        return view("web.blog.index",[
+        return view('web.blog.index', [
             'head' => $head,
             'posts' => $posts,
+            'categorias' => $this->blogCategories(),
         ]);
     }
 
     public function blogCategory($slug)
     {
-        $category = CatPost::where('slug', $slug)->first();
+        $category = CatPost::where('slug', $slug)->firstOrFail();
 
-        $posts = Post::where('category', $category->id)
-                ->postson()
-                ->orderBy('created_at', 'DESC')
-                ->paginate(21);
+        $categoryIds = $category->children()->pluck('id')->push($category->id);
 
-        $head = $this->seo->render('Blog - ' . $category->title ?? env('APP_NAME'),
+        $posts = Post::with('categoryObject')
+            ->whereIn('category', $categoryIds)
+            ->postson()
+            ->orderByDesc('created_at')
+            ->paginate(21);
+
+        $head = $this->seo->render('Blog - '.$category->title ?? env('APP_NAME'),
             'Confira nossos artigos e notícias sobre Ubatuba na categoria '.$category->title.'.',
             route('web.blog.category', ['slug' => $category->slug]),
             $this->config->getmetaimg() ?? url(asset('theme/images/image.jpg'))
         );
 
-        return view("web.blog.index",[
+        return view('web.blog.index', [
             'head' => $head,
             'posts' => $posts,
+            'categorias' => $this->blogCategories(),
             'category' => $category,
         ]);
     }
 
     public function artigo(Request $request)
     {
-        $post = Post::where('slug', $request->slug)->postson()->first();
-
-        $postsTags = Post::where('type', 'artigo')->postson()->limit(3)->get();
-        $categorias = CatPost::orderBy('title', 'ASC')
-            ->where('type', 'artigo')
-            ->whereNull('id_pai')
-            ->with(['children' => function($q) {
-                $q->where('status', 1)
-                ->withCount(['posts' => fn($q) => $q->where('status', 1)])
-                ->having('posts_count', '>', 0);
-            }])
-            ->get()
-            ->filter(fn($cat) => $cat->children->count() > 0);
-        $postsMais = Post::orderBy('views', 'DESC')->where('type', 'artigo')->limit(3)->postson()->get();
-        
-        $post->views = $post->views + 1;
-        $post->save();
-
-        $head = $this->seo->render('Blog - ' . $post->title ?? env('APP_NAME'),
-            $post->title,
-            route('web.blog.artigo', ['slug' => $post->slug]),
-            $post->nocover() ?? $this->config->getmetaimg()
-        );
-
-        return view("web.blog.article", [
-            'head' => $head,
-            'post' => $post,
-            'postsMais' => $postsMais,
-            'categorias' => $categorias,
-            'postsTags' => $postsTags,
-        ]);
+        return $this->showPost($request, 'artigo');
     }
 
     public function noticia(Request $request)
     {
-        $post = Post::where('slug', $request->slug)->postson()->first();
+        return $this->showPost($request, 'noticia');
+    }
 
-        $postsTags = Post::where('type', 'noticia')->postson()->limit(3)->get();
-        $categorias = CatPost::orderBy('title', 'ASC')
-                ->where('type', 'noticia')
-                ->whereNull('id_pai')
-                ->with(['children' => function($q) {
-                    $q->where('status', 1)
-                    ->withCount(['posts' => fn($q) => $q->where('status', 1)])
-                    ->having('posts_count', '>', 0);
-                }])
-                ->available()
-                ->get()
-                ->filter(fn($cat) => $cat->children->count() > 0);
-        $postsMais = Post::orderBy('views', 'DESC')->where('type', 'noticia')->limit(3)->postson()->get();
-        
-        $post->views = $post->views + 1;
-        $post->save();
+    private function showPost(Request $request, string $type)
+    {
+        $post = Post::with('categoryObject')
+            ->where('type', $type)
+            ->where('slug', $request->slug)
+            ->postson()
+            ->firstOrFail();
 
-        $head = $this->seo->render('Notícia - ' . $post->title ?? env('APP_NAME'),
+        $post->increment('views');
+
+        $categorias = $this->blogCategories([$type]);
+        $postsMais = Post::where('type', $type)
+            ->postson()
+            ->orderByDesc('views')
+            ->limit(3)
+            ->get();
+
+        $relacionados = Post::with('categoryObject')
+            ->where('type', $type)
+            ->postson()
+            ->where('id', '!=', $post->id)
+            ->when($post->category, fn ($query) => $query->where('category', $post->category))
+            ->orderByDesc('created_at')
+            ->limit(3)
+            ->get();
+
+        $head = $this->seo->render(
+            ($type === 'noticia' ? 'Notícia' : 'Blog').' - '.$post->title,
             $post->title,
-            route('web.blog.noticia', ['slug' => $post->slug]),
-            $post->cover() ?? $this->config->getmetaimg()
+            route($type === 'noticia' ? 'web.blog.noticia' : 'web.blog.artigo', ['slug' => $post->slug]),
+            $post->nocover() ?? $this->config->getmetaimg()
         );
 
-        return view("web.blog.article", [
+        return view('web.blog.article', [
             'head' => $head,
             'post' => $post,
             'postsMais' => $postsMais,
+            'relacionados' => $relacionados,
             'categorias' => $categorias,
-            'postsTags' => $postsTags,
+            'todasTags' => $this->blogTags($type),
         ]);
+    }
+
+    private function blogCategories(array $types = ['artigo', 'noticia'])
+    {
+        return CatPost::whereIn('type', $types)
+            ->where('status', 1)
+            ->withCount(['posts' => fn ($query) => $query->where('status', 1)])
+            ->orderBy('title')
+            ->get()
+            ->filter(fn ($category) => $category->posts_count > 0)
+            ->values();
+    }
+
+    private function blogTags(string $type)
+    {
+        return Post::where('type', $type)
+            ->postson()
+            ->whereNotNull('tags')
+            ->pluck('tags')
+            ->flatMap(fn ($tags) => array_map('trim', explode(',', $tags)))
+            ->filter()
+            ->unique()
+            ->take(20)
+            ->values();
     }
 }

@@ -226,6 +226,12 @@
                     </div>
 
                     <div>
+                        <h3 class="font-semibold text-sm text-gray-500">Taxa IPTU</h3>
+
+                        <p>R$ {{ number_format($selectedReservation->iptu_fee ?? 0,2,',','.') }}</p>
+                    </div>
+
+                    <div>
                         <h3 class="font-semibold text-sm text-gray-500">Total</h3>
 
                         <p class="font-semibold">

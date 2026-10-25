@@ -11,10 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('property_reviews')) {
+            return;
+        }
+
         Schema::create('property_reviews', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('property_id')->constrained()->cascadeOnDelete();
+            $table->unsignedInteger('property_id');
+            $table->foreign('property_id')->references('id')->on('properties')->cascadeOnDelete();
             $table->foreignId('reservation_id')->constrained('property_reservations')->cascadeOnDelete();
 
             $table->string('guest_name');

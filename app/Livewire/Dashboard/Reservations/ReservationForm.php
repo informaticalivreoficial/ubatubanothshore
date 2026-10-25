@@ -4,7 +4,9 @@ namespace App\Livewire\Dashboard\Reservations;
 
 use App\Models\Property;
 use App\Models\PropertyReservation;
+use App\Support\PropertyPricing;
 use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Livewire\Component;
 
 class ReservationForm extends Component
@@ -12,21 +14,35 @@ class ReservationForm extends Component
     public ?PropertyReservation $reservation = null;
 
     public $property;
+
     public $property_id;
+
     public $guest_name;
+
     public $guest_email;
+
     public $guest_phone;
 
     public $check_in;
+
     public $check_out;
+
     public $guests = 1;
+
     public $nights;
 
     public $daily_total;
+
+    public $extra_total = 0;
+
     public $cleaning_fee = 0;
+
+    public $iptu_fee = 0;
+
     public $total_value;
 
     public $status = 'pending';
+
     public $notes;
 
     public $blockedDates = [];
@@ -53,25 +69,26 @@ class ReservationForm extends Component
 
             $this->check_in = $reservation->check_in?->format('Y-m-d');
             $this->check_out = $reservation->check_out?->format('Y-m-d');
-        }     
+        }
     }
 
     public function loadBlockedDates()
     {
-        if (!$this->property_id) return;
+        if (! $this->property_id) {
+            return;
+        }
 
         $reservations = PropertyReservation::where('property_id', $this->property_id)
-            ->when($this->reservation?->id, fn ($q) =>
-                $q->where('id', '!=', $this->reservation->id)
+            ->when($this->reservation?->id, fn ($q) => $q->where('id', '!=', $this->reservation->id)
             )
-            ->whereIn('status', ['pending','confirmed'])
+            ->whereIn('status', ['pending', 'confirmed'])
             ->get();
 
         $dates = [];
 
         foreach ($reservations as $reservation) {
 
-            $period = \Carbon\CarbonPeriod::create(
+            $period = CarbonPeriod::create(
                 $reservation->check_in,
                 $reservation->check_out->subDay()
             );
@@ -86,7 +103,7 @@ class ReservationForm extends Component
 
     public function updatedCheckIn($value)
     {
-        if (!$value || strlen($value) !== 10) {
+        if (! $value || strlen($value) !== 10) {
             return;
         }
 
@@ -99,7 +116,7 @@ class ReservationForm extends Component
 
     public function updatedCheckOut($value)
     {
-        if (!$value || strlen($value) !== 10) {
+        if (! $value || strlen($value) !== 10) {
             return;
         }
 
@@ -120,22 +137,28 @@ class ReservationForm extends Component
             'guest_email' => 'required|email',
             'guest_phone' => 'nullable',
             'check_in' => 'required|date',
-            'check_out' => 'required|date',
-            'guests' => 'required|integer|min:1|max:' . $property->capacity,
+            'check_out' => 'required|date|after:check_in',
+            'guests' => 'required|integer|min:1|max:'.$property->capacity,
             'status' => 'required',
         ]);
 
         // 🔥 recalcula tudo antes de salvar
         $property = Property::find($this->property_id);
-        $totals = PropertyReservation::calculateTotals(
+        $quote = PropertyPricing::quote(
             $property,
             $this->check_in,
             $this->check_out,
-            $this->guests
+            (int) $this->guests
         );
-        $data = array_merge($data, $totals);
 
-        //$data['extra_total'] = $this->extraTotal;
+        $data['nights'] = $quote['nights'];
+        $data['daily_total'] = $quote['daily_total'];
+        $data['cleaning_fee'] = (float) $this->cleaning_fee;
+        $data['iptu_fee'] = (float) $this->iptu_fee;
+        $data['total_value'] = $quote['daily_total']
+            + $quote['extra_total']
+            + (float) $this->cleaning_fee
+            + (float) $this->iptu_fee;
 
         $reservation = PropertyReservation::updateOrCreate(
             ['id' => $this->reservation?->id],
@@ -159,56 +182,29 @@ class ReservationForm extends Component
 
     public function calculateTotal()
     {
-        if (!$this->check_in || !$this->check_out || !$this->property_id) {
+        if (! $this->check_in || ! $this->check_out || ! $this->property_id) {
             return;
         }
 
         $property = Property::find($this->property_id);
 
-        $checkIn  = Carbon::parse($this->check_in);
+        $checkIn = Carbon::parse($this->check_in);
         $checkOut = Carbon::parse($this->check_out);
 
         if ($checkOut->lte($checkIn)) {
             return;
         }
 
-        $this->nights = $checkIn->diffInDays($checkOut);
+        $quote = PropertyPricing::quote($property, $checkIn, $checkOut, (int) $this->guests);
 
-        // ✅ Cálculo dia a dia considerando temporadas
-        $seasons = $property->seasons()
-            ->where('start_date', '<=', $checkOut->toDateString())
-            ->where('end_date', '>=', $checkIn->toDateString())
-            ->get();
-
-        $dailyTotal = 0;
-        $current = $checkIn->copy();
-
-        while ($current->lt($checkOut)) {
-
-            $season = $seasons->first(function ($s) use ($current) {
-                return $current->between(
-                    Carbon::parse($s->start_date),
-                    Carbon::parse($s->end_date)
-                );
-            });
-
-            $dailyTotal += $season
-                ? $season->price_per_day
-                : $property->rental_value;
-
-            $current->addDay();
-        }
-
-        $this->daily_total = $dailyTotal;
-
-        // Extra hóspedes
-        $extra = 0;
-        if ($this->guests > $property->aditional_person) {
-            $extraGuests = $this->guests - $property->aditional_person;
-            $extra = $extraGuests * $property->value_aditional * $this->nights;
-        }
-
-        $this->total_value = $dailyTotal + $extra + $this->cleaning_fee;
+        $this->nights = $quote['nights'];
+        $this->daily_total = $quote['daily_total'];
+        $this->extra_total = $quote['extra_total'];
+        $this->iptu_fee = $quote['iptu_fee'];
+        $this->total_value = $quote['daily_total']
+            + $quote['extra_total']
+            + (float) $this->cleaning_fee
+            + $quote['iptu_fee'];
     }
 
     public function updated($field)
@@ -218,6 +214,7 @@ class ReservationForm extends Component
             'check_out',
             'guests',
             'cleaning_fee',
+            'iptu_fee',
             'daily_total', // ✅
             'nights',      // ✅
         ])) {
@@ -227,7 +224,7 @@ class ReservationForm extends Component
 
     public function recalculateFromInputs()
     {
-        $this->total_value = $this->daily_total + $this->cleaning_fee;
+        $this->total_value = $this->daily_total + $this->extra_total + $this->cleaning_fee + $this->iptu_fee;
     }
 
     public function updatedPropertyId($value)
@@ -236,12 +233,13 @@ class ReservationForm extends Component
 
         $property = Property::find($value);
 
-        if (!$property) {
+        if (! $property) {
             return;
         }
 
-        $this->daily_total = $property->rental_value;
+        $this->daily_total = $property->priceForGuests($this->guests);
         $this->cleaning_fee = $property->cleaning_fee;
+        $this->iptu_fee = $property->iptu_fee ?? 0;
 
         $this->maxGuests = $property->capacity;
 
@@ -254,13 +252,13 @@ class ReservationForm extends Component
 
     public function updatedGuests($value)
     {
-        if (!$this->property_id) {
+        if (! $this->property_id) {
             return;
         }
 
         $property = Property::find($this->property_id);
 
-        if (!$property) {
+        if (! $property) {
             return;
         }
 
@@ -286,7 +284,7 @@ class ReservationForm extends Component
     public function render()
     {
         return view('livewire.dashboard.reservations.reservation-form', [
-            'properties' => Property::pluck('title', 'id')
+            'properties' => Property::pluck('title', 'id'),
         ]);
     }
 }

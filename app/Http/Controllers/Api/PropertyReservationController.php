@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Property;
 use App\Models\PropertyReservation;
+use App\Support\PropertyPricing;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PropertyReservationController extends Controller
@@ -37,7 +39,7 @@ class PropertyReservationController extends Controller
         );
 
         return response()->json([
-            'available' => $available
+            'available' => $available,
         ]);
     }
 
@@ -46,6 +48,7 @@ class PropertyReservationController extends Controller
         $request->validate([
             'check_in' => 'required|date|after_or_equal:today',
             'check_out' => 'required|date|after:check_in',
+            'guests' => 'nullable|integer|min:1',
         ]);
 
         $available = $property->isAvailable(
@@ -53,14 +56,14 @@ class PropertyReservationController extends Controller
             $request->check_out
         );
 
-        if (!$available) {
+        if (! $available) {
             return response()->json([
-                'available' => false
+                'available' => false,
             ]);
         }
 
-        $checkIn = \Carbon\Carbon::parse($request->check_in);
-        $checkOut = \Carbon\Carbon::parse($request->check_out);
+        $checkIn = Carbon::parse($request->check_in);
+        $checkOut = Carbon::parse($request->check_out);
 
         $nights = $checkIn->diffInDays($checkOut);
 
@@ -68,23 +71,26 @@ class PropertyReservationController extends Controller
         if ($nights < $property->min_nights) {
             return response()->json([
                 'available' => false,
-                'message' => 'Mínimo de ' . $property->min_nights . ' noites'
+                'message' => 'Mínimo de '.$property->min_nights.' noites',
             ], 422);
         }
 
-        $dailyTotal = $property->calculatePrice(
+        $quote = PropertyPricing::quote(
+            $property,
             $request->check_in,
-            $request->check_out
+            $request->check_out,
+            (int) ($request->guests ?? 1)
         );
-
-        $cleaningFee = $property->cleaning_fee ?? 0;
 
         return response()->json([
             'available' => true,
-            'nights' => $nights,
-            'daily_total' => $dailyTotal,
-            'cleaning_fee' => $cleaningFee,
-            'total_value' => $dailyTotal + $cleaningFee,
+            'nights' => $quote['nights'],
+            'daily_total' => $quote['daily_total'],
+            'extra_guests' => $quote['extra_guests'],
+            'extra_total' => $quote['extra_total'],
+            'cleaning_fee' => $quote['cleaning_fee'],
+            'iptu_fee' => $quote['iptu_fee'],
+            'total_value' => $quote['total_value'],
         ]);
     }
 
@@ -96,14 +102,24 @@ class PropertyReservationController extends Controller
             'guest_name' => 'required|string|max:255',
             'guest_email' => 'required|email|max:255',
             'guest_phone' => 'nullable|string|max:20',
+            'guests' => 'nullable|integer|min:1',
         ]);
 
         // Verifica disponibilidade
-        if (!$property->isAvailable($request->check_in, $request->check_out)) {
+        if (! $property->isAvailable($request->check_in, $request->check_out)) {
             return response()->json([
-                'message' => 'Datas indisponíveis'
+                'message' => 'Datas indisponíveis',
             ], 422);
         }
+
+        $guests = (int) ($request->guests ?? 1);
+
+        $quote = PropertyPricing::quote(
+            $property,
+            $request->check_in,
+            $request->check_out,
+            $guests
+        );
 
         $reservation = PropertyReservation::create([
             'property_id' => $property->id,
@@ -113,14 +129,19 @@ class PropertyReservationController extends Controller
             'guest_phone' => $request->guest_phone,
             'check_in' => $request->check_in,
             'check_out' => $request->check_out,
+            'nights' => $quote['nights'],
+            'guests' => $guests,
             'origin' => 'site',
             'status' => 'pending',
-            'cleaning_fee' => $property->cleaning_fee ?? 0,
+            'daily_total' => $quote['daily_total'],
+            'cleaning_fee' => $quote['cleaning_fee'],
+            'iptu_fee' => $quote['iptu_fee'],
+            'total_value' => $quote['total_value'],
         ]);
 
         return response()->json([
             'message' => 'Pré-reserva criada',
-            'reservation_id' => $reservation->id
+            'reservation_id' => $reservation->id,
         ]);
     }
 }

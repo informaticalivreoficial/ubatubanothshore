@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\PropertyPricing;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ class PropertyReservation extends Model
         'guests',
         'guests_info',
         'cleaning_fee',
+        'iptu_fee',
         'total_value',
         'origin',
         'status',
@@ -75,7 +77,6 @@ class PropertyReservation extends Model
         return $this->belongsTo(User::class);
     }
 
-
     public function review()
     {
         return $this->hasOne(PropertyReview::class, 'reservation_id');
@@ -90,32 +91,18 @@ class PropertyReservation extends Model
             return null;
         }
 
-        $nights = $checkIn->diffInDays($checkOut);
+        $quote = PropertyPricing::quote($property, $checkIn, $checkOut, (int) $guests);
 
-        $cleaningFee = $property->cleaning_fee ?? 0;
-
-        $subtotal = $property->rental_value * $nights;
-
-        $extraGuests = max(
-            0,
-            (int) $guests - (int) $property->aditional_person
-        );
-
-        $extraTotal =
-            $extraGuests *
-            $property->value_aditional *
-            $nights;
-
-        $total =
-            $subtotal +
-            $extraTotal +
-            $cleaningFee;
+        if (empty($quote)) {
+            return null;
+        }
 
         return [
-            'nights' => $nights,
-            'daily_total' => $subtotal,
-            'cleaning_fee' => $cleaningFee,
-            'total_value' => $total
+            'nights' => $quote['nights'],
+            'daily_total' => $quote['daily_total'],
+            'cleaning_fee' => $quote['cleaning_fee'],
+            'iptu_fee' => $quote['iptu_fee'],
+            'total_value' => $quote['total_value'],
         ];
     }
 }
