@@ -58,6 +58,10 @@ class CheckoutPage extends Component
 
     public $seasonApplied = false;
 
+    public $seasonNights = 0;
+
+    public $baseNights = 0;
+
     public function mount(Property $property, $check_in, $check_out, $guests)
     {
         $this->property = $property;
@@ -191,6 +195,14 @@ class CheckoutPage extends Component
             ]);
         }
 
+        $seasonConflict = $this->property->seasonPeriodConflict($this->check_in, $this->check_out);
+
+        if ($seasonConflict) {
+            throw ValidationException::withMessages([
+                'check_in' => $seasonConflict->coverageMessage(),
+            ]);
+        }
+
         $deadline = $this->property->bookingDeadline();
 
         if ($deadline && Carbon::parse($this->check_out)->gt($deadline)) {
@@ -230,6 +242,8 @@ class CheckoutPage extends Component
         $this->iptu_fee = $quote['iptu_fee'];
         $this->total = $quote['total_value'];
         $this->seasonApplied = $quote['season_applied'];
+        $this->seasonNights = $quote['season_nights'];
+        $this->baseNights = $quote['base_nights'];
     }
 
     public function increaseGuests()

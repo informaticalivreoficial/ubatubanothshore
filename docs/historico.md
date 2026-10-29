@@ -4,7 +4,7 @@ Documento vivo do projeto: visão geral, linha do tempo, arquitetura, regras de
 negócio, decisões, riscos e diário de mudanças. Serve de contexto para pessoas e
 agentes. Atualize a cada mudança relevante.
 
-Última atualização: 2026-10-25.
+Última atualização: 2026-10-28.
 
 ## 1. Visão geral
 
@@ -97,9 +97,10 @@ duas abordagens na mesma tela.
 ### PropertySeason (`property_seasons`)
 
 Faixa `start_date`–`end_date` com `price_per_day`. Preço da temporada sobrepõe a
-diária individual e a diária de casal. Regra adicional no site: se check-in ou
-check-out cair dentro de uma temporada, a reserva deve cobrir o período completo
-da temporada.
+diária individual e a diária de casal. Regra adicional: quando o período
+selecionado cruza uma temporada, a reserva precisa incluir todas as noites dela;
+pode ser maior (antes ou depois), e as noites excedentes usam a tarifa normal.
+A validação é centralizada em `Property::seasonPeriodConflict()`.
 
 ### PropertyBlockedDate (`property_blocked_dates`)
 
@@ -198,8 +199,9 @@ painel aprova/reprova. Avaliações aprovadas aparecem no site.
 5. **Mínimo de noites**: `min_nights` precisa ser respeitado em todos os fluxos.
 6. **Disponibilidade**: sem sobreposição com reservas de status diferente de
    `cancelled` e sem `property_blocked_dates` no período.
-7. **Temporada fechada**: no site, reserva que encosta em temporada deve cobrir
-   todo o período dela.
+7. **Temporada incluída**: reserva que cruza uma temporada precisa incluir todas
+   as noites dela, mas pode ser maior antes ou depois; as noites fora da
+   temporada usam a tarifa normal.
 8. **Expiração do anúncio**: `properties.expired_at` limita o check-out no site.
 9. **Status**: `pending`, `confirmed`, `cancelled`, `finished`,
    `waiting_payment`, `paid`, `expired`, `refunded`.
@@ -233,8 +235,9 @@ painel aprova/reprova. Avaliações aprovadas aparecem no site.
    controller não valida a assinatura.
 4. **Coordenadas inteiras**: `latitude`/`longitude` como `integer` perdem
    precisão; avaliar `decimal(10,7)`.
-5. **Cálculo de temporada no site**: regra de período completo está só em
-   `BookingForm`, não no backend/API; validar também no servidor.
+5. **Temporada no backend**: `Property::seasonPeriodConflict()` já valida site,
+   checkout e API; falta cobrir o formulário de reserva do painel, se ele passar
+   a permitir escolher temporadas.
 6. **Testes escassos**: os testes de preço cobrem a nova regra, mas ainda faltam
    testes de disponibilidade, reserva e webhook.
 7. **Config local ignorada**: `.gitignore` ignora `opencode.json`, `.opencode/`
@@ -255,6 +258,29 @@ Formato sugerido:
 - Decisão: ...
 - Impacto/validação: ...
 ```
+
+### 2026-10-28 - Temporada como período mínimo, não exato
+
+- Tipo: fix/feature
+- Arquivos: `app/Models/Property.php`, `app/Models/PropertySeason.php`,
+  `app/Support/PropertyPricing.php`, `app/Livewire/Web/BookingForm.php`,
+  `app/Livewire/Web/CheckoutPage.php`,
+  `app/Http/Controllers/Api/PropertyReservationController.php`,
+  `resources/views/livewire/web/booking-form.blade.php`,
+  `resources/views/livewire/web/checkout-page.blade.php`,
+  `tests/Feature/BookingFormTest.php`, `docs/historico.md`
+- Decisão: a temporada passou a exigir que a reserva inclua todas as noites
+  dela, e não mais que o período seja exatamente igual. O cliente pode reservar
+  antes e/ou depois; as noites fora da temporada continuam na tarifa normal. A
+  regra é centralizada em `Property::seasonPeriodConflict()` e
+  `PropertySeason::isCoveredBy()`/`coverageMessage()`, usada pelo formulário de
+  reserva, pelo checkout e pela API (`calculate` e `store`). O cálculo passou a
+  retornar `season_nights` e `base_nights` para exibir a quebra de noites no
+  site e no checkout.
+- Impacto/validação: `BookingFormTest` ganhou casos de período exato, período
+  maior, período parcial e reserva encostada antes da temporada; 24 testes
+  passando (`BookingFormTest`, `PropertyPricingTest`,
+  `PropertyAvailabilityTest`), `view:cache` e Pint executados.
 
 ### 2026-10-25 - Agente especializado e histórico do projeto
 

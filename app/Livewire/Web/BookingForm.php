@@ -37,6 +37,10 @@ class BookingForm extends Component
 
     public $seasonApplied = false;
 
+    public $seasonNights = 0;
+
+    public $baseNights = 0;
+
     public $seasonMinNightsError = null;
 
     public $bookingClosed = false;
@@ -111,14 +115,14 @@ class BookingForm extends Component
         $this->dateError = null;
 
         if (! $this->check_in || ! $this->check_out) {
-            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
+            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
             return;
         }
 
         if ($this->bookingClosed) {
             $this->dateError = 'As reservas para este imóvel estão encerradas.';
-            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
+            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
             return;
         }
@@ -128,14 +132,14 @@ class BookingForm extends Component
 
         if ($checkOut->lte($checkIn)) {
             $this->dateError = 'A data de check-out deve ser posterior ao check-in.';
-            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
+            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
             return;
         }
 
         if ($checkIn->lt(today())) {
             $this->dateError = 'A data de check-in não pode estar no passado.';
-            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
+            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
             return;
         }
@@ -144,7 +148,7 @@ class BookingForm extends Component
 
         if ($bookingDeadline && $checkOut->gt($bookingDeadline)) {
             $this->dateError = 'A reserva não pode ultrapassar a data disponível.';
-            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
+            $this->reset(['nights', 'dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
             return;
         }
@@ -153,34 +157,19 @@ class BookingForm extends Component
 
         if ($this->nights < $this->property->min_nights) {
             $this->dateError = "Esta propriedade exige mínimo de {$this->property->min_nights} noite(s).";
-            $this->reset(['dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
+            $this->reset(['dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
             return;
         }
 
-        // ✅ Busca temporadas que se sobrepõem ao período
-        $seasons = $this->property->seasons()
-            ->where('start_date', '<=', $checkOut->toDateString())
-            ->where('end_date', '>=', $checkIn->toDateString())
-            ->get();
+        // ✅ Temporada precisa ser integralmente incluída na reserva
+        $seasonConflict = $this->property->seasonPeriodConflict($checkIn, $checkOut);
 
-        // ✅ Valida período completo da temporada
-        foreach ($seasons as $season) {
-            $seasonStart = Carbon::parse($season->start_date);
-            $seasonEnd = Carbon::parse($season->end_date);
-            $seasonNights = $seasonStart->diffInDays($seasonEnd) + 1;
+        if ($seasonConflict) {
+            $this->dateError = $seasonConflict->coverageMessage();
+            $this->reset(['dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee', 'seasonApplied', 'seasonNights', 'baseNights']);
 
-            $startsInSeason = $checkIn->between($seasonStart, $seasonEnd);
-            $endsInSeason = $checkOut->copy()->subDay()->between($seasonStart, $seasonEnd);
-
-            if ($startsInSeason || $endsInSeason) {
-                if (! $checkIn->eq($seasonStart) || ! $checkOut->copy()->addDay()->eq($seasonEnd->copy()->addDay())) {
-                    $this->dateError = "A temporada '{$season->label}' exige reserva do período completo: {$seasonStart->format('d/m/Y')} até {$seasonEnd->format('d/m/Y')} ({$seasonNights} noite(s)).";
-                    $this->reset(['dailyTotal', 'total', 'extraGuests', 'extraTotal', 'iptuFee']);
-
-                    return;
-                }
-            }
+            return;
         }
 
         $quote = PropertyPricing::quote($this->property, $checkIn, $checkOut, (int) $this->guests);
@@ -192,6 +181,8 @@ class BookingForm extends Component
         $this->iptuFee = $quote['iptu_fee'];
         $this->total = $quote['total_value'];
         $this->seasonApplied = $quote['season_applied'];
+        $this->seasonNights = $quote['season_nights'];
+        $this->baseNights = $quote['base_nights'];
     }
 
     public function goToCheckout()

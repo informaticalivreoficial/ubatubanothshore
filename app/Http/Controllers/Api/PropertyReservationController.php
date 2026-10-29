@@ -75,6 +75,15 @@ class PropertyReservationController extends Controller
             ], 422);
         }
 
+        $seasonConflict = $property->seasonPeriodConflict($checkIn, $checkOut);
+
+        if ($seasonConflict) {
+            return response()->json([
+                'available' => false,
+                'message' => $seasonConflict->coverageMessage(),
+            ], 422);
+        }
+
         $quote = PropertyPricing::quote(
             $property,
             $request->check_in,
@@ -113,6 +122,14 @@ class PropertyReservationController extends Controller
         }
 
         $guests = (int) ($request->guests ?? 1);
+
+        $seasonConflict = $property->seasonPeriodConflict($request->check_in, $request->check_out);
+
+        if ($seasonConflict) {
+            return response()->json([
+                'message' => $seasonConflict->coverageMessage(),
+            ], 422);
+        }
 
         $quote = PropertyPricing::quote(
             $property,

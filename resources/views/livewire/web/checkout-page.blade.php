@@ -222,8 +222,10 @@
                             <div class="flex justify-between mb-2">
                                 <span class="text-sm text-gray-600">
                                     {{ $nights }} noite(s)
-                                    @if($seasonApplied)
-                                        <span class="text-xs text-gray-400">(temporadas aplicadas)</span>
+                                    @if ($seasonApplied)
+                                        <span class="text-xs text-gray-400">
+                                            ({{ $seasonNights }} de temporada@if ($baseNights > 0) + {{ $baseNights }} na tarifa normal@endif)
+                                        </span>
                                     @endif
                                 </span>
                                 <span class="text-sm text-gray-700">

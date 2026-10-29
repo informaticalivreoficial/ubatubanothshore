@@ -252,6 +252,23 @@ class Property extends Model
         return ! $hasBlocked;
     }
 
+    public function seasonPeriodConflict($checkin, $checkout): ?PropertySeason
+    {
+        $checkin = Carbon::parse($checkin)->startOfDay();
+        $checkout = Carbon::parse($checkout)->startOfDay();
+
+        if ($checkout->lte($checkin)) {
+            return null;
+        }
+
+        return $this->seasons()
+            ->where('start_date', '<', $checkout->toDateString())
+            ->where('end_date', '>=', $checkin->toDateString())
+            ->orderBy('start_date')
+            ->get()
+            ->first(fn (PropertySeason $season) => ! $season->isCoveredBy($checkin, $checkout));
+    }
+
     public function calculatePrice($checkin, $checkout, $guests = 1)
     {
         $quote = PropertyPricing::quote($this, $checkin, $checkout, (int) $guests);

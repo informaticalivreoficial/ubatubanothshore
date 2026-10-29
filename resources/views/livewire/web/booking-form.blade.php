@@ -103,10 +103,13 @@
             <div class="space-y-2 border-t border-gray-200 pt-4 text-sm">
                 <div class="flex justify-between gap-4">
                     <span class="text-gray-600">
-                        {{ $nights }} noite(s) x
                         @if ($seasonApplied)
-                            <span class="text-xs text-gray-400">(temporada)</span>
+                            {{ $seasonNights }} noite(s) de temporada
+                            @if ($baseNights > 0)
+                                + {{ $baseNights }} noite(s) na tarifa normal
+                            @endif
                         @else
+                            {{ $nights }} noite(s) x
                             R$ {{ number_format($property->priceForGuests($guests), 2, ',', '.') }}
                             <span class="text-xs text-gray-400">
                                 ({{ $guests >= 2 ? 'total para os 2 primeiros hóspedes' : '1 hóspede' }})

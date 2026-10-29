@@ -66,6 +66,8 @@ class PropertyPricing
 
         $dailyTotal = 0.0;
         $seasonApplied = false;
+        $seasonNights = 0;
+        $baseNights = 0;
         $current = $checkIn->copy();
 
         while ($current->lt($checkOut)) {
@@ -73,8 +75,10 @@ class PropertyPricing
 
             if ($seasonalRate !== null) {
                 $seasonApplied = true;
+                $seasonNights++;
                 $dailyTotal += $seasonalRate;
             } else {
+                $baseNights++;
                 $dailyTotal += self::baseNightlyRate($property, $guests);
             }
 
@@ -95,6 +99,8 @@ class PropertyPricing
             'iptu_fee' => $iptuFee,
             'total_value' => $dailyTotal + $extraTotal + $cleaningFee + $iptuFee,
             'season_applied' => $seasonApplied,
+            'season_nights' => $seasonNights,
+            'base_nights' => $baseNights,
         ];
     }
 }
